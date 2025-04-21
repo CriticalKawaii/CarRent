@@ -1,0 +1,26 @@
+﻿<Page x:Class="WpfApp.Pages.admin.VehiclesOverviewPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApp.Pages.admin"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="VehiclesOverviewPage">
+
+    <Grid>
+        <StackPanel>
+            <TextBox Text="Транспрот" d:Foreground="White" Margin="5,10" FontSize="16" FontWeight="Bold"/>
+            <DataGrid Name="DataGridVehicles" AutoGenerateColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding VehicleID}" Width="*"/>
+                    <DataGridTextColumn Header="Производитель" Binding="{Binding Make}" Width="*"/>
+                    <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="*"/>
+                    <DataGridTextColumn Header="Год" Binding="{Binding Year}" Width="*"/>
+                    <DataGridTextColumn Header="Номер" Binding="{Binding LicensePlate}" Width="*"/>
+                    <DataGridTextColumn Header="Статус" Binding="{Binding Available}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </StackPanel>
+    </Grid>
+</Page>
