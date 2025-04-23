@@ -9,7 +9,7 @@
       Title="AccountPage">
 
     <Grid>
-        <Border Margin="20" Style="{StaticResource FloatingBorder}" VerticalAlignment="Stretch">
+        <Border Margin="20" Style="{StaticResource FloatingBorder}">
             <StackPanel>
                 <TextBlock Text="Профиль" Style="{StaticResource MaterialDesignHeadline6TextBlock}"/>
                 <TabControl>

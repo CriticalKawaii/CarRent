@@ -5,143 +5,226 @@
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     mc:Ignorable="d">
-    
+
     <ResourceDictionary.MergedDictionaries>
-        <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Amber"/>
+        <materialDesign:BundledTheme BaseTheme="Light"
+                                     PrimaryColor="DeepPurple"
+                                     SecondaryColor="Amber" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <Style x:Key="TabRadioButtonBottom" BasedOn="{StaticResource MaterialDesignTabRadioButtonBottom}"  TargetType="RadioButton">
-        <Setter Property="Height" Value="50"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="20"/>
-        <Setter Property="Foreground" Value="White"/>
+    <Style x:Key="TabRadioButtonBottom"
+           BasedOn="{StaticResource MaterialDesignTabRadioButtonBottom}"
+           TargetType="RadioButton">
+        <Setter Property="Height"
+                Value="50" />
+        <Setter Property="FontWeight"
+                Value="Bold" />
+        <Setter Property="FontSize"
+                Value="20" />
+        <Setter Property="Foreground"
+                Value="White" />
         <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"/>
-                <Setter Property="BorderBrush"  Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"/>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Foreground"
+                        Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
+                <Setter Property="BorderBrush"
+                        Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
             </Trigger>
         </Style.Triggers>
     </Style>
-    
-    <Style x:Key="FloatingHintComboBox" BasedOn="{StaticResource MaterialDesignComboBox}" TargetType="ComboBox">
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="0, 10"/>
-    </Style>
-    
-    <Style x:Key="FloatingHintTextBox" BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}" TargetType="TextBox">
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="0, 10"/>
+
+    <Style x:Key="FloatingHintComboBox"
+           BasedOn="{StaticResource MaterialDesignFloatingHintComboBox}"
+           TargetType="ComboBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 10" />
     </Style>
 
-    <Style x:Key="FloatingHintPasswordBox" BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}" TargetType="PasswordBox">
-        <Setter Property="FontSize" Value="14"/>
-        <Setter Property="Margin" Value="0, 10"/>
-        <Setter Property="MaxLength" Value="32"/>
+    <Style x:Key="OutlinedComboBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedComboBox}"
+           TargetType="ComboBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 5" />
     </Style>
-    
-    <Style x:Key="RevealPasswordCheckBox" BasedOn="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}" TargetType="CheckBox">
+
+    <Style x:Key="FloatingHintTextBox"
+           BasedOn="{StaticResource MaterialDesignFloatingHintTextBox}"
+           TargetType="TextBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 10" />
+    </Style>
+
+    <Style x:Key="OutlinedTextBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedTextBox}"
+           TargetType="TextBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 5" />
+
+    </Style>
+
+    <Style x:Key="FloatingHintPasswordBox"
+           BasedOn="{StaticResource MaterialDesignFloatingHintPasswordBox}"
+           TargetType="PasswordBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 10" />
+    </Style>
+
+    <Style x:Key="OutlinedPasswordBox"
+           BasedOn="{StaticResource MaterialDesignOutlinedPasswordBox}"
+           TargetType="PasswordBox">
+        <Setter Property="FontSize"
+                Value="14" />
+        <Setter Property="Margin"
+                Value="0, 5" />
+    </Style>
+
+    <Style x:Key="RevealPasswordCheckBox"
+           BasedOn="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
+           TargetType="CheckBox">
         <Style.Setters>
-            <Setter Property="Foreground" Value="{DynamicResource MaterialDesign.Brush.Primary.Light}"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Foreground"
+                    Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Right" />
             <Setter Property="Content">
                 <Setter.Value>
-                    <materialDesign:PackIcon Kind="EyeOff" VerticalAlignment="Center" Width="25" Height="20" Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}"/>
+                    <materialDesign:PackIcon Kind="EyeOff"
+                                             VerticalAlignment="Center"
+                                             Width="25"
+                                             Height="20"
+                                             Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
                 </Setter.Value>
             </Setter>
         </Style.Setters>
         <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
+            <Trigger Property="IsChecked"
+                     Value="True">
                 <Setter Property="Content">
                     <Setter.Value>
-                        <materialDesign:PackIcon Kind="Eye" Width="25" Height="20"/>
+                        <materialDesign:PackIcon Kind="Eye"
+                                                 Width="25"
+                                                 Height="20" />
                     </Setter.Value>
                 </Setter>
             </Trigger>
         </Style.Triggers>
     </Style>
-    
-    <Style x:Key="RaisedLightButton" BasedOn="{StaticResource MaterialDesignRaisedLightButton}" TargetType="Button">
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Margin" Value="0, 10"/>
-        <Setter Property="Foreground" Value="White"/>
+
+    <Style x:Key="RaisedLightButton"
+           BasedOn="{StaticResource MaterialDesignRaisedLightButton}"
+           TargetType="Button">
+        <Setter Property="Margin"
+                Value="0, 10" />
+        <Setter Property="Foreground"
+                Value="White" />
     </Style>
 
-    <Style x:Key="FlatLightButton" BasedOn="{StaticResource MaterialDesignFlatLightButton}" TargetType="Button">
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Margin" Value="0, 10"/>
+    <Style x:Key="FlatLightButton"
+           BasedOn="{StaticResource MaterialDesignFlatButton}"
+           TargetType="Button">
+        <Setter Property="Margin"
+                Value="0, 10" />
     </Style>
 
-    <Style x:Key="FloatingBorder" TargetType="Border">
+    <Style x:Key="FloatingBorder"
+           TargetType="Border">
         <Style.Setters>
-            <Setter Property="Background" Value="White"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="CornerRadius" Value="30"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect RenderingBias="Quality" Color="#FF878787" BlurRadius="30" />
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="Padding"
+                    Value="20" />
+            <Setter Property="CornerRadius"
+                    Value="30" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
         </Style.Setters>
     </Style>
 
-    <Style x:Key="ItemContainerStyleRentACar" TargetType="ListViewItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+    <Style x:Key="ItemContainerStyleRentACar"
+           TargetType="ListViewItem"
+           BasedOn="{StaticResource MaterialDesignListBoxItem}">
         <Style.Setters>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Background" Value="{DynamicResource MaterialDesign.Brush.Secondary}"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Margin"
+                    Value="5" />
+            <Setter Property="Background"
+                    Value="{DynamicResource MaterialDesign.Brush.Secondary}" />
+            <Setter Property="Foreground"
+                    Value="White" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Stretch" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListViewItem">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="26" Padding="4">
-                            <materialDesign:Ripple Focusable="False" Feedback="{TemplateBinding Foreground}">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="26"
+                                Padding="4">
+                            <materialDesign:Ripple Focusable="False"
+                                                   Feedback="{TemplateBinding Foreground}">
                                 <Grid>
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
 
-                                    <Border Grid.RowSpan="3" Margin="0,0,10,0" CornerRadius="22,0,0,22" 
-                                        Height="135" Width="180" VerticalAlignment="Stretch">
+                                    <Border Grid.RowSpan="3"
+                                            Margin="0,0,10,0"
+                                            CornerRadius="22,0,0,22"
+                                            Height="135"
+                                            Width="180"
+                                            VerticalAlignment="Stretch">
                                         <Border.Background>
-                                            <ImageBrush ImageSource="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}" Stretch="UniformToFill"/>
+                                            <ImageBrush ImageSource="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
+                                                        Stretch="UniformToFill" />
                                         </Border.Background>
                                     </Border>
 
-                                    <TextBlock Grid.Column="1" 
-                                               Padding="5" 
-                                               TextWrapping="Wrap" 
-                                               FontWeight="Bold" 
-                                               FontSize="16" 
+                                    <TextBlock Grid.Column="1"
+                                               Padding="5"
+                                               TextWrapping="Wrap"
+                                               FontWeight="Bold"
+                                               FontSize="16"
                                                Margin="0,0,0,1">
                                         <TextBlock.Text>
                                             <MultiBinding StringFormat="{}{0} {1} {2}">
-                                                <Binding Path="Make" TargetNullValue='Unknown Make'/>
-                                                <Binding Path="Model" TargetNullValue='Unknown Model'/>
-                                                <Binding Path="Year" TargetNullValue='N/A'/>
+                                                <Binding Path="Make"
+                                                         TargetNullValue='Unknown Make' />
+                                                <Binding Path="Model"
+                                                         TargetNullValue='Unknown Model' />
+                                                <Binding Path="Year"
+                                                         TargetNullValue='N/A' />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
-                                    
-                                    <TextBlock Grid.Row="1" 
-                                               Padding="5" 
-                                               Grid.Column="1" 
-                                               Text="{Binding DailyRate, TargetNullValue='Rate not available', StringFormat='{}{0:C}'}" 
-                                               Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-                                    <materialDesign:RatingBar Grid.Row="2" 
-                                                              Grid.Column="1" 
-                                                              Value="{Binding AvgRating, TargetNullValue=0}" 
-                                                              IsReadOnly="True" 
-                                                              Background="{DynamicResource MaterialDesign.Brush.Secondary}" 
-                                                              Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"/>
+                                    <TextBlock Grid.Row="1"
+                                               Padding="5"
+                                               Grid.Column="1"
+                                               Text="{Binding DailyRate, TargetNullValue='Rate not available', StringFormat='{}{0:C}'}"
+                                               Style="{StaticResource MaterialDesignBody1TextBlock}" />
+
+                                    <materialDesign:RatingBar Grid.Row="2"
+                                                              Grid.Column="1"
+                                                              Value="{Binding AvgRating, TargetNullValue=0}"
+                                                              IsReadOnly="True"
+                                                              Background="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                                              Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" />
                                 </Grid>
                             </materialDesign:Ripple>
                         </Border>
@@ -150,48 +233,18 @@
             </Setter>
         </Style.Setters>
         <Style.Triggers>
-            <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}"/>
+            <Trigger Property="IsSelected"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="{DynamicResource MaterialDesign.Brush.Secondary.Dark}" />
             </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Cursor" Value="Hand"/>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Cursor"
+                        Value="Hand" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
 </ResourceDictionary>
 
-<!--
-    
- <Style.Setters>
-     <Setter Property="Template">
-         <Setter.Value>
-             <ControlTemplate TargetType="RadioButton">
-                 <Border VerticalAlignment="Stretch"
-                           HorizontalAlignment="Stretch"
-                           Background="{TemplateBinding Background}"
-                           BorderThickness="3,0,0,0"
-                           Margin="2"
-                           CornerRadius="8"
-                           BorderBrush="{TemplateBinding BorderBrush}">
-
-                     <ContentPresenter
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center"/>
-                 </Border>
-             </ControlTemplate>
-         </Setter.Value>
-     </Setter>
-     
-     <Setter Property="BorderBrush" Value="Transparent"/>
-     <Setter Property="Background" Value="Transparent"/>
-     <Setter Property="BorderThickness" Value="0"/>
- </Style.Setters>
- 
- <Style.Triggers>
-     <Trigger Property="IsChecked" Value="True">
-         <Setter Property="Background" Value="#EEEEEEEE"/>
-         <Setter Property="BorderBrush"  Value="Black"/>
-     </Trigger>
- </Style.Triggers>
- -->

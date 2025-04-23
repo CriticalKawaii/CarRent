@@ -21,7 +21,7 @@
                   Name="DataGridUsers" 
                   AutoGenerateColumns="False" 
                   IsReadOnly="True" 
-                  MaxHeight="300"
+                  MaxHeight="250"
                   VerticalAlignment="Stretch"
                   ScrollViewer.CanContentScroll="True" 
                   ScrollViewer.VerticalScrollBarVisibility="Visible">

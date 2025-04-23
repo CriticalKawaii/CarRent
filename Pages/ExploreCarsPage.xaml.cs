@@ -18,7 +18,7 @@ namespace WpfApp
             ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
         }
 
-        private void ListViewItem_Selected(object sender, System.Windows.RoutedEventArgs e)
+        private void ListViewItem_Selected(object sender, RoutedEventArgs e)
         {
             ListViewItem viewItem = (ListViewItem)sender;
             MessageBox.Show(viewItem.Name);
