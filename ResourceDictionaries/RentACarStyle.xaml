@@ -152,6 +152,73 @@
         </Style.Setters>
     </Style>
 
+    <DataTemplate x:Key="VehicleItemTemplate">
+        <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
+                CornerRadius="26"
+                Margin="5"
+                Padding="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Vehicle Image -->
+                <Border Grid.RowSpan="3"
+                        Margin="0,0,10,0"
+                        CornerRadius="22,0,0,22"
+                        Height="135"
+                        VerticalAlignment="Stretch">
+                    <Border.Background>
+                        <ImageBrush ImageSource="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
+                                    Stretch="UniformToFill" />
+                    </Border.Background>
+                </Border>
+
+                <!-- Vehicle Details -->
+                <TextBlock Grid.Column="1"
+                           Padding="5"
+                           Foreground="White"
+                           TextWrapping="Wrap"
+                           FontWeight="Bold"
+                           FontSize="16"
+                           Margin="0,0,0,1">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} {1} {2}">
+                            <Binding Path="Make"
+                                     TargetNullValue='Unknown Make' />
+                            <Binding Path="Model"
+                                     TargetNullValue='Unknown Model' />
+                            <Binding Path="Year"
+                                     TargetNullValue='N/A' />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+
+                <!-- Daily Rate -->
+                <TextBlock Grid.Row="1"
+                           Padding="5"
+                           Grid.Column="1"
+                           Foreground="White"
+                           Text="{Binding DailyRate, TargetNullValue='Rate not available', StringFormat='{}{0:C}'}"
+                           Style="{StaticResource MaterialDesignBody1TextBlock}" />
+
+                <!-- Rating -->
+                <materialDesign:RatingBar Grid.Row="2"
+                                          Grid.Column="1"
+                                          Value="{Binding AvgRating, TargetNullValue=0}"
+                                          IsReadOnly="True"
+                                          Background="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                          Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+
     <Style x:Key="ItemContainerStyleRentACar"
            TargetType="ListViewItem"
            BasedOn="{StaticResource MaterialDesignListBoxItem}">

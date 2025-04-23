@@ -1,35 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WpfApp.Pages.Admin.Edit
 {
-    /// <summary>
-    /// Interaction logic for EditUsersPage.xaml
-    /// </summary>
+
     public partial class EditUsersPage : Page
     {
+        private User _user = new User();
+        private string _originalPassword;
+
         public EditUsersPage(User selectedUser)
         {
             InitializeComponent();
-            if (selectedUser != null) 
+            if (selectedUser != null)
+            {
                 _user = selectedUser;
+
+                _originalPassword = selectedUser.PasswordHash;
+                _user.PasswordHash = "";
+            }
+
             DataContext = _user;
             ComboBoxRoles.ItemsSource = DBEntities.GetContext().Roles.ToList();
         }
-        private User _user = new User();
 
         public static string GetHash(string password)
         {
@@ -66,6 +64,17 @@ namespace WpfApp.Pages.Admin.Edit
                 _user.CreatedAt = DateTime.Now;
                 _user.PasswordHash = GetHash(_user.PasswordHash);
                 DBEntities.GetContext().Users.Add(_user);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(_user.PasswordHash))
+                {
+                    _user.PasswordHash = _originalPassword;
+                }
+                else
+                {
+                    _user.PasswordHash = GetHash(_user.PasswordHash);
+                }
             }
 
             try

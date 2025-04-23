@@ -1,13 +1,15 @@
 ﻿<Page x:Class="WpfApp.Pages.Admin.Edit.EditUsersPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:WpfApp.Pages.Admin.Edit"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="EditUsersPage" d:Background="White">
+      mc:Ignorable="d"
+      d:DesignHeight="450"
+      d:DesignWidth="800"
+      Title="EditUsersPage"
+      d:Background="White">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -19,17 +21,35 @@
         </Grid.RowDefinitions>
 
         <ComboBox Name="ComboBoxRoles"
-                  ItemsSource="{Binding Roles}" 
+                  ItemsSource="{Binding Roles}"
                   DisplayMemberPath="Role1"
-                  SelectedItem="{Binding Role}" 
+                  SelectedItem="{Binding Role}"
                   Grid.Row="0"
                   materialDesign:HintAssist.Hint="Роль"
-                  Style="{StaticResource FloatingHintComboBox}"/>
-        <TextBox Grid.Row="1" Text="{Binding Email}" materialDesign:HintAssist.Hint="E-mail" Style="{StaticResource FloatingHintTextBox}"/>
-        <TextBox Grid.Row="2" Text="{Binding FirstName}" materialDesign:HintAssist.Hint="Имя" Style="{StaticResource FloatingHintTextBox}"/>
-        <TextBox Grid.Row="3" Text="{Binding LastName}" materialDesign:HintAssist.Hint="Фамилия" Style="{StaticResource FloatingHintTextBox}"/>
-        <TextBox Grid.Row="4" Text="{Binding PasswordHash}" materialDesign:HintAssist.Hint="Пароль" Style="{StaticResource FloatingHintTextBox}"/>
+                  Style="{StaticResource FloatingHintComboBox}" />
+        <TextBox Grid.Row="1"
+                 Text="{Binding Email}"
+                 materialDesign:HintAssist.Hint="E-mail"
+                 Style="{StaticResource FloatingHintTextBox}" />
+        <TextBox Grid.Row="2"
+                 Text="{Binding FirstName}"
+                 materialDesign:HintAssist.Hint="Имя"
+                 Style="{StaticResource FloatingHintTextBox}" />
+        <TextBox Grid.Row="3"
+                 Text="{Binding LastName}"
+                 materialDesign:HintAssist.Hint="Фамилия"
+                 Style="{StaticResource FloatingHintTextBox}" />
+        <TextBox Grid.Row="4"
+                 Text="{Binding PasswordHash}"
+                 materialDesign:HintAssist.Hint="Пароль"
+                 Style="{StaticResource FloatingHintTextBox}" />
 
-        <Button Name="ButtonSave" Content="Сохранить" Grid.Row="5" Click="ButtonSave_Click" HorizontalAlignment="Center" Style="{StaticResource RaisedLightButton}" IsDefault="True"/>
+        <Button Name="ButtonSave"
+                Content="Сохранить"
+                Grid.Row="5"
+                Click="ButtonSave_Click"
+                HorizontalAlignment="Center"
+                Style="{StaticResource RaisedLightButton}"
+                IsDefault="True" />
     </Grid>
 </Page>

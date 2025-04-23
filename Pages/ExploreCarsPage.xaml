@@ -82,7 +82,8 @@
                       ScrollViewer.CanContentScroll="True"
                       UseLayoutRounding="True">
 
-                <!--sample data-->
+                <!--sample data
+                ItemTemplate="{StaticResource VehicleItemTemplate}"-->
                 <ListView.Resources>
                     <col:ArrayList x:Key="vehicles">
                         <local:Vehicle Make="Toyota"
@@ -99,7 +100,7 @@
                     </col:ArrayList>
                 </ListView.Resources>
             </ListView>
-
+            
             <ScrollViewer Grid.Column="1"
                           Grid.RowSpan="3"
                           materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
