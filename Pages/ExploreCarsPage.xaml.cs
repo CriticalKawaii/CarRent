@@ -1,28 +1,44 @@
+using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfApp.Classes;
+using WpfApp.Pages;
 
 namespace WpfApp
 {
     public partial class ExploreCarsPage : Page
     {
+        public ObservableCollection<Vehicle> Vehicles { get; set; }
+        public MainWindow mainWindow { get; set; }
         public ExploreCarsPage()
         {
             InitializeComponent();
-            ListViewExploreCars.ItemsSource = DBEntities.GetContext().Vehicles.ToList();
+            Loaded += ExploreCarsPage_Loaded;
+        }
+
+        private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList());
+            ListViewExploreCars.ItemsSource = Vehicles;
+            ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
             ListViewExploreCars.SelectedIndex = 0;
 
-            ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+            mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)
         {
-            ListViewItem viewItem = (ListViewItem)sender;
-            MessageBox.Show(viewItem.Name);
+            if (sender is ListViewItem viewItem)
+            {
+                MessageBox.Show(viewItem.Name);
+            }
         }
+
         public ImageSource ByteArrayToImageSource(byte[] imageData)
         {
             if (imageData == null || imageData.Length == 0)
@@ -49,17 +65,33 @@ namespace WpfApp
                 listBoxReviews.ItemsSource = selectedVehicle.Reviews.ToList();
                 if (selectedVehicle.VehicleImage != null)
                 {
-                    imageVehicle.Source = ByteArrayToImageSource(selectedVehicle.VehicleImage);
+                    imageVehicle.Source = ByteArrayToImageSource(selectedVehicle.VehicleImage) ?? new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.png"));
                 }
-
             }
         }
 
         private void UpdateItems()
         {
-            var currentItems = DBEntities.GetContext().Vehicles.ToList();
-            currentItems = currentItems.Where(x => x.Make.ToLower().Contains(TextBoxSearch.Text.ToLower())).ToList();
-            if(ComboBoxSort.SelectedIndex == 0) ListViewExploreCars.ItemsSource = currentItems.Where(x => x.VehicleCategory.VehicleCategory1.ToLower().Contains(ComboBoxSort.Text.ToLower())).ToList();
+            var allVehicles = Vehicles;
+
+            string searchText = TextBoxSearch.Text?.Trim().ToLowerInvariant() ?? "";
+
+            var filteredItems = allVehicles.Where(x =>
+                (x.Make?.ToLowerInvariant().Contains(searchText) ?? false) ||
+                (x.Model?.ToLowerInvariant().Contains(searchText) ?? false) ||
+                x.Year.ToString().Contains(searchText)).ToList();
+
+            if (ComboBoxSort.SelectedItem is VehicleCategory selectedCategory)
+            {
+                filteredItems = filteredItems
+                    .Where(x => x.VehicleCategoryID == selectedCategory.VehicleCategoryID)
+                    .ToList();
+            }
+
+            //filteredItems = filteredItems.OrderBy(v => v.DailyRate).ToList(); // or Year, Make, etc.
+
+            ListViewExploreCars.ItemsSource = filteredItems;
+            ListViewExploreCars.SelectedIndex = filteredItems.Any() ? 0 : -1;
         }
 
         private void TextBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -75,22 +107,18 @@ namespace WpfApp
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
             ComboBoxSort.SelectedIndex = -1;
-            UpdateItems();
+        }
+
+        private void ButtonRent_Click(object sender, RoutedEventArgs e)
+        {
+            if (SessionManager.IsLoggedIn)
+            {
+                NavigationService.Navigate(new RentPage());
+            }
+            else if(mainWindow != null)
+            {
+                mainWindow.RadioButtonAccount.IsChecked = true;
+            }
         }
     }
 }
-
-
-//VehicleImage.ImageSource = ByteArrayToImageSource(selectedVehicle.VehicleImage);
-//TextBlockMake.Text = $"Make: {selectedVehicle.Make}\nLicense Plate: {selectedVehicle.LicensePlate}";
-/*
- ICollectionView view = CollectionViewSource.GetDefaultView(vehicles);
-view.SortDescriptions.Add(new SortDescription("Make", ListSortDirection.Ascending));
-
-
-view.Filter = item =>
-{
-    Vehicle vehicle = item as Vehicle;
-    return vehicle != null && vehicle.AvgRating >= 4;
-};
- */

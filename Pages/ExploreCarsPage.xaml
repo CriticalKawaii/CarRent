@@ -11,11 +11,11 @@
       d:Height="550"
       d:Width="800">
 
-    <Border Style="{StaticResource FloatingBorder}" Margin="20">
+    <Border Style="{StaticResource FloatingBorder}" Margin="20" VerticalAlignment="Stretch">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="420"
-                                  MaxWidth="500" />
+                <ColumnDefinition MinWidth="400"
+                                  MaxWidth="420" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -42,6 +42,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <ComboBox x:Name="ComboBoxSort"
                           Style="{StaticResource OutlinedComboBox}"
@@ -57,8 +58,9 @@
                                                  Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
                     </materialDesign:HintAssist.Hint>
                 </ComboBox>
+                
                 <Button Click="ButtonRemove_Click"
-                        Grid.Column="1"
+                        Grid.Column="3"
                         Style="{StaticResource FlatLightButton}"
                         Width="70">
                     <materialDesign:PackIcon Kind="FilterOff"
@@ -123,6 +125,11 @@
                                Style="{StaticResource MaterialDesignHeadline5TextBlock}" />
                     <TextBlock x:Name="textBlockDailyRate"
                                FontSize="16" />
+                    <Button Click="ButtonRent_Click"
+                            Content="АРЕНДОВАТЬ"
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource RaisedLightButton}"/>
+                    
                     <TextBlock Text="Отзывы"
                                FontSize="18"
                                FontWeight="Bold"

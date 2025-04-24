@@ -25,9 +25,10 @@ namespace WpfApp.Pages
         public AccountPage()
         {
             InitializeComponent();
-            if(SessionManager.CurrentUser != null && SessionManager.CurrentUser.RoleID == 2)
+            if(SessionManager.CurrentUser != null && SessionManager.CurrentUser.RoleID != 1)
             {
                 TabItemAdministration.Visibility = Visibility.Visible;
+                TabItemReports.Visibility = Visibility.Visible;
             }
         }
         private void ButtonUsersPage_Click(object sender, RoutedEventArgs e)

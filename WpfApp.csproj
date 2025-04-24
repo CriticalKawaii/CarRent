@@ -53,7 +53,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Resources\Icons\RentACar.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\Icons\RentACar1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -101,6 +101,7 @@
     <Compile Include="BookingStatus.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Security.cs" />
     <Compile Include="Classes\SessionManager.cs" />
     <Compile Include="Insurance.cs">
       <DependentUpon>Model1.tt</DependentUpon>
@@ -143,6 +144,9 @@
     </Compile>
     <Compile Include="Pages\ExploreCarsPage.xaml.cs">
       <DependentUpon>ExploreCarsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\RentPage.xaml.cs">
+      <DependentUpon>RentPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\SignInPage.xaml.cs">
       <DependentUpon>SignInPage.xaml</DependentUpon>
@@ -226,6 +230,10 @@
     <Page Include="Pages\ExploreCarsPage.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Pages\RentPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\SignInPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -287,7 +295,7 @@
       <DependentUpon>Model1.edmx</DependentUpon>
       <LastGenOutput>Model1.cs</LastGenOutput>
     </Content>
-    <Resource Include="Resources\Icons\RentACar.ico" />
+    <Resource Include="Resources\Icons\RentACar1.ico" />
     <Resource Include="Resources\Images\car_placeholder.png" />
   </ItemGroup>
   <ItemGroup />

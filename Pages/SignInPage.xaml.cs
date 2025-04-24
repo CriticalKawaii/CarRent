@@ -18,13 +18,20 @@ namespace WpfApp
 {
     public partial class SignInPage : Page
     {
+        public MainWindow mainWindow {get; set;}
         private int failedAttempts = 0;
         public string GeneratedCaptcha { get; private set; } 
 
         public SignInPage()
         {
             InitializeComponent();
+            Loaded += SignInPage_Loaded;
+        }
+
+        public void SignInPage_Loaded(object sender, RoutedEventArgs e)
+        {
             textBoxEmail.Focus();
+            mainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         private static string GetHash(string password)
@@ -121,6 +128,8 @@ namespace WpfApp
             string password = passwordBoxPassword.Password.Trim();
             string captchaText = captchaImage.Visibility == Visibility.Visible ? captchaInput.Text.Trim() : "";
             Authorize(email, password, captchaText);
+            if (mainWindow != null)
+                mainWindow.RadioButtonAccountIcon.Kind = PackIconKind.Account;
         }
 
 

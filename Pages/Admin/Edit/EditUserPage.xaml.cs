@@ -11,7 +11,7 @@ namespace WpfApp.Pages.Admin.Edit
 
     public partial class EditUsersPage : Page
     {
-        private User _user = new User();
+        private User _user;
         private string _originalPassword;
 
         public EditUsersPage(User selectedUser)
@@ -19,10 +19,19 @@ namespace WpfApp.Pages.Admin.Edit
             InitializeComponent();
             if (selectedUser != null)
             {
-                _user = selectedUser;
+                //_user = selectedUser;
+                _user = new User
+                {
+                    UserID = selectedUser.UserID,
+                    Email = selectedUser.Email,
+                    FirstName = selectedUser.FirstName,
+                    LastName = selectedUser.LastName,
+                    RoleID = selectedUser.RoleID,
+                    Role = selectedUser.Role,
+                    CreatedAt = selectedUser.CreatedAt
+                };
 
                 _originalPassword = selectedUser.PasswordHash;
-                _user.PasswordHash = "";
             }
 
             DataContext = _user;
@@ -49,9 +58,9 @@ namespace WpfApp.Pages.Admin.Edit
                 errors.AppendLine("Введите имя!");
             if (string.IsNullOrWhiteSpace(_user.LastName))
                 errors.AppendLine("Введите фамилию!");
-            if (string.IsNullOrWhiteSpace(_user.PasswordHash))
+            if (_user.UserID == 0 && string.IsNullOrWhiteSpace(_user.PasswordHash))
                 errors.AppendLine("Введите пароль!");
-            
+
 
             if (errors.Length > 0)
             {

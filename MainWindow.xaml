@@ -42,14 +42,15 @@
                          x:Name="RadioButtonAccount"
                          Style="{StaticResource TabRadioButtonBottom}"
                          Checked="RadioButtonAccount_Checked">
-                <materialDesign:PackIcon Kind="AccountOutline"
+                <materialDesign:PackIcon x:Name="RadioButtonAccountIcon"
+                                         Kind="SignIn"
                                          Width="30"
                                          Height="30" />
             </RadioButton>
             <RadioButton x:Name="RadioButtonExplore"
                          Style="{StaticResource TabRadioButtonBottom}"
                          Checked="RadioButtonExplore_Checked">
-                <materialDesign:PackIcon Kind="CarOutline"
+                <materialDesign:PackIcon Kind="Car"
                                          Width="30"
                                          Height="30" />
             </RadioButton>
@@ -58,7 +59,7 @@
         <Frame Grid.Row="1"
                Grid.ColumnSpan="3"
                x:Name="frameMainWindow"
-               NavigationUIVisibility="Hidden"/>
+               NavigationUIVisibility="Hidden" />
 
 
     </Grid>
