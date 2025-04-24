@@ -62,7 +62,9 @@ namespace WpfApp
                 textBlockMakeModel.Text = $"{selectedVehicle.Make} {selectedVehicle.Model} {selectedVehicle.Year}";
                 textBlockLicensePlate.Text = $"License: {selectedVehicle.LicensePlate}";
                 textBlockDailyRate.Text = $"Daily Rate: {selectedVehicle.DailyRate:C}";
-                listBoxReviews.ItemsSource = selectedVehicle.Reviews.ToList();
+
+                ListViewReviews.ItemsSource = selectedVehicle.Reviews.ToList();
+
                 if (selectedVehicle.VehicleImage != null)
                 {
                     imageVehicle.Source = ByteArrayToImageSource(selectedVehicle.VehicleImage) ?? new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.png"));

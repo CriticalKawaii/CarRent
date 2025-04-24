@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfApp.Classes;
 using WpfApp.Pages.admin;
 
@@ -30,7 +18,9 @@ namespace WpfApp.Pages
                 TabItemAdministration.Visibility = Visibility.Visible;
                 TabItemReports.Visibility = Visibility.Visible;
             }
+            DataContext = SessionManager.CurrentUser;
         }
+
         private void ButtonUsersPage_Click(object sender, RoutedEventArgs e)
         {
             frameAdmin.Navigate(new UsersOverviewPage());
@@ -54,6 +44,12 @@ namespace WpfApp.Pages
         private void ButtonPaymentsPage_Click(object sender, RoutedEventArgs e)
         {
             frameAdmin.Navigate(new PaymentsOverviewPage());
+        }
+
+        private void ButtonSignOut_Click(object sender, RoutedEventArgs e)
+        {
+            SessionManager.SignOut();
+            NavigationService.Navigate(new SignInPage());
         }
     }
 }

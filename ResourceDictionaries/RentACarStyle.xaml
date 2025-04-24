@@ -152,73 +152,6 @@
         </Style.Setters>
     </Style>
 
-    <DataTemplate x:Key="VehicleItemTemplate">
-        <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
-                CornerRadius="26"
-                Margin="5"
-                Padding="4">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="180" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Vehicle Image -->
-                <Border Grid.RowSpan="3"
-                        Margin="0,0,10,0"
-                        CornerRadius="22,0,0,22"
-                        Height="135"
-                        VerticalAlignment="Stretch">
-                    <Border.Background>
-                        <ImageBrush ImageSource="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
-                                    Stretch="UniformToFill" />
-                    </Border.Background>
-                </Border>
-
-                <!-- Vehicle Details -->
-                <TextBlock Grid.Column="1"
-                           Padding="5"
-                           Foreground="White"
-                           TextWrapping="Wrap"
-                           FontWeight="Bold"
-                           FontSize="16"
-                           Margin="0,0,0,1">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0} {1} {2}">
-                            <Binding Path="Make"
-                                     TargetNullValue='Unknown Make' />
-                            <Binding Path="Model"
-                                     TargetNullValue='Unknown Model' />
-                            <Binding Path="Year"
-                                     TargetNullValue='N/A' />
-                        </MultiBinding>
-                    </TextBlock.Text>
-                </TextBlock>
-
-                <!-- Daily Rate -->
-                <TextBlock Grid.Row="1"
-                           Padding="5"
-                           Grid.Column="1"
-                           Foreground="White"
-                           Text="{Binding DailyRate, TargetNullValue='Rate not available', StringFormat='{}{0:C}'}"
-                           Style="{StaticResource MaterialDesignBody1TextBlock}" />
-
-                <!-- Rating -->
-                <materialDesign:RatingBar Grid.Row="2"
-                                          Grid.Column="1"
-                                          Value="{Binding AvgRating, TargetNullValue=0}"
-                                          IsReadOnly="True"
-                                          Background="{DynamicResource MaterialDesign.Brush.Secondary}"
-                                          Foreground="{DynamicResource MaterialDesign.Brush.Secondary}" />
-            </Grid>
-        </Border>
-    </DataTemplate>
-
     <Style x:Key="ItemContainerStyleRentACar"
            TargetType="ListViewItem"
            BasedOn="{StaticResource MaterialDesignListBoxItem}">
@@ -238,9 +171,10 @@
                                          BorderThickness="1"
                                          materialDesign:ElevationAssist.Elevation="Dp4"
                                          Padding="6"
+                                         materialDesign:RippleAssist.Feedback="White"
+                                         materialDesign:RippleAssist.RippleOnTop="True"
                                          UniformCornerRadius="15">
-                        <materialDesign:Ripple Focusable="False"
-                                               Feedback="LightGray">
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -248,10 +182,10 @@
                                 </Grid.ColumnDefinitions>
 
                                 <materialDesign:Card Width="150"
-                                        Height="100"
-                                        UniformCornerRadius="17"
-                                        ClipToBounds="True"
-                                        Margin="2">
+                                                     Height="100"
+                                                     UniformCornerRadius="17"
+                                                     ClipToBounds="True"
+                                                     Margin="2">
                                     <Image Source="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
                                            Stretch="UniformToFill" />
                                 </materialDesign:Card>
@@ -264,9 +198,9 @@
                                         <TextBlock.Text>
                                             <MultiBinding StringFormat="{}{0} {1}">
                                                 <Binding Path="Make"
-                                                         TargetNullValue='Unknown' />
+                                                         TargetNullValue='N/A' />
                                                 <Binding Path="Model"
-                                                         TargetNullValue='Model' />
+                                                         TargetNullValue='N/A' />
                                             </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
@@ -274,13 +208,13 @@
                                     <TextBlock FontSize="14"
                                                Foreground="Gray"
                                                Margin="0,2,0,0"
-                                               Text="{Binding Year, StringFormat='Year: {0}'}" />
+                                               Text="{Binding Year, StringFormat='Год: {0}'}" />
 
                                     <TextBlock FontSize="16"
                                                Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                Margin="0,6,0,0"
                                                FontWeight="Medium"
-                                               Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} в день'}" />
+                                               Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} / день'}" />
 
                                     <materialDesign:RatingBar Margin="0,8,0,0"
                                                               Value="{Binding AvgRating, TargetNullValue=0}"
@@ -288,7 +222,6 @@
                                                               Foreground="{DynamicResource PrimaryHueMidBrush}" />
                                 </StackPanel>
                             </Grid>
-                        </materialDesign:Ripple>
                     </materialDesign:Card>
                 </ControlTemplate>
             </Setter.Value>
@@ -308,94 +241,4 @@
             </Trigger>
         </Style.Triggers>
     </Style>
-
-
 </ResourceDictionary>
-
-<!--  
-    <Style x:Key="ItemContainerStyleRentACar"
-       TargetType="ListViewItem"
-       BasedOn="{StaticResource MaterialDesignListBoxItem}">
-    <Setter Property="Margin"
-            Value="10" />
-    <Setter Property="Padding"
-            Value="0" />
-    <Setter Property="HorizontalContentAlignment"
-            Value="Stretch" />
-    <Setter Property="Template">
-        <Setter.Value>
-            <ControlTemplate TargetType="ListViewItem">
-                <Border Margin="0"
-                        CornerRadius="20"
-                        Background="{TemplateBinding Background}"
-                        SnapsToDevicePixels="True"
-                        Padding="6">
-                    <materialDesign:Ripple>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-
-                            <Border Width="150"
-                                    Height="100"
-                                    CornerRadius="15"
-                                    ClipToBounds="True"
-                                    Margin="5">
-                                <Image Source="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
-                                       Stretch="UniformToFill" />
-                            </Border>
-
-                            <StackPanel Grid.Column="1"
-                                        Margin="10,0"
-                                        VerticalAlignment="Center">
-                                <TextBlock FontSize="18"
-                                           FontWeight="SemiBold">
-                                    <TextBlock.Text>
-                                        <MultiBinding StringFormat="{}{0} {1}">
-                                            <Binding Path="Make"
-                                                     TargetNullValue='Unknown' />
-                                            <Binding Path="Model"
-                                                     TargetNullValue='Model' />
-                                        </MultiBinding>
-                                    </TextBlock.Text>
-                                </TextBlock>
-
-                                <TextBlock FontSize="14"
-                                           Foreground="Gray"
-                                           Margin="0,2,0,0"
-                                           Text="{Binding Year, StringFormat='Year: {0}'}" />
-
-                                <TextBlock FontSize="16"
-                                           Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                           Margin="0,6,0,0"
-                                           FontWeight="Medium"
-                                           Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} per day'}" />
-
-                                <materialDesign:RatingBar Margin="0,8,0,0"
-                                                          Value="{Binding AvgRating, TargetNullValue=0}"
-                                                          IsReadOnly="True"
-                                                          Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                            </StackPanel>
-                        </Grid>
-                    </materialDesign:Ripple>
-                </Border>
-            </ControlTemplate>
-        </Setter.Value>
-    </Setter>
-    <Style.Triggers>
-        <Trigger Property="IsSelected"
-                 Value="True">
-            <Setter Property="Background"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary.Dark}" />
-        </Trigger>
-        <Trigger Property="IsMouseOver"
-                 Value="True">
-            <Setter Property="Cursor"
-                    Value="Hand" />
-            <Setter Property="Background"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary}" />
-        </Trigger>
-    </Style.Triggers>
-    </Style>
--->
