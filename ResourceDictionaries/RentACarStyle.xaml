@@ -187,7 +187,8 @@
                                                      ClipToBounds="True"
                                                      Margin="2">
                                     <Image Source="{Binding VehicleImageSource}"
-                                           Stretch="UniformToFill" />
+                                           Stretch="UniformToFill"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
                                 </materialDesign:Card>
 
                                 <StackPanel Grid.Column="1"
@@ -196,12 +197,14 @@
                                     <TextBlock FontSize="18"
                                                FontWeight="SemiBold">
                                         <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} {1}">
+                                            <MultiBinding StringFormat="{}{0} {1} {2}">
                                                 <Binding Path="Make"
                                                          TargetNullValue='N/A' />
                                                 <Binding Path="Model"
                                                          TargetNullValue='N/A' />
-                                            </MultiBinding>
+                                                <Binding Path="Year"
+                                                         TargetNullValue='N/A' />
+                                        </MultiBinding>
                                         </TextBlock.Text>
                                     </TextBlock>
 
@@ -211,16 +214,17 @@
                                                Text="{Binding Year, StringFormat='Год: {0}'}" />
 
                                     <TextBlock FontSize="16"
-                                               Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                               Foreground="Black"
                                                Margin="0,6,0,0"
                                                FontWeight="Medium"
                                                Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} / день'}" />
 
                                     <materialDesign:RatingBar Margin="0,8,0,0"
                                                               Value="{Binding AvgRating, TargetNullValue=0}"
-                                                              IsReadOnly="True"
-                                                              Foreground="{DynamicResource PrimaryHueMidBrush}" />
-                                </StackPanel>
+                                                              IsReadOnly="True"/>
+
+                                
+                            </StackPanel>
                             </Grid>
                     </materialDesign:Card>
                 </ControlTemplate>

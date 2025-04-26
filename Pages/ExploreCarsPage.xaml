@@ -120,7 +120,7 @@
                             CornerRadius="12"
                             Background="White"
                             MaxHeight="350"
-                            Effect="{StaticResource MaterialDesignShadowDepth5}">
+                            Effect="{StaticResource MaterialDesignShadowDepth2}">
                         <Border.Triggers>
                             <EventTrigger RoutedEvent="Border.Loaded">
                                 <BeginStoryboard>
@@ -128,7 +128,7 @@
                                         <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                          From="0"
                                                          To="1"
-                                                         Duration="0:0:0.7" />
+                                                         Duration="0:0:0.2" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </EventTrigger>
@@ -142,7 +142,7 @@
                                        Source="{Binding VehicleImageSource}"
                                        Stretch="UniformToFill"
                                        RenderOptions.BitmapScalingMode="HighQuality">
-                                    
+
                                     <Image.Effect>
                                         <DropShadowEffect ShadowDepth="0"
                                                           BlurRadius="20"
@@ -151,7 +151,6 @@
                                 </Image>
                             </Border>
 
-                            <!-- Car Model Label -->
                             <Border Background="#C8000000"
                                     VerticalAlignment="Bottom"
                                     HorizontalAlignment="Stretch"
@@ -162,14 +161,15 @@
                                                FontWeight="Bold"
                                                FontSize="22"
                                                HorizontalAlignment="Center" />
-                                    <TextBlock Text="{Binding Model}"
-                                               Foreground="White"
+                                    <TextBlock Foreground="White"
                                                FontSize="16"
-                                               HorizontalAlignment="Center" />
+                                               HorizontalAlignment="Center">
+                                        <Run Text="{Binding Model}" />
+                                        <Run Text="{Binding Year}" />
+                                    </TextBlock>
                                 </StackPanel>
                             </Border>
 
-                            <!-- License Plate Badge -->
                             <Border Background="{DynamicResource MaterialDesign.Brush.Primary}"
                                     CornerRadius="6"
                                     Padding="12,4"
@@ -181,7 +181,6 @@
                                            FontWeight="Medium" />
                             </Border>
 
-                            <!-- Rating Overlay -->
                             <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
                                     CornerRadius="6"
                                     Padding="8,4"
@@ -201,26 +200,11 @@
                         </Grid>
                     </Border>
 
-                    <TextBlock TextWrapping="Wrap"
-                               FontWeight="Bold"
-                               Style="{DynamicResource MaterialDesignHeadline4TextBlock}">
-                        <Run Text="{Binding Make}" />
-                        <Run Text=" " />
-                        <Run Text="{Binding Model}" />
-                        <Run Text=" " />
-                        <Run Text="{Binding Year}" />
-                    </TextBlock>
-
-                    <TextBlock Style="{StaticResource MaterialDesignHeadline5TextBlock}">
-                        <Run Text="Daily Rate: " />
-                        <Run Text="{Binding DailyRate, StringFormat=C}" />
-                    </TextBlock>
-                    
                     <Button Click="ButtonRent_Click"
                             Content="АРЕНДОВАТЬ"
                             HorizontalAlignment="Center"
                             Style="{StaticResource RaisedLightButton}" />
-                    
+
                     <GroupBox Header="Характеристики"
                               Style="{StaticResource MaterialDesignCardGroupBox}"
                               Margin="0,10,0,10">
@@ -251,17 +235,27 @@
 
                             <TextBlock Grid.Row="1"
                                        Grid.Column="0"
-                                       Text="Номер:"
+                                       Text="Суточная ставка:"
                                        Style="{StaticResource MaterialDesignBody1TextBlock}"
                                        FontWeight="Medium"
                                        Margin="0,0,10,5" />
                             <TextBlock Grid.Row="1"
                                        Grid.Column="1"
-                                       Text="{Binding LicensePlate}"
+                                       Text="{Binding DailyRate, StringFormat=C}"
                                        Style="{StaticResource MaterialDesignBody1TextBlock}"
                                        Margin="0,0,0,5" />
 
-                            
+                            <TextBlock Grid.Row="2"
+                                       Grid.Column="0"
+                                       Text="Номер:"
+                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                       FontWeight="Medium"
+                                       Margin="0,0,10,5" />
+                            <TextBlock Grid.Row="2"
+                                       Grid.Column="1"
+                                       Text="{Binding LicensePlate}"
+                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                       Margin="0,0,0,5" />
 
                             <TextBlock Grid.Row="3"
                                        Grid.Column="0"
@@ -273,23 +267,16 @@
                                         Grid.Column="1"
                                         Orientation="Horizontal">
                                 <materialDesign:RatingBar Value="{Binding AvgRating}"
-                                                          IsReadOnly="True" />
+                                                          IsReadOnly="True"
+                                                          VerticalAlignment="Center" />
                                 <TextBlock Text="{Binding AvgRating, StringFormat={}{0:F1}}"
                                            Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                           Margin="10,0,0,0" d:Text="0"/>
+                                           Margin="10,0,0,0"
+                                           VerticalAlignment="Center"
+                                           d:Text="0" />
                             </StackPanel>
 
-                            <TextBlock Grid.Row="4"
-                                       Grid.Column="0"
-                                       Text="Available From:"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       FontWeight="Medium"
-                                       Margin="0,0,10,5" />
-                            <TextBlock Grid.Row="4"
-                                       Grid.Column="1"
-                                       Text="{Binding AvailableFrom, StringFormat={}{0:d}}"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       Margin="0,0,0,5" />
+
                         </Grid>
                     </GroupBox>
 
@@ -312,7 +299,7 @@
                                                 <RowDefinition Height="Auto" />
                                                 <RowDefinition Height="Auto" />
                                             </Grid.RowDefinitions>
-                                            
+
                                             <Grid Grid.Row="0"
                                                   Background="{DynamicResource MaterialDesignDivider}">
                                                 <StackPanel Orientation="Horizontal">
@@ -328,11 +315,11 @@
                                                     <materialDesign:PackIcon Kind="Car"
                                                                              VerticalAlignment="Center"
                                                                              Margin="0,0,8,0" />
-                                                    <TextBlock Text="{Binding Vehicle}"
+                                                    <TextBlock Text="{Binding Vehicle.Make}"
                                                                Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                                                 </StackPanel>
                                             </Grid>
-                                            
+
                                             <StackPanel Grid.Row="1"
                                                         Margin="16">
                                                 <TextBlock Text="{Binding Comment}"

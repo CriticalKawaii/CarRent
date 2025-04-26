@@ -11,115 +11,111 @@
       Title="AccountPage"
       FontFamily="{materialDesign:MaterialDesignFont}">
 
-        <Border Margin="20"
-                Style="{StaticResource FloatingBorder}"
-                VerticalAlignment="Stretch">
-            <StackPanel>
-                <DockPanel>
-                    <Button Style="{StaticResource FlatLightButton}"
-                            HorizontalAlignment="Center"
-                            Foreground="Red"
-                            ToolTip="Выход"
-                            Click="ButtonSignOut_Click">
-                        <materialDesign:PackIcon Kind="SignOut"
-                                                 Width="25"
-                                                 Height="25" />
-                    </Button>
+    <Border Margin="20"
+            Style="{StaticResource FloatingBorder}"
+            VerticalAlignment="Stretch">
+        <StackPanel>
+            <DockPanel>
+                <Button Style="{StaticResource FlatLightButton}"
+                        HorizontalAlignment="Center"
+                        Foreground="Red"
+                        ToolTip="Выход"
+                        Click="ButtonSignOut_Click">
+                    <materialDesign:PackIcon Kind="SignOut"
+                                             Width="25"
+                                             Height="25" />
+                </Button>
 
-                    <TextBlock d:Text="Личный кабинет"
-                               VerticalAlignment="Center"
-                               Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
-                               Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                               DockPanel.Dock="Right" />
-                </DockPanel>
-                <TabControl>
-                    <TabItem Header="Аренды"></TabItem>
+                <TextBlock d:Text="Личный кабинет"
+                           VerticalAlignment="Center"
+                           Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
+                           Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                           DockPanel.Dock="Right" />
+            </DockPanel>
+            <TabControl>
+                <TabItem Header="Аренды">
+                    <DataGrid />
+                </TabItem>
 
-                    <TabItem Header="Личные данные">
+                <TabItem Header="Личные данные">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <TextBox Grid.Row="0"
+                                 Text="{Binding Email}"
+                                 materialDesign:HintAssist.Hint="E-mail"
+                                 Style="{StaticResource FloatingHintTextBox}" />
+                        <TextBox Grid.Row="1"
+                                 Text="{Binding FirstName}"
+                                 materialDesign:HintAssist.Hint="Имя"
+                                 Style="{StaticResource FloatingHintTextBox}" />
+                        <TextBox Grid.Row="2"
+                                 Text="{Binding LastName}"
+                                 materialDesign:HintAssist.Hint="Фамилия"
+                                 Style="{StaticResource FloatingHintTextBox}" />
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Отчеты"
+                         Name="TabItemReports"
+                         Visibility="Collapsed"
+                         d:Visibility="Visible">
+
+                </TabItem>
+
+                <TabItem x:Name="TabItemAdministration"
+                         Header="Администрирование"
+                         Visibility="Collapsed"
+                         d:Visibility="Visible">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-
-                            <TextBox Grid.Row="0"
-                                     Text="{Binding Email}"
-                                     materialDesign:HintAssist.Hint="E-mail"
-                                     Style="{StaticResource FloatingHintTextBox}" />
-                            <TextBox Grid.Row="1"
-                                     Text="{Binding FirstName}"
-                                     materialDesign:HintAssist.Hint="Имя"
-                                     Style="{StaticResource FloatingHintTextBox}" />
-                            <TextBox Grid.Row="2"
-                                     Text="{Binding LastName}"
-                                     materialDesign:HintAssist.Hint="Фамилия"
-                                     Style="{StaticResource FloatingHintTextBox}" />
-                            <TextBox Grid.Row="3"
-                                     Text="{Binding PasswordHash}"
-                                     materialDesign:HintAssist.Hint="Пароль"
-                                     Style="{StaticResource FloatingHintTextBox}" />
-
-
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Button Margin="5"
+                                    Content="Пользователи"
+                                    Name="ButtonUsersPage"
+                                    Click="ButtonUsersPage_Click" />
+                            <Button Margin="5"
+                                    Grid.Column="1"
+                                    Content="Транспорт"
+                                    Name="ButtonVehiclesPage"
+                                    Click="ButtonVehiclesPage_Click" />
+                            <Button Margin="5"
+                                    Grid.Column="2"
+                                    Content="Аренды"
+                                    Name="ButtonBookingsPage"
+                                    Click="ButtonBookingsPage_Click" />
+                            <Button Margin="5"
+                                    Grid.Column="3"
+                                    Content="Отзывы"
+                                    Name="ButtonReviewsPage"
+                                    Click="ButtonReviewsPage_Click" />
+                            <Button Margin="5"
+                                    Grid.Column="4"
+                                    Content="Оплаты"
+                                    Name="ButtonPaymentsPage"
+                                    Click="ButtonPaymentsPage_Click" />
                         </Grid>
-                    </TabItem>
-
-                    <TabItem Header="Отчеты"
-                             Name="TabItemReports"
-                             Visibility="Collapsed"
-                             d:Visibility="Visible">
-                        
-                    </TabItem>
-                    
-                    <TabItem x:Name="TabItemAdministration"
-                             Header="Администрирование"
-                             Visibility="Collapsed"
-                             d:Visibility="Visible">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="auto" />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <Button Margin="5"
-                                        Content="Пользователи"
-                                        Name="ButtonUsersPage"
-                                        Click="ButtonUsersPage_Click" />
-                                <Button Margin="5"
-                                        Grid.Column="1"
-                                        Content="Транспорт"
-                                        Name="ButtonVehiclesPage"
-                                        Click="ButtonVehiclesPage_Click" />
-                                <Button Margin="5"
-                                        Grid.Column="2"
-                                        Content="Аренды"
-                                        Name="ButtonBookingsPage"
-                                        Click="ButtonBookingsPage_Click" />
-                                <Button Margin="5"
-                                        Grid.Column="3"
-                                        Content="Отзывы"
-                                        Name="ButtonReviewsPage"
-                                        Click="ButtonReviewsPage_Click" />
-                                <Button Margin="5"
-                                        Grid.Column="4"
-                                        Content="Оплаты"
-                                        Name="ButtonPaymentsPage"
-                                        Click="ButtonPaymentsPage_Click" />
-                            </Grid>
-                            <Frame Grid.Row="1"
-                                   x:Name="frameAdmin"
-                                   NavigationUIVisibility="Hidden" />
-                        </Grid>
-                    </TabItem>
-                </TabControl>
-            </StackPanel>
-        </Border>
+                        <Frame Grid.Row="1"
+                               x:Name="frameAdmin"
+                               NavigationUIVisibility="Hidden" />
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Border>
 </Page>

@@ -29,11 +29,12 @@
         <TextBlock Text="RENT-A-CAR"
                    HorizontalAlignment="Center"
                    MouseLeftButtonDown="Window_MouseDown"
-                   Margin="30,10"
+                   Margin="40,0"
                    Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
                    FontStyle="Italic"
+                   VerticalAlignment="Center"
                    FontWeight="ExtraBlack"
-                   Style="{StaticResource MaterialDesignHeadline4TextBlock}" />
+                   Style="{StaticResource MaterialDesignHeadline3TextBlock}" />
 
         <StackPanel Grid.Column="2"
                     Orientation="Horizontal"
@@ -58,12 +59,9 @@
                                          Height="30" />
             </RadioButton>
         </StackPanel>
-        
         <Frame Grid.Row="1"
                Grid.ColumnSpan="3"
                x:Name="frameMainWindow"
                NavigationUIVisibility="Hidden" />
-
-
     </Grid>
 </Window>
