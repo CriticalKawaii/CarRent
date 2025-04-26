@@ -199,11 +199,36 @@
                             </Border>
                         </Grid>
                     </Border>
+                    <GroupBox Header="Аренда"
+                              MaxWidth="500"
+                              Style="{StaticResource MaterialDesignCardGroupBox}"
+                              Margin="0,10,0,10">
+                        <StackPanel>
+                            <DatePicker Name="DatePickerStart"
+                                        materialDesign:HintAssist.Hint="Дата начала аренды"
+                                        Margin="5"
+                                        materialDesign:TextFieldAssist.HasClearButton="True"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+                            
+                            <DatePicker Name="DatePickerEnd" 
+                                        materialDesign:HintAssist.Hint="Дата окончания аренды"
+                                        Margin="5"
+                                        materialDesign:TextFieldAssist.HasClearButton="True"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
 
-                    <Button Click="ButtonRent_Click"
-                            Content="АРЕНДОВАТЬ"
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource RaisedLightButton}" />
+                            <TextBlock x:Name="TextBlockTotalDays"
+                                       Text="Количество дней: 0"
+                                       Margin="0,10,0,0" />
+
+                            <Button x:Name="ButtonRent"
+                                    Click="ButtonRent_Click"
+                                    Content="{Binding DailyRate}"
+                                    ContentStringFormat="АРЕНДОВАТЬ {0:C}"
+                                    HorizontalAlignment="Center"
+                                    Style="{StaticResource RaisedLightButton}" />
+                        </StackPanel>
+                    </GroupBox>
+                    
 
                     <GroupBox Header="Характеристики"
                               Style="{StaticResource MaterialDesignCardGroupBox}"

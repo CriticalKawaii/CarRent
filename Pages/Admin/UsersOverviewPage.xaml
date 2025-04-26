@@ -18,23 +18,21 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock Text="Пользователи"
-                   d:Foreground="White"
                    Margin="5,10"
-                   FontSize="16"
-                   FontWeight="Bold" />
+                   FontSize="16"/>
 
         <DataGrid Grid.Row="1"
                   Name="DataGridUsers"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  MaxHeight="250"
+                  MaxHeight="225"
                   VerticalAlignment="Stretch"
                   ScrollViewer.CanContentScroll="True"
                   ScrollViewer.VerticalScrollBarVisibility="Visible">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID"
                                     Binding="{Binding UserID}"
-                                    Width="Auto" />
+                                    />
                 <DataGridTextColumn Header="E-mail"
                                     Binding="{Binding Email}"
                                     Width="*" />

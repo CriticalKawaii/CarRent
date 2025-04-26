@@ -101,13 +101,18 @@ namespace WpfApp
 
         private void ButtonRent_Click(object sender, RoutedEventArgs e)
         {
-            if (SessionManager.IsLoggedIn)
+            if (!SessionManager.IsLoggedIn)
+            {
+                MessageBox.Show("Пожалуйста, войдите в систему для оформления аренды.", "Требуется авторизация", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (mainWindow != null)
+                {
+                    mainWindow.RadioButtonAccount.IsChecked = true;
+                }
+                return;
+            }
+            else
             {
                 NavigationService.Navigate(new RentPage());
-            }
-            else if(mainWindow != null)
-            {
-                mainWindow.RadioButtonAccount.IsChecked = true;
             }
         }
     }

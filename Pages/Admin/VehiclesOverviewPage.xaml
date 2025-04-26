@@ -1,26 +1,86 @@
 ﻿<Page x:Class="WpfApp.Pages.admin.VehiclesOverviewPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:WpfApp.Pages.admin"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      d:DesignHeight="450"
+      d:DesignWidth="800"
       Title="VehiclesOverviewPage">
 
     <Grid>
-        <StackPanel>
-            <TextBox Text="Транспрот" d:Foreground="White" Margin="5,10" FontSize="16" FontWeight="Bold"/>
-            <DataGrid Name="DataGridVehicles" AutoGenerateColumns="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding VehicleID}" Width="*"/>
-                    <DataGridTextColumn Header="Производитель" Binding="{Binding Make}" Width="*"/>
-                    <DataGridTextColumn Header="Модель" Binding="{Binding Model}" Width="*"/>
-                    <DataGridTextColumn Header="Год" Binding="{Binding Year}" Width="*"/>
-                    <DataGridTextColumn Header="Номер" Binding="{Binding LicensePlate}" Width="*"/>
-                    <DataGridTextColumn Header="Статус" Binding="{Binding Available}" Width="*"/>
-                </DataGrid.Columns>
-            </DataGrid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Text="Транспорт"
+                   Margin="5,10"
+                   FontSize="16" />
+        <DataGrid Name="DataGridVehicles"
+                  Grid.Row="1"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  MaxHeight="225"
+                  VerticalAlignment="Stretch"
+                  ScrollViewer.CanContentScroll="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID"
+                                    Binding="{Binding VehicleID}" />
+                <DataGridTextColumn Header="Производитель"
+                                    Binding="{Binding Make}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Модель"
+                                    Binding="{Binding Model}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Год"
+                                    Binding="{Binding Year}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Номер"
+                                    Binding="{Binding LicensePlate}"
+                                    Width="*" />
+                <DataGridTextColumn Header="Статус"
+                                    Binding="{Binding Available}"
+                                    Width="*" />
+                <DataGridTemplateColumn Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button x:Name="ButtonEdit"
+                                    >
+                                <materialDesign:PackIcon Kind="EditOutline"
+                                                         VerticalAlignment="Center"
+                                                         HorizontalAlignment="Center"
+                                                         Width="16"
+                                                         Height="16" />
+                            </Button>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Grid.Row="2"
+                    Orientation="Horizontal">
+            <Button Margin="10"
+                    Name="ButtonAdd"
+                    HorizontalAlignment="Left"
+                    >
+                <materialDesign:PackIcon Kind="Add"
+                                         Width="16"
+                                         Height="16" />
+            </Button>
+            <Button Margin="10"
+                    Name="ButtonDel"
+                    HorizontalAlignment="Right"
+                    >
+                <materialDesign:PackIcon Kind="DeleteOutline"
+                                         Width="16"
+                                         Height="16" />
+            </Button>
         </StackPanel>
     </Grid>
 </Page>

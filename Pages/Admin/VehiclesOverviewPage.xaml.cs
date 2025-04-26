@@ -11,5 +11,7 @@ namespace WpfApp.Pages.admin
             InitializeComponent();
             DataGridVehicles.ItemsSource = DBEntities.GetContext().Vehicles.ToList();
         }
+
+
     }
 }

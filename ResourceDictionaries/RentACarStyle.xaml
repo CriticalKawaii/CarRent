@@ -95,7 +95,7 @@
            TargetType="CheckBox">
         <Style.Setters>
             <Setter Property="Foreground"
-                    Value="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                    Value="{DynamicResource MaterialDesign.Brush.Primary}" />
             <Setter Property="HorizontalAlignment"
                     Value="Right" />
             <Setter Property="Content">
@@ -104,7 +104,7 @@
                                              VerticalAlignment="Center"
                                              Width="25"
                                              Height="20"
-                                             Foreground="{DynamicResource MaterialDesign.Brush.Primary.Light}" />
+                                             Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
                 </Setter.Value>
             </Setter>
         </Style.Setters>

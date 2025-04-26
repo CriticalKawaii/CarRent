@@ -7,7 +7,7 @@
       mc:Ignorable="d"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       d:DesignHeight="450"
-      d:DesignWidth="800"
+      d:DesignWidth="1150"
       Title="AccountPage"
       FontFamily="{materialDesign:MaterialDesignFont}">
 
@@ -33,8 +33,49 @@
                            DockPanel.Dock="Right" />
             </DockPanel>
             <TabControl>
-                <TabItem Header="Аренды">
-                    <DataGrid />
+                <TabItem Header="Мои аренды">
+
+
+                    <DataGrid x:Name="DataGridUserBookings"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding BookingID}"
+                                                Width="Auto" />
+                            <DataGridTextColumn Header="Автомобиль"
+                                                Binding="{Binding Vehicle.Make}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Модель"
+                                                Binding="{Binding Vehicle.Model}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Начало"
+                                                Binding="{Binding StartDate, StringFormat='{}{0:dd.MM.yyyy}'}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Окончание"
+                                                Binding="{Binding EndDate, StringFormat='{}{0:dd.MM.yyyy}'}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Стоимость"
+                                                Binding="{Binding TotalCost, StringFormat='{}{0:C}'}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Статус"
+                                                Binding="{Binding BookingStatus.BookingStatus1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button x:Name="ButtonViewDetails"
+                                                Click="ButtonViewBookingDetails_Click"
+                                                Style="{StaticResource MaterialDesignFlatButton}">
+                                            <materialDesign:PackIcon Kind="Eye"
+                                                                     Width="20"
+                                                                     Height="20" />
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </TabItem>
 
                 <TabItem Header="Личные данные">
@@ -75,41 +116,33 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto" />
-                            <RowDefinition />
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Button Margin="5"
-                                    Content="Пользователи"
-                                    Name="ButtonUsersPage"
-                                    Click="ButtonUsersPage_Click" />
-                            <Button Margin="5"
-                                    Grid.Column="1"
-                                    Content="Транспорт"
-                                    Name="ButtonVehiclesPage"
-                                    Click="ButtonVehiclesPage_Click" />
-                            <Button Margin="5"
-                                    Grid.Column="2"
-                                    Content="Аренды"
-                                    Name="ButtonBookingsPage"
-                                    Click="ButtonBookingsPage_Click" />
-                            <Button Margin="5"
-                                    Grid.Column="3"
-                                    Content="Отзывы"
-                                    Name="ButtonReviewsPage"
-                                    Click="ButtonReviewsPage_Click" />
-                            <Button Margin="5"
-                                    Grid.Column="4"
-                                    Content="Оплаты"
-                                    Name="ButtonPaymentsPage"
-                                    Click="ButtonPaymentsPage_Click" />
-                        </Grid>
+                        <materialDesign:ColorZone Mode="PrimaryMid"
+                                                  HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton Content="Пользователи"
+                                             Name="ButtonUsersPage"
+                                             Checked="ButtonUsersPage_Checked"
+                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                                <RadioButton Content="Транспорт"
+                                             Name="ButtonVehiclesPage"
+                                             Checked="ButtonVehiclesPage_Checked"
+                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                                <RadioButton Content="Аренды"
+                                             Name="ButtonBookingsPage"
+                                             Checked="ButtonBookingsPage_Checked"
+                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                                <RadioButton Content="Отзывы"
+                                             Name="ButtonReviewsPage"
+                                             Checked="ButtonReviewsPage_Checked"
+                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                                <RadioButton Content="Оплаты"
+                                             Name="ButtonPaymentsPage"
+                                             Checked="ButtonPaymentsPage_Checked"
+                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                            </StackPanel>
+                        </materialDesign:ColorZone>
                         <Frame Grid.Row="1"
                                x:Name="frameAdmin"
                                NavigationUIVisibility="Hidden" />

@@ -10,8 +10,10 @@
 
     <Grid>
         <StackPanel>
-            <TextBox Text="Аренды" d:Foreground="White" Margin="5,10" FontSize="16" FontWeight="Bold"/>
-            <DataGrid Name="DataGridBookings" AutoGenerateColumns="False">
+            <TextBlock Text="Аренды" d:Foreground="White" Margin="5,10" FontSize="16"/>
+            <DataGrid Name="DataGridBookings"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding BookingID}" Width="*"/>
                     <DataGridTextColumn Header="ID транспорта" Binding="{Binding VehicleID}" Width="*"/>
