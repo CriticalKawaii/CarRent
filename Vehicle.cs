@@ -11,8 +11,12 @@ namespace WpfApp
 {
     using System;
     using System.Collections.Generic;
-    
-    public partial class Vehicle
+    using System.ComponentModel;
+    using System.IO;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+
+    public partial class Vehicle : INotifyPropertyChanged
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Vehicle()
@@ -24,7 +28,7 @@ namespace WpfApp
         public int VehicleID { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
-        public byte[] VehicleImage { get; set; }
+        private byte[] VehicleImage { get; set; }
         public int Year { get; set; }
         public string LicensePlate { get; set; }
         public string VIN { get; set; }
@@ -33,7 +37,43 @@ namespace WpfApp
         public Nullable<bool> Available { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
         public Nullable<decimal> AvgRating { get; set; }
-    
+
+        private ImageSource _vehicleImageSource;
+        public ImageSource VehicleImageSource
+        {
+            get
+            {
+                if (_vehicleImageSource == null && VehicleImage != null && VehicleImage.Length > 0)
+                {
+                    _vehicleImageSource = ByteArrayToImageSource(VehicleImage);
+                }
+                else if (_vehicleImageSource == null)
+                {
+                    _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
+                }
+                return _vehicleImageSource;
+            }
+        }
+
+        private ImageSource ByteArrayToImageSource(byte[] imageData)
+        {
+            using (var stream = new MemoryStream(imageData))
+            {
+                var bitmapImage = new BitmapImage();
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = stream;
+                bitmapImage.EndInit();
+                return bitmapImage;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Booking> Bookings { get; set; }
         public virtual VehicleCategory VehicleCategory { get; set; }

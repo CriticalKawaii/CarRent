@@ -68,7 +68,10 @@
                     <TabItem Header="Отчеты"
                              Name="TabItemReports"
                              Visibility="Collapsed"
-                             d:Visibility="Visible"></TabItem>
+                             d:Visibility="Visible">
+                        
+                    </TabItem>
+                    
                     <TabItem x:Name="TabItemAdministration"
                              Header="Администрирование"
                              Visibility="Collapsed"

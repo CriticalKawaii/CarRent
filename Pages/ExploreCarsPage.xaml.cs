@@ -15,6 +15,7 @@ namespace WpfApp
     {
         public ObservableCollection<Vehicle> Vehicles { get; set; }
         public MainWindow mainWindow { get; set; }
+
         public ExploreCarsPage()
         {
             InitializeComponent();
@@ -56,20 +57,7 @@ namespace WpfApp
         }
         private void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataContext = (Vehicle)ListViewExploreCars.SelectedItem;
-            if (DataContext is Vehicle selectedVehicle)
-            {
-                textBlockMakeModel.Text = $"{selectedVehicle.Make} {selectedVehicle.Model} {selectedVehicle.Year}";
-                textBlockLicensePlate.Text = $"License: {selectedVehicle.LicensePlate}";
-                textBlockDailyRate.Text = $"Daily Rate: {selectedVehicle.DailyRate:C}";
-
-                ListViewReviews.ItemsSource = selectedVehicle.Reviews.ToList();
-
-                if (selectedVehicle.VehicleImage != null)
-                {
-                    imageVehicle.Source = ByteArrayToImageSource(selectedVehicle.VehicleImage) ?? new BitmapImage(new Uri("pack://application:,,,/Images/placeholder.png"));
-                }
-            }
+            DataContext = ListViewExploreCars.SelectedItem as Vehicle;
         }
 
         private void UpdateItems()

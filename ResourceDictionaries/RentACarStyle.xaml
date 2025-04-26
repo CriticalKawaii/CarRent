@@ -123,7 +123,7 @@
     </Style>
 
     <Style x:Key="RaisedLightButton"
-           BasedOn="{StaticResource MaterialDesignRaisedLightButton}"
+           BasedOn="{StaticResource MaterialDesignRaisedButton}"
            TargetType="Button">
         <Setter Property="Margin"
                 Value="0, 10" />
@@ -186,7 +186,7 @@
                                                      UniformCornerRadius="17"
                                                      ClipToBounds="True"
                                                      Margin="2">
-                                    <Image Source="{Binding VehicleImage, TargetNullValue='/Resources/Images/car_placeholder.png'}"
+                                    <Image Source="{Binding VehicleImageSource}"
                                            Stretch="UniformToFill" />
                                 </materialDesign:Card>
 
