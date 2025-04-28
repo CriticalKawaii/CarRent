@@ -6,6 +6,7 @@
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
       xmlns:local="clr-namespace:WpfApp"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d"
       Title="ExploreCarsPage"
       d:Height="800"
@@ -187,13 +188,14 @@
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Setter Property="Visibility"
-                                                Value="Visible" />
+                                                Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Available}"
-                                                         Value="True">
+                                                         Value="False">
                                                 <Setter Property="Visibility"
-                                                        Value="Collapsed" />
+                                                        Value="Visible" />
                                             </DataTrigger>
+                                            
                                         </Style.Triggers>
                                     </Style> 
                                 </Border.Style>
@@ -219,24 +221,38 @@
                     </Border>
                     <GroupBox Header="Аренда"
                               MaxWidth="500"
+                              IsEnabled="{Binding Available}"
                               Style="{StaticResource MaterialDesignCardGroupBox}"
                               Margin="0,10,0,10">
                         <StackPanel>
+                            <!--DisplayDateStart="{x:Static sys:DateTime.Today}"-->
                             <DatePicker Name="DatePickerStart"
                                         materialDesign:HintAssist.Hint="Дата начала аренды"
                                         Margin="5"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
+                                        SelectedDateChanged="DatePickerStart_SelectedDateChanged"
                                         Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-
+                            
                             <DatePicker Name="DatePickerEnd"
                                         materialDesign:HintAssist.Hint="Дата окончания аренды"
                                         Margin="5"
+                                        IsEnabled="False"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
                                         Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
 
-                            <TextBlock x:Name="TextBlockTotalDays"
-                                       Text="Количество дней: 0"
-                                       Margin="0,10,0,0" />
+                            <ComboBox x:Name="ComboBoxInsurance"
+                                      materialDesign:HintAssist.Hint="Страховка"
+                                      Style="{StaticResource OutlinedComboBox}"
+                                      Margin="5">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding InsuranceName}" />
+                                            <TextBlock Text="{Binding InsurancePrice, StringFormat={}{0:C}}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
 
                             <Button x:Name="ButtonRent"
                                     Click="ButtonRent_Click"

@@ -12,7 +12,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using WpfApp.Classes;
 using WpfApp.Pages;
-using WpfApp.Pages.admin;
 
 namespace WpfApp
 {

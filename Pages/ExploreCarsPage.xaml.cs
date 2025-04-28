@@ -20,6 +20,7 @@ namespace WpfApp
         {
             InitializeComponent();
             Loaded += ExploreCarsPage_Loaded;
+            
         }
 
         private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
@@ -28,8 +29,11 @@ namespace WpfApp
             ListViewExploreCars.ItemsSource = Vehicles;
             ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
             ListViewExploreCars.SelectedIndex = 0;
-
+            ComboBoxInsurance.ItemsSource = DBEntities.GetContext().Insurances.ToList();
             mainWindow = Application.Current.MainWindow as MainWindow;
+
+            DatePickerStart.DisplayDateStart = DateTime.Now.AddDays(1);
+            DatePickerStart.DisplayDateEnd = DateTime.Now.AddMonths(1);
         }
 
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)
@@ -40,21 +44,6 @@ namespace WpfApp
             }
         }
 
-        public ImageSource ByteArrayToImageSource(byte[] imageData)
-        {
-            if (imageData == null || imageData.Length == 0)
-                return null;
-
-            using (var stream = new MemoryStream(imageData))
-            {
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.StreamSource = stream;
-                bitmapImage.EndInit();
-                return bitmapImage;
-            }
-        }
         private void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DataContext = ListViewExploreCars.SelectedItem as Vehicle;
@@ -113,6 +102,18 @@ namespace WpfApp
             else
             {
                 NavigationService.Navigate(new RentPage());
+            }
+        }
+
+        private void DatePickerStart_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DatePickerStart.SelectedDate != null)
+            {
+                DatePickerEnd.IsEnabled = true;
+                DatePickerEnd.DisplayDateStart = DatePickerStart.DisplayDate.AddDays(1);
+            }
+            else {
+                DatePickerEnd.IsEnabled = false;
             }
         }
     }

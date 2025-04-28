@@ -78,7 +78,6 @@
                     Click="RefreshCaptcha_Click"
                     Style="{StaticResource FlatLightButton}"
                     HorizontalAlignment="Center" />
-
         </StackPanel>
     </Border>
 </Page>

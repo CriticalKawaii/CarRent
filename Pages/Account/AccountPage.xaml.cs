@@ -11,9 +11,6 @@ using System;
 
 namespace WpfApp.Pages
 {
-    /// <summary>
-    /// Interaction logic for AccountPage.xaml
-    /// </summary>
     public partial class AccountPage : Page
     {
         public AccountPage()
@@ -24,13 +21,9 @@ namespace WpfApp.Pages
                 TabItemAdministration.Visibility = Visibility.Visible;
                 TabItemReports.Visibility = Visibility.Visible;
 
-                ChartBookings.ChartAreas.Add(new ChartArea("Main"));
-                var currentSeries = new Series("Бронирования") { 
-                    IsValueShownAsLabel = true
-                };
-                ChartBookings.Series.Add(currentSeries);
+                
 
-                ComboBoxVehicleCategory.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+                
                 ComboBoxDiagram.ItemsSource = Enum.GetValues(typeof(SeriesChartType));
             }
             DataContext = SessionManager.CurrentUser;
@@ -106,34 +99,17 @@ namespace WpfApp.Pages
 
         private void UpdateChart(object sender, SelectionChangedEventArgs e)
         {
-            if (ComboBoxDiagram.SelectedItem is SeriesChartType currentType) {
-                Series currentSeries = ChartBookings.Series.FirstOrDefault();
-                currentSeries.ChartType = currentType;
-                if (currentSeries == null)
-                    return;
-                
-                currentSeries.ChartType = currentType;
-                currentSeries.Points.Clear();
+            
+        }
 
-                var context = DBEntities.GetContext();
+        private void ButtonWord_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
 
-                var bookingCounts = context.Bookings
-                    .GroupBy(b => b.Vehicle.VehicleCategory.VehicleCategory1)
-                    .Select(g => new
-                    {
-                        VehicleCategory = g.Key,
-                        BookingCount = g.Count(),
-                    }).ToList();
+        private void ButtonExcel_Click(object sender, RoutedEventArgs e)
+        {
 
-
-                foreach (var item in bookingCounts)
-                {
-                    currentSeries.Points.AddXY(item.VehicleCategory, item.BookingCount);
-                    
-
-                    currentSeries.Points.Last().ToolTip = $"{item.VehicleCategory}: {item.BookingCount} бронирований";
-                }
-            }
         }
     }
 }

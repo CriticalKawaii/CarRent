@@ -105,6 +105,7 @@
     <Compile Include="BookingStatus.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Core.cs" />
     <Compile Include="Classes\SessionManager.cs" />
     <Compile Include="Insurance.cs">
       <DependentUpon>Model1.tt</DependentUpon>

@@ -21,10 +21,8 @@
                         HorizontalAlignment="Center"
                         Foreground="Red"
                         ToolTip="Выход"
+                        Content="{materialDesign:PackIcon SignOut, Size=25}"
                         Click="ButtonSignOut_Click">
-                    <materialDesign:PackIcon Kind="SignOut"
-                                             Width="25"
-                                             Height="25" />
                 </Button>
 
                 <TextBlock d:Text="Личный кабинет"
@@ -115,28 +113,32 @@
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Center">
-                                <ComboBox Name="ComboBoxVehicleCategory"
-                                          SelectedIndex="0"
-                                          Margin="5"
-                                          materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                                          DisplayMemberPath="VehicleCategory1"
-                                          SelectionChanged="UpdateChart" 
-                                          Style="{StaticResource OutlinedComboBox}"
-                                          materialDesign:HintAssist.Hint="Категория авто"/>
+                                
                                 <ComboBox Name="ComboBoxDiagram"
                                           SelectedIndex="0"
                                           Margin="5"
                                           SelectionChanged="UpdateChart"
                                           Style="{StaticResource OutlinedComboBox}"
                                           materialDesign:HintAssist.Hint="Диаграмма" />
+                                <Button Content="{materialDesign:PackIcon Kind=MicrosoftWord,Size=25}"
+                                        Margin="5" 
+                                        ToolTip="Экспорт в Microsoft Word"
+                                        BorderThickness="0"
+                                        Click="ButtonWord_Click"
+                                        Background="#185abd" />
+                                <Button Content="{materialDesign:PackIcon Kind=MicrosoftExcel,Size=25}"
+                                        Margin="5"
+                                        ToolTip="Экспорт в Microsoft Excel"
+                                        BorderThickness="0"
+                                        Background="#107c41"
+                                        Click="ButtonExcel_Click"/>
                             </StackPanel>
                         </StackPanel>
-                        <WindowsFormsHost Grid.Row="1"
-                                          >
+                        <WindowsFormsHost Grid.Row="1">
                             <charts:Chart x:Name="ChartBookings">
                                 <charts:Chart.Legends>
                                     <charts:Legend>
-                                        
+
                                     </charts:Legend>
                                 </charts:Chart.Legends>
                             </charts:Chart>
