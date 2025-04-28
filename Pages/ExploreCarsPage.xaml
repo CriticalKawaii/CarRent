@@ -8,9 +8,12 @@
       xmlns:local="clr-namespace:WpfApp"
       mc:Ignorable="d"
       Title="ExploreCarsPage"
-      d:Height="700"
+      d:Height="800"
       d:Width="850"
       FontFamily="{materialDesign:MaterialDesignFont}">
+    <Page.Resources>
+        <materialDesign:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Page.Resources>
 
     <Border  Style="{StaticResource FloatingBorder}"
              Margin="20"
@@ -96,10 +99,12 @@
                                        DailyRate="22.229"
                                        LicensePlate="aa777"
                                        AvgRating="5"
-                                       Model="Obunga" />
+                                       Model="Obunga" 
+                                       Available="True"/>
                         <local:Vehicle Make="Ford"
                                        LicensePlate="bb777"
-                                       AvgRating="4.2" />
+                                       AvgRating="4.2" 
+                                       Available="False"/>
                         <local:Vehicle Make="Volkswagen"
                                        LicensePlate="cc777"
                                        AvgRating="3.7" />
@@ -170,15 +175,28 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="{DynamicResource MaterialDesign.Brush.Primary}"
+                            <Border Background="Red"
                                     CornerRadius="6"
                                     Padding="12,4"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Top"
                                     Margin="0,15,15,0">
-                                <TextBlock Text="{Binding LicensePlate}"
+                                <TextBlock Text="Недоступно"
                                            Foreground="White"
                                            FontWeight="Medium" />
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility"
+                                                Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Available}"
+                                                         Value="True">
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style> 
+                                </Border.Style>
                             </Border>
 
                             <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
@@ -209,8 +227,8 @@
                                         Margin="5"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
                                         Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-                            
-                            <DatePicker Name="DatePickerEnd" 
+
+                            <DatePicker Name="DatePickerEnd"
                                         materialDesign:HintAssist.Hint="Дата окончания аренды"
                                         Margin="5"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
@@ -228,7 +246,7 @@
                                     Style="{StaticResource RaisedLightButton}" />
                         </StackPanel>
                     </GroupBox>
-                    
+
 
                     <GroupBox Header="Характеристики"
                               Style="{StaticResource MaterialDesignCardGroupBox}"
@@ -310,6 +328,7 @@
                         <ListView x:Name="ListViewReviews"
                                   d:ItemsSource="{d:SampleData ItemCount=5}"
                                   ItemsSource="{Binding Reviews}"
+                                  IsHitTestVisible="False"
                                   ScrollViewer.CanContentScroll="False"
                                   ScrollViewer.VerticalScrollBarVisibility="Auto">
 
@@ -331,8 +350,10 @@
                                                     <materialDesign:PackIcon Kind="Account"
                                                                              VerticalAlignment="Center"
                                                                              Margin="0,0,8,0" />
-                                                    <TextBlock Text="{Binding User.Email}"
-                                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                                    <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}">
+                                                        <Run Text="{Binding User.FirstName}" />
+                                                        <Run Text="{Binding User.LastName}" />
+                                                    </TextBlock>
 
                                                     <Separator Width="20"
                                                                Visibility="Hidden" />
@@ -340,7 +361,7 @@
                                                     <materialDesign:PackIcon Kind="Car"
                                                                              VerticalAlignment="Center"
                                                                              Margin="0,0,8,0" />
-                                                    <TextBlock Text="{Binding Vehicle.Make}"
+                                                    <TextBlock Text="{Binding VehicleID}"
                                                                Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                                                 </StackPanel>
                                             </Grid>

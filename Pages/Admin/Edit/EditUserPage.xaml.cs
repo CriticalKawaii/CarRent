@@ -11,30 +11,23 @@ namespace WpfApp.Pages.Admin.Edit
 
     public partial class EditUsersPage : Page
     {
-        private User _user;
-        private string _originalPassword;
+        private User _user = new User();
+        private readonly string _originalPassword;
 
         public EditUsersPage(User selectedUser)
         {
             InitializeComponent();
             if (selectedUser != null)
             {
-                //_user = selectedUser;
-                _user = new User
-                {
-                    UserID = selectedUser.UserID,
-                    Email = selectedUser.Email,
-                    FirstName = selectedUser.FirstName,
-                    LastName = selectedUser.LastName,
-                    RoleID = selectedUser.RoleID,
-                    Role = selectedUser.Role,
-                    CreatedAt = selectedUser.CreatedAt
-                };
-
+                _user = selectedUser;
                 _originalPassword = selectedUser.PasswordHash;
             }
-
             DataContext = _user;
+            Loaded += Page_Loaded;
+        }
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            TextBoxPassword.Text = null;
             ComboBoxRoles.ItemsSource = DBEntities.GetContext().Roles.ToList();
         }
 
@@ -94,7 +87,7 @@ namespace WpfApp.Pages.Admin.Edit
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString());
+                MessageBox.Show("Ошибка при сохранении: " + ex.Message);
             }
         }
     }

@@ -3,6 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using WpfApp.Classes;
 using WpfApp.Pages.admin;
+using System.Windows.Forms.DataVisualization.Charting;
+using Word = Microsoft.Office.Interop.Word;
+using Excel = Microsoft.Office.Interop.Excel;
+using System;
+
 
 namespace WpfApp.Pages
 {
@@ -18,6 +23,15 @@ namespace WpfApp.Pages
             {
                 TabItemAdministration.Visibility = Visibility.Visible;
                 TabItemReports.Visibility = Visibility.Visible;
+
+                ChartBookings.ChartAreas.Add(new ChartArea("Main"));
+                var currentSeries = new Series("Бронирования") { 
+                    IsValueShownAsLabel = true
+                };
+                ChartBookings.Series.Add(currentSeries);
+
+                ComboBoxVehicleCategory.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+                ComboBoxDiagram.ItemsSource = Enum.GetValues(typeof(SeriesChartType));
             }
             DataContext = SessionManager.CurrentUser;
             Loaded += AccountPage_Loaded;
@@ -88,6 +102,38 @@ namespace WpfApp.Pages
         {
             SessionManager.SignOut();
             NavigationService.Navigate(new SignInPage());
+        }
+
+        private void UpdateChart(object sender, SelectionChangedEventArgs e)
+        {
+            if (ComboBoxDiagram.SelectedItem is SeriesChartType currentType) {
+                Series currentSeries = ChartBookings.Series.FirstOrDefault();
+                currentSeries.ChartType = currentType;
+                if (currentSeries == null)
+                    return;
+                
+                currentSeries.ChartType = currentType;
+                currentSeries.Points.Clear();
+
+                var context = DBEntities.GetContext();
+
+                var bookingCounts = context.Bookings
+                    .GroupBy(b => b.Vehicle.VehicleCategory.VehicleCategory1)
+                    .Select(g => new
+                    {
+                        VehicleCategory = g.Key,
+                        BookingCount = g.Count(),
+                    }).ToList();
+
+
+                foreach (var item in bookingCounts)
+                {
+                    currentSeries.Points.AddXY(item.VehicleCategory, item.BookingCount);
+                    
+
+                    currentSeries.Points.Last().ToolTip = $"{item.VehicleCategory}: {item.BookingCount} бронирований";
+                }
+            }
         }
     }
 }

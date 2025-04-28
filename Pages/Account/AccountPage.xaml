@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:WpfApp.Pages"
       mc:Ignorable="d"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      xmlns:charts="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
       d:DesignHeight="450"
       d:DesignWidth="1150"
       Title="AccountPage"
@@ -106,7 +107,41 @@
                          Name="TabItemReports"
                          Visibility="Collapsed"
                          d:Visibility="Visible">
-
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+                                <ComboBox Name="ComboBoxVehicleCategory"
+                                          SelectedIndex="0"
+                                          Margin="5"
+                                          materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                          DisplayMemberPath="VehicleCategory1"
+                                          SelectionChanged="UpdateChart" 
+                                          Style="{StaticResource OutlinedComboBox}"
+                                          materialDesign:HintAssist.Hint="Категория авто"/>
+                                <ComboBox Name="ComboBoxDiagram"
+                                          SelectedIndex="0"
+                                          Margin="5"
+                                          SelectionChanged="UpdateChart"
+                                          Style="{StaticResource OutlinedComboBox}"
+                                          materialDesign:HintAssist.Hint="Диаграмма" />
+                            </StackPanel>
+                        </StackPanel>
+                        <WindowsFormsHost Grid.Row="1"
+                                          >
+                            <charts:Chart x:Name="ChartBookings">
+                                <charts:Chart.Legends>
+                                    <charts:Legend>
+                                        
+                                    </charts:Legend>
+                                </charts:Chart.Legends>
+                            </charts:Chart>
+                        </WindowsFormsHost>
+                    </Grid>
                 </TabItem>
 
                 <TabItem x:Name="TabItemAdministration"

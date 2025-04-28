@@ -159,6 +159,8 @@
                 Value="5" />
         <Setter Property="Padding"
                 Value="0" />
+        <Setter Property="IsHitTestVisible"
+                Value="True" />
         <Setter Property="HorizontalContentAlignment"
                 Value="Stretch" />
         <Setter Property="Template">
@@ -194,26 +196,21 @@
                                 <StackPanel Grid.Column="1"
                                             Margin="10,0"
                                             VerticalAlignment="Center">
-                                    <TextBlock FontSize="18"
-                                               FontWeight="SemiBold">
-                                        <TextBlock.Text>
-                                            <MultiBinding StringFormat="{}{0} {1} {2}">
-                                                <Binding Path="Make"
-                                                         TargetNullValue='N/A' />
-                                                <Binding Path="Model"
-                                                         TargetNullValue='N/A' />
-                                                <Binding Path="Year"
-                                                         TargetNullValue='N/A' />
+                                <TextBlock FontSize="18"
+                                           FontWeight="SemiBold">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} {1} {2}">
+                                            <Binding Path="Make"
+                                                     TargetNullValue='N/A' />
+                                            <Binding Path="Model"
+                                                     TargetNullValue='N/A' />
+                                            <Binding Path="Year"
+                                                     TargetNullValue='N/A' />
                                         </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
+                                    </TextBlock.Text>
+                                </TextBlock>
 
-                                    <TextBlock FontSize="14"
-                                               Foreground="Gray"
-                                               Margin="0,2,0,0"
-                                               Text="{Binding Year, StringFormat='Год: {0}'}" />
-
-                                    <TextBlock FontSize="16"
+                                <TextBlock FontSize="16"
                                                Foreground="Black"
                                                Margin="0,6,0,0"
                                                FontWeight="Medium"
@@ -243,6 +240,13 @@
                 <Setter Property="Background"
                         Value="#FFDECEFD" />
             </Trigger>
+            <DataTrigger Binding="{Binding Available}"
+                         Value="False">
+                <Setter Property="IsHitTestVisible"
+                        Value="False" />
+                <Setter Property="Focusable"
+                        Value="False" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

@@ -24,7 +24,7 @@ namespace WpfApp
 
         private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
         {
-            Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList());
+            Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
             ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
             ListViewExploreCars.SelectedIndex = 0;
