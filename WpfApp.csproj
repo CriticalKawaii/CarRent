@@ -149,9 +149,6 @@
     <Compile Include="Pages\ExploreCarsPage.xaml.cs">
       <DependentUpon>ExploreCarsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\RentPage.xaml.cs">
-      <DependentUpon>RentPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\SignInPage.xaml.cs">
       <DependentUpon>SignInPage.xaml</DependentUpon>
     </Compile>
@@ -233,10 +230,6 @@
     </Page>
     <Page Include="Pages\ExploreCarsPage.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\RentPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\SignInPage.xaml">
       <SubType>Designer</SubType>

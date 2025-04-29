@@ -113,7 +113,14 @@
                         <StackPanel HorizontalAlignment="Center">
                             <StackPanel Orientation="Horizontal"
                                         HorizontalAlignment="Center">
-                                
+                                <ComboBox Name="ComboBoxVehicleCategory"
+                                          SelectedIndex="0"
+                                          Margin="5"
+                                          materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                          DisplayMemberPath="VehicleCategory1"
+                                          SelectionChanged="UpdateChart"
+                                          Style="{StaticResource OutlinedComboBox}"
+                                          materialDesign:HintAssist.Hint="Категория авто" />
                                 <ComboBox Name="ComboBoxDiagram"
                                           SelectedIndex="0"
                                           Margin="5"

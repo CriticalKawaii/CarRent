@@ -11,7 +11,8 @@
       Title="ExploreCarsPage"
       d:Height="800"
       d:Width="850"
-      FontFamily="{materialDesign:MaterialDesignFont}">
+      FontFamily="{materialDesign:MaterialDesignFont}"
+      IsVisibleChanged="Page_IsVisibleChanged">
     <Page.Resources>
         <materialDesign:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Page.Resources>
@@ -67,7 +68,8 @@
                     </materialDesign:HintAssist.Hint>
                 </ComboBox>
 
-                <Button Click="ButtonRemove_Click"
+                <Button x:Name="ButtonRemove" 
+                        Click="ButtonRemove_Click"
                         Grid.Column="3"
                         Style="{StaticResource FlatLightButton}"
                         Width="70">
@@ -229,6 +231,7 @@
                             <DatePicker Name="DatePickerStart"
                                         materialDesign:HintAssist.Hint="Дата начала аренды"
                                         Margin="5"
+                                        FontSize="14"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
                                         SelectedDateChanged="DatePickerStart_SelectedDateChanged"
                                         Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
@@ -236,12 +239,18 @@
                             <DatePicker Name="DatePickerEnd"
                                         materialDesign:HintAssist.Hint="Дата окончания аренды"
                                         Margin="5"
+                                        FontSize="14"
                                         IsEnabled="False"
+                                        SelectedDateChanged="DatePickerEnd_SelectedDateChanged"
                                         materialDesign:TextFieldAssist.HasClearButton="True"
                                         Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
 
                             <ComboBox x:Name="ComboBoxInsurance"
+                                      IsEnabled="False"
                                       materialDesign:HintAssist.Hint="Страховка"
+                                      materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                      materialDesign:TextFieldAssist.HasClearButton="True"
+                                      SelectionChanged="ComboBoxInsurance_SelectionChanged"
                                       Style="{StaticResource OutlinedComboBox}"
                                       Margin="5">
                                 <ComboBox.ItemTemplate>
@@ -256,8 +265,8 @@
 
                             <Button x:Name="ButtonRent"
                                     Click="ButtonRent_Click"
-                                    Content="{Binding DailyRate}"
-                                    ContentStringFormat="АРЕНДОВАТЬ {0:C}"
+                                    IsEnabled="False"
+                                    Content="Арендовать"
                                     HorizontalAlignment="Center"
                                     Style="{StaticResource RaisedLightButton}" />
                         </StackPanel>

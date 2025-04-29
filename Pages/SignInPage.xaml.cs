@@ -17,7 +17,7 @@ namespace WpfApp
 {
     public partial class SignInPage : Page
     {
-        public MainWindow mainWindow {get; set;}
+        public MainWindow MainWindow {get; set;}
         private int failedAttempts = 0;
         public string GeneratedCaptcha { get; private set; } 
 
@@ -30,7 +30,7 @@ namespace WpfApp
         public void SignInPage_Loaded(object sender, RoutedEventArgs e)
         {
             textBoxEmail.Focus();
-            mainWindow = Application.Current.MainWindow as MainWindow;
+            MainWindow = Application.Current.MainWindow as MainWindow;
         }
 
         private static string GetHash(string password)
@@ -127,8 +127,8 @@ namespace WpfApp
             string password = passwordBoxPassword.Password.Trim();
             string captchaText = captchaImage.Visibility == Visibility.Visible ? captchaInput.Text.Trim() : "";
             Authorize(email, password, captchaText);
-            if (mainWindow != null)
-                mainWindow.RadioButtonAccountIcon.Kind = PackIconKind.Account;
+            if (MainWindow != null)
+                MainWindow.RadioButtonAccountIcon.Kind = PackIconKind.Account;
         }
 
 
