@@ -104,10 +104,12 @@ namespace WpfApp
             }
             else
             {
-                ListViewExploreCars.IsEnabled = false;
-                TextBoxSearch.IsEnabled = false;
-                ComboBoxSort.IsEnabled = false;
-                ButtonRemove.IsEnabled = false;
+                //ListViewExploreCars.IsEnabled = false;
+                //TextBoxSearch.IsEnabled = false;
+                //ComboBoxSort.IsEnabled = false;
+                //ButtonRemove.IsEnabled = false;
+
+
             }
         }
 

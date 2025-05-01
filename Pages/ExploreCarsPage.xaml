@@ -8,431 +8,427 @@
       xmlns:local="clr-namespace:WpfApp"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
       mc:Ignorable="d"
+      d:Background="White"
       Title="ExploreCarsPage"
       d:Height="800"
       d:Width="850"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch"
       FontFamily="{materialDesign:MaterialDesignFont}"
       IsVisibleChanged="Page_IsVisibleChanged">
-    <Page.Resources>
-        <materialDesign:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-    </Page.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" 
+                              MinWidth="400"
+                              MaxWidth="420" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-    <Border  Style="{StaticResource FloatingBorder}"
-             Margin="20"
-             VerticalAlignment="Stretch">
-        <Grid>
+        <TextBox x:Name="TextBoxSearch"
+                 MaxLength="25"
+                 TextChanged="TextBoxSearch_TextChanged"
+                 Style="{StaticResource OutlinedTextBox}"
+                 materialDesign:TextFieldAssist.HasClearButton="True"
+                 materialDesign:TextFieldAssist.ClearButtonSize="20">
+            <materialDesign:HintAssist.Hint>
+                <materialDesign:PackIcon Kind="Search"
+                                         VerticalAlignment="Center"
+                                         Width="25"
+                                         Height="25"
+                                         Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
+            </materialDesign:HintAssist.Hint>
+        </TextBox>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition MinWidth="400"
-                                  MaxWidth="420" />
+                <ColumnDefinition />
+                <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <TextBox x:Name="TextBoxSearch"
-                     MaxLength="25"
-                     TextChanged="TextBoxSearch_TextChanged"
-                     Style="{StaticResource OutlinedTextBox}"
-                     materialDesign:TextFieldAssist.HasClearButton="True"
-                     materialDesign:TextFieldAssist.ClearButtonSize="20">
+            <ComboBox x:Name="ComboBoxSort"
+                      Style="{StaticResource OutlinedComboBox}"
+                      ItemsSource="{Binding VehicleCategories}"
+                      materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                      DisplayMemberPath="VehicleCategory1"
+                      SelectionChanged="ComboBoxSort_SelectionChanged">
                 <materialDesign:HintAssist.Hint>
-                    <materialDesign:PackIcon Kind="Search"
+                    <materialDesign:PackIcon Kind="Car"
                                              VerticalAlignment="Center"
                                              Width="25"
                                              Height="25"
                                              Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
                 </materialDesign:HintAssist.Hint>
-            </TextBox>
+            </ComboBox>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <ComboBox x:Name="ComboBoxSort"
-                          Style="{StaticResource OutlinedComboBox}"
-                          ItemsSource="{Binding VehicleCategories}"
-                          materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                          DisplayMemberPath="VehicleCategory1"
-                          SelectionChanged="ComboBoxSort_SelectionChanged">
-                    <materialDesign:HintAssist.Hint>
-                        <materialDesign:PackIcon Kind="Car"
-                                                 VerticalAlignment="Center"
-                                                 Width="25"
-                                                 Height="25"
-                                                 Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
-                    </materialDesign:HintAssist.Hint>
-                </ComboBox>
+            <Button x:Name="ButtonRemove"
+                    Click="ButtonRemove_Click"
+                    Grid.Column="3"
+                    Style="{StaticResource FlatLightButton}"
+                    Width="70">
+                <materialDesign:PackIcon Kind="FilterOff"
+                                         VerticalAlignment="Center"
+                                         Width="25"
+                                         Height="25"
+                                         Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
+            </Button>
+        </Grid>
 
-                <Button x:Name="ButtonRemove" 
-                        Click="ButtonRemove_Click"
-                        Grid.Column="3"
-                        Style="{StaticResource FlatLightButton}"
-                        Width="70">
-                    <materialDesign:PackIcon Kind="FilterOff"
-                                             VerticalAlignment="Center"
-                                             Width="25"
-                                             Height="25"
-                                             Foreground="{DynamicResource MaterialDesign.Brush.Primary}" />
-                </Button>
-            </Grid>
+        <ListView x:Name="ListViewExploreCars"
+                  materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  Grid.Row="2"
+                  ItemContainerStyle="{StaticResource ItemContainerStyleRentACar}"
+                  Style="{StaticResource MaterialDesignListView}"
+                  SelectionChanged="ListViewExploreCars_SelectionChanged"
+                  SelectionMode="Single"
+                  d:ItemsSource="{DynamicResource vehicles}"
+                  d:SelectedIndex="0"
+                  ScrollViewer.CanContentScroll="True"
+                  UseLayoutRounding="True">
 
-            <ListView x:Name="ListViewExploreCars"
-                      materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      Grid.Row="2"
-                      ItemContainerStyle="{StaticResource ItemContainerStyleRentACar}"
-                      Style="{StaticResource MaterialDesignListView}"
-                      SelectionChanged="ListViewExploreCars_SelectionChanged"
-                      SelectionMode="Single"
-                      d:ItemsSource="{DynamicResource vehicles}"
-                      d:SelectedIndex="0"
-                      ScrollViewer.CanContentScroll="True"
-                      UseLayoutRounding="True">
+            <!--для дизайна-->
+            <ListView.Resources>
+                <col:ArrayList x:Key="vehicles">
+                    <local:Vehicle Make="Toyota"
+                                   Year="2002"
+                                   DailyRate="22.229"
+                                   LicensePlate="aa777"
+                                   AvgRating="5"
+                                   Model="Obunga"
+                                   Available="True" />
+                    <local:Vehicle Make="Ford"
+                                   LicensePlate="bb777"
+                                   AvgRating="4.2"
+                                   Available="False" />
+                    <local:Vehicle Make="Volkswagen"
+                                   LicensePlate="cc777"
+                                   AvgRating="3.7" />
+                    <local:Vehicle Make="Geely"
+                                   LicensePlate="dd777" />
+                </col:ArrayList>
+            </ListView.Resources>
+            <!--для дизайна-->
+        </ListView>
 
-                <!--для дизайна-->
-                <ListView.Resources>
-                    <col:ArrayList x:Key="vehicles">
-                        <local:Vehicle Make="Toyota"
-                                       Year="2002"
-                                       DailyRate="22.229"
-                                       LicensePlate="aa777"
-                                       AvgRating="5"
-                                       Model="Obunga" 
-                                       Available="True"/>
-                        <local:Vehicle Make="Ford"
-                                       LicensePlate="bb777"
-                                       AvgRating="4.2" 
-                                       Available="False"/>
-                        <local:Vehicle Make="Volkswagen"
-                                       LicensePlate="cc777"
-                                       AvgRating="3.7" />
-                        <local:Vehicle Make="Geely"
-                                       LicensePlate="dd777" />
-                    </col:ArrayList>
-                </ListView.Resources>
-                <!--для дизайна-->
-            </ListView>
+        <ScrollViewer Grid.Column="1"
+                      Grid.RowSpan="3"
+                      materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
+            <StackPanel  Margin="5">
+                <Border Grid.Row="0"
+                        Margin="15"
+                        HorizontalAlignment="Center"
+                        CornerRadius="12"
+                        Background="White"
+                        MaxHeight="350"
+                        Effect="{StaticResource MaterialDesignShadowDepth2}">
+                    <Border.Triggers>
+                        <EventTrigger RoutedEvent="Border.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                     From="0"
+                                                     To="1"
+                                                     Duration="0:0:0.2" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </Border.Triggers>
 
-            <ScrollViewer Grid.Column="1"
-                          Grid.RowSpan="3"
-                          materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
-                <StackPanel  Margin="5">
-                    <Border Grid.Row="0"
-                            Margin="15"
-                            HorizontalAlignment="Center"
-                            CornerRadius="12"
-                            Background="White"
-                            MaxHeight="350"
-                            Effect="{StaticResource MaterialDesignShadowDepth2}">
-                        <Border.Triggers>
-                            <EventTrigger RoutedEvent="Border.Loaded">
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                                         From="0"
-                                                         To="1"
-                                                         Duration="0:0:0.2" />
-                                    </Storyboard>
-                                </BeginStoryboard>
-                            </EventTrigger>
-                        </Border.Triggers>
+                    <Grid>
+                        <Border CornerRadius="12"
+                                ClipToBounds="True"
+                                MaxWidth="711">
+                            <Image x:Name="imageVehicle"
+                                   Source="{Binding VehicleImageSource}"
+                                   Stretch="UniformToFill"
+                                   RenderOptions.BitmapScalingMode="HighQuality">
 
-                        <Grid>
-                            <Border CornerRadius="12"
-                                    ClipToBounds="True"
-                                    MaxWidth="711">
-                                <Image x:Name="imageVehicle"
-                                       Source="{Binding VehicleImageSource}"
-                                       Stretch="UniformToFill"
-                                       RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.Effect>
+                                    <DropShadowEffect ShadowDepth="0"
+                                                      BlurRadius="20"
+                                                      Opacity="0.3" />
+                                </Image.Effect>
+                            </Image>
+                        </Border>
 
-                                    <Image.Effect>
-                                        <DropShadowEffect ShadowDepth="0"
-                                                          BlurRadius="20"
-                                                          Opacity="0.3" />
-                                    </Image.Effect>
-                                </Image>
-                            </Border>
-
-                            <Border Background="#C8000000"
-                                    VerticalAlignment="Bottom"
-                                    HorizontalAlignment="Stretch"
-                                    Padding="15,10">
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Make}"
-                                               Foreground="White"
-                                               FontWeight="Bold"
-                                               FontSize="22"
-                                               HorizontalAlignment="Center" />
-                                    <TextBlock Foreground="White"
-                                               FontSize="16"
-                                               HorizontalAlignment="Center">
+                        <Border Background="#C8000000"
+                                VerticalAlignment="Bottom"
+                                HorizontalAlignment="Stretch"
+                                Padding="15,10">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Make}"
+                                           Foreground="White"
+                                           FontWeight="Bold"
+                                           FontSize="22"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Foreground="White"
+                                           FontSize="16"
+                                           HorizontalAlignment="Center">
                                         <Run Text="{Binding Model}" />
                                         <Run Text="{Binding Year}" />
-                                    </TextBlock>
-                                </StackPanel>
-                            </Border>
+                                </TextBlock>
+                            </StackPanel>
+                        </Border>
 
-                            <Border Background="Red"
-                                    CornerRadius="6"
-                                    Padding="12,4"
-                                    HorizontalAlignment="Right"
-                                    VerticalAlignment="Top"
-                                    Margin="0,15,15,0">
-                                <TextBlock Text="Недоступно"
+                        <Border Background="Red"
+                                CornerRadius="6"
+                                Padding="12,4"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Margin="0,15,15,0">
+                            <TextBlock Text="Недоступно"
+                                       Foreground="White"
+                                       FontWeight="Medium" />
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Visibility"
+                                            Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Available}"
+                                                     Value="False">
+                                            <Setter Property="Visibility"
+                                                    Value="Visible" />
+                                        </DataTrigger>
+
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+
+                        <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
+                                CornerRadius="6"
+                                Padding="8,4"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Margin="15,15,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Star"
+                                                         Foreground="White"
+                                                         VerticalAlignment="Center"
+                                                         Margin="0,0,4,0" />
+                                <TextBlock Text="{Binding AvgRating, StringFormat={}{0:F1}}"
                                            Foreground="White"
                                            FontWeight="Medium" />
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Setter Property="Visibility"
-                                                Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Available}"
-                                                         Value="False">
-                                                <Setter Property="Visibility"
-                                                        Value="Visible" />
-                                            </DataTrigger>
-                                            
-                                        </Style.Triggers>
-                                    </Style> 
-                                </Border.Style>
-                            </Border>
-
-                            <Border Background="{DynamicResource MaterialDesign.Brush.Secondary}"
-                                    CornerRadius="6"
-                                    Padding="8,4"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Margin="15,15,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <materialDesign:PackIcon Kind="Star"
-                                                             Foreground="White"
-                                                             VerticalAlignment="Center"
-                                                             Margin="0,0,4,0" />
-                                    <TextBlock Text="{Binding AvgRating, StringFormat={}{0:F1}}"
-                                               Foreground="White"
-                                               FontWeight="Medium" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                    </Border>
-                    <GroupBox Header="Аренда"
-                              MaxWidth="500"
-                              IsEnabled="{Binding Available}"
-                              Style="{StaticResource MaterialDesignCardGroupBox}"
-                              Margin="0,10,0,10">
-                        <StackPanel>
-                            <!--DisplayDateStart="{x:Static sys:DateTime.Today}"-->
-                            <DatePicker Name="DatePickerStart"
-                                        materialDesign:HintAssist.Hint="Дата начала аренды"
-                                        Margin="5"
-                                        FontSize="14"
-                                        materialDesign:TextFieldAssist.HasClearButton="True"
-                                        SelectedDateChanged="DatePickerStart_SelectedDateChanged"
-                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-                            
-                            <DatePicker Name="DatePickerEnd"
-                                        materialDesign:HintAssist.Hint="Дата окончания аренды"
-                                        Margin="5"
-                                        FontSize="14"
-                                        IsEnabled="False"
-                                        SelectedDateChanged="DatePickerEnd_SelectedDateChanged"
-                                        materialDesign:TextFieldAssist.HasClearButton="True"
-                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
-
-                            <ComboBox x:Name="ComboBoxInsurance"
-                                      IsEnabled="False"
-                                      materialDesign:HintAssist.Hint="Страховка"
-                                      materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                                      materialDesign:TextFieldAssist.HasClearButton="True"
-                                      SelectionChanged="ComboBoxInsurance_SelectionChanged"
-                                      Style="{StaticResource OutlinedComboBox}"
-                                      Margin="5">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding InsuranceName}" />
-                                            <TextBlock Text="{Binding InsurancePrice, StringFormat={}{0:C}}" />
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-
-                            <Button x:Name="ButtonRent"
-                                    Click="ButtonRent_Click"
-                                    IsEnabled="False"
-                                    Content="Арендовать"
-                                    HorizontalAlignment="Center"
-                                    Style="{StaticResource RaisedLightButton}" />
-                        </StackPanel>
-                    </GroupBox>
-
-
-                    <GroupBox Header="Характеристики"
-                              Style="{StaticResource MaterialDesignCardGroupBox}"
-                              Margin="0,10,0,10">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="0"
-                                       Text="Категория:"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       FontWeight="Medium"
-                                       Margin="0,0,10,5" />
-                            <TextBlock Grid.Row="0"
-                                       Grid.Column="1"
-                                       Text="{Binding VehicleCategory.VehicleCategory1}"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       Margin="0,0,0,5" />
-
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="0"
-                                       Text="Суточная ставка:"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       FontWeight="Medium"
-                                       Margin="0,0,10,5" />
-                            <TextBlock Grid.Row="1"
-                                       Grid.Column="1"
-                                       Text="{Binding DailyRate, StringFormat=C}"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       Margin="0,0,0,5" />
-
-                            <TextBlock Grid.Row="2"
-                                       Grid.Column="0"
-                                       Text="Номер:"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       FontWeight="Medium"
-                                       Margin="0,0,10,5" />
-                            <TextBlock Grid.Row="2"
-                                       Grid.Column="1"
-                                       Text="{Binding LicensePlate}"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       Margin="0,0,0,5" />
-
-                            <TextBlock Grid.Row="3"
-                                       Grid.Column="0"
-                                       Text="Рейтинг:"
-                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                       FontWeight="Medium"
-                                       Margin="0,0,10,5" />
-                            <StackPanel Grid.Row="3"
-                                        Grid.Column="1"
-                                        Orientation="Horizontal">
-                                <materialDesign:RatingBar Value="{Binding AvgRating}"
-                                                          IsReadOnly="True"
-                                                          VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding AvgRating, StringFormat={}{0:F1}}"
-                                           Style="{StaticResource MaterialDesignBody1TextBlock}"
-                                           Margin="10,0,0,0"
-                                           VerticalAlignment="Center"
-                                           d:Text="0" />
                             </StackPanel>
+                        </Border>
+                    </Grid>
+                </Border>
+                <GroupBox Header="Аренда"
+                          MaxWidth="500"
+                          IsEnabled="{Binding Available}"
+                          Style="{StaticResource MaterialDesignCardGroupBox}"
+                          Margin="0,10,0,10">
+                    <StackPanel>
+                        <!--DisplayDateStart="{x:Static sys:DateTime.Today}"-->
+                        <DatePicker Name="DatePickerStart"
+                                    materialDesign:HintAssist.Hint="Дата начала аренды"
+                                    Margin="5"
+                                    FontSize="14"
+                                    materialDesign:TextFieldAssist.HasClearButton="True"
+                                    SelectedDateChanged="DatePickerStart_SelectedDateChanged"
+                                    Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
 
+                        <DatePicker Name="DatePickerEnd"
+                                    materialDesign:HintAssist.Hint="Дата окончания аренды"
+                                    Margin="5"
+                                    FontSize="14"
+                                    IsEnabled="False"
+                                    SelectedDateChanged="DatePickerEnd_SelectedDateChanged"
+                                    materialDesign:TextFieldAssist.HasClearButton="True"
+                                    Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
 
-                        </Grid>
-                    </GroupBox>
-
-                    <GroupBox Header="Отзывы"
-                              Style="{StaticResource MaterialDesignCardGroupBox}">
-                        <ListView x:Name="ListViewReviews"
-                                  d:ItemsSource="{d:SampleData ItemCount=5}"
-                                  ItemsSource="{Binding Reviews}"
-                                  IsHitTestVisible="False"
-                                  ScrollViewer.CanContentScroll="False"
-                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
-
-                            <ListView.ItemTemplate>
+                        <ComboBox x:Name="ComboBoxInsurance"
+                                  IsEnabled="False"
+                                  materialDesign:HintAssist.Hint="Страховка"
+                                  materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                  materialDesign:TextFieldAssist.HasClearButton="True"
+                                  SelectionChanged="ComboBoxInsurance_SelectionChanged"
+                                  Style="{StaticResource OutlinedComboBox}"
+                                  Margin="5">
+                            <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <materialDesign:Card Margin="8"
-                                                         Padding="0"
-                                                         UniformCornerRadius="4">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding InsuranceName}" />
+                                        <TextBlock Text="{Binding InsurancePrice, StringFormat={}{0:C}}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
-                                            <Grid Grid.Row="0"
-                                                  Background="{DynamicResource MaterialDesignDivider}">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <materialDesign:PackIcon Kind="Account"
-                                                                             VerticalAlignment="Center"
-                                                                             Margin="0,0,8,0" />
-                                                    <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}">
+                        <Button x:Name="ButtonRent"
+                                Click="ButtonRent_Click"
+                                IsEnabled="False"
+                                Content="Арендовать"
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource RaisedLightButton}" />
+                    </StackPanel>
+                </GroupBox>
+
+
+                <GroupBox Header="Характеристики"
+                          Style="{StaticResource MaterialDesignCardGroupBox}"
+                          Margin="0,10,0,10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Категория:"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   FontWeight="Medium"
+                                   Margin="0,0,10,5" />
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="1"
+                                   Text="{Binding VehicleCategory.VehicleCategory1}"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   Margin="0,0,0,5" />
+
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="Суточная ставка:"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   FontWeight="Medium"
+                                   Margin="0,0,10,5" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="{Binding DailyRate, StringFormat=C}"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   Margin="0,0,0,5" />
+
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="0"
+                                   Text="Номер:"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   FontWeight="Medium"
+                                   Margin="0,0,10,5" />
+                        <TextBlock Grid.Row="2"
+                                   Grid.Column="1"
+                                   Text="{Binding LicensePlate}"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   Margin="0,0,0,5" />
+
+                        <TextBlock Grid.Row="3"
+                                   Grid.Column="0"
+                                   Text="Рейтинг:"
+                                   Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                   FontWeight="Medium"
+                                   Margin="0,0,10,5" />
+                        <StackPanel Grid.Row="3"
+                                    Grid.Column="1"
+                                    Orientation="Horizontal">
+                            <materialDesign:RatingBar Value="{Binding AvgRating}"
+                                                      IsReadOnly="True"
+                                                      VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding AvgRating, StringFormat={}{0:F1}}"
+                                       Style="{StaticResource MaterialDesignBody1TextBlock}"
+                                       Margin="10,0,0,0"
+                                       VerticalAlignment="Center"
+                                       d:Text="0" />
+                        </StackPanel>
+
+
+                    </Grid>
+                </GroupBox>
+
+                <GroupBox Header="Отзывы"
+                          Style="{StaticResource MaterialDesignCardGroupBox}">
+                    <ListView x:Name="ListViewReviews"
+                              d:ItemsSource="{d:SampleData ItemCount=5}"
+                              ItemsSource="{Binding Reviews}"
+                              IsHitTestVisible="False"
+                              ScrollViewer.CanContentScroll="False"
+                              ScrollViewer.VerticalScrollBarVisibility="Auto">
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <materialDesign:Card Margin="8"
+                                                     Padding="0"
+                                                     UniformCornerRadius="4">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0"
+                                              Background="{DynamicResource MaterialDesignDivider}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <materialDesign:PackIcon Kind="Account"
+                                                                         VerticalAlignment="Center"
+                                                                         Margin="0,0,8,0" />
+                                                <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}">
                                                         <Run Text="{Binding User.FirstName}" />
                                                         <Run Text="{Binding User.LastName}" />
-                                                    </TextBlock>
+                                                </TextBlock>
 
-                                                    <Separator Width="20"
-                                                               Visibility="Hidden" />
+                                                <Separator Width="20"
+                                                           Visibility="Hidden" />
 
-                                                    <materialDesign:PackIcon Kind="Car"
-                                                                             VerticalAlignment="Center"
-                                                                             Margin="0,0,8,0" />
-                                                    <TextBlock Text="{Binding VehicleID}"
-                                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
-                                                </StackPanel>
-                                            </Grid>
-
-                                            <StackPanel Grid.Row="1"
-                                                        Margin="16">
-                                                <TextBlock Text="{Binding Comment}"
-                                                           TextWrapping="Wrap"
-                                                           Style="{StaticResource MaterialDesignBody1TextBlock}" />
-                                            </StackPanel>
-
-                                            <Grid Grid.Row="2"
-                                                  Background="#FFF4F4F4">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-
-                                                <materialDesign:RatingBar Value="{Binding Rating}"
-                                                                          IsReadOnly="True" />
-
-                                                <TextBlock Grid.Column="1"
-                                                           Text="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}"
-                                                           Margin="0,0,10,0"
-                                                           VerticalAlignment="Center"
+                                                <materialDesign:PackIcon Kind="Car"
+                                                                         VerticalAlignment="Center"
+                                                                         Margin="0,0,8,0" />
+                                                <TextBlock Text="{Binding VehicleID}"
                                                            Style="{StaticResource MaterialDesignCaptionTextBlock}" />
-                                            </Grid>
+                                            </StackPanel>
                                         </Grid>
-                                    </materialDesign:Card>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
 
-                            <ListView.ItemContainerStyle>
-                                <Style TargetType="ListViewItem"
-                                       BasedOn="{StaticResource MaterialDesignListBoxItem}">
-                                    <Setter Property="HorizontalContentAlignment"
-                                            Value="Stretch" />
-                                    <Setter Property="Padding"
-                                            Value="0" />
-                                </Style>
-                            </ListView.ItemContainerStyle>
-                        </ListView>
-                    </GroupBox>
-                </StackPanel>
-            </ScrollViewer>
-        </Grid>
-    </Border>
+                                        <StackPanel Grid.Row="1"
+                                                    Margin="16">
+                                            <TextBlock Text="{Binding Comment}"
+                                                       TextWrapping="Wrap"
+                                                       Style="{StaticResource MaterialDesignBody1TextBlock}" />
+                                        </StackPanel>
+
+                                        <Grid Grid.Row="2"
+                                              Background="#FFF4F4F4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+
+                                            <materialDesign:RatingBar Value="{Binding Rating}"
+                                                                      IsReadOnly="True" />
+
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}"
+                                                       Margin="0,0,10,0"
+                                                       VerticalAlignment="Center"
+                                                       Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                        </Grid>
+                                    </Grid>
+                                </materialDesign:Card>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem"
+                                   BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                <Setter Property="HorizontalContentAlignment"
+                                        Value="Stretch" />
+                                <Setter Property="Padding"
+                                        Value="0" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                    </ListView>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </Page>

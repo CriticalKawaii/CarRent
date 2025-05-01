@@ -38,5 +38,15 @@ namespace WpfApp
         {
             Dispatcher.InvokeAsync( () => { frameMainWindow?.Navigate(ExploreCarsPage); } );
         }
+
+        private void frameMainWindow_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
+        {
+            LoadingProgressBar.Visibility = Visibility.Collapsed;
+        }
+
+        private void frameMainWindow_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            LoadingProgressBar.Visibility = Visibility.Visible;
+        }
     }
 }

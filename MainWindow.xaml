@@ -59,9 +59,24 @@
                                          Height="30" />
             </RadioButton>
         </StackPanel>
-        <Frame Grid.Row="1"
-               Grid.ColumnSpan="3"
-               x:Name="frameMainWindow"
-               NavigationUIVisibility="Hidden" />
+        
+        <Border Grid.Row="1"
+                Grid.ColumnSpan="3"
+                Style="{StaticResource FloatingBorder}">
+            <Grid>
+                <ProgressBar x:Name="LoadingProgressBar"
+                             IsIndeterminate="True"
+                             Visibility="Collapsed"
+                             Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             Value="0" />
+                <Frame x:Name="frameMainWindow"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Stretch"
+                       NavigationUIVisibility="Hidden"
+                       Navigating="frameMainWindow_Navigating"
+                       LoadCompleted="frameMainWindow_LoadCompleted"/>
+            </Grid>
+            
+        </Border>
     </Grid>
 </Window>

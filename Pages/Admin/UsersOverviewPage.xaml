@@ -52,13 +52,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button x:Name="ButtonEdit"
-                                    Click="ButtonEdit_Click">
-                                <materialDesign:PackIcon Kind="EditOutline"
-                                                         VerticalAlignment="Center"
-                                                         HorizontalAlignment="Center"
-                                                         Width="16"
-                                                         Height="16" />
-                            </Button>
+                                    Click="ButtonEdit_Click"
+                                    Content="{materialDesign:PackIcon Kind=Edit,Size=16}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -71,20 +66,14 @@
                     Orientation="Horizontal">
             <Button Margin="10"
                     Name="ButtonAdd"
+                    Content="{materialDesign:PackIcon Kind=Add,Size=16}"
                     HorizontalAlignment="Left"
-                    Click="ButtonAdd_Click">
-                <materialDesign:PackIcon Kind="Add"
-                                         Width="16"
-                                         Height="16" />
-            </Button>
+                    Click="ButtonAdd_Click" />
             <Button Margin="10"
                     Name="ButtonDel"
                     HorizontalAlignment="Right"
-                    Click="ButtonDel_Click">
-                <materialDesign:PackIcon Kind="DeleteOutline"
-                                         Width="16"
-                                         Height="16" />
-            </Button>
+                    Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                    Click="ButtonDel_Click" />
         </StackPanel>
     </Grid>
 </Page>

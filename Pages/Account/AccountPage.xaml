@@ -10,11 +10,9 @@
       d:DesignHeight="450"
       d:DesignWidth="1150"
       Title="AccountPage"
+      d:Background="White"
       FontFamily="{materialDesign:MaterialDesignFont}">
 
-    <Border Margin="20"
-            Style="{StaticResource FloatingBorder}"
-            VerticalAlignment="Stretch">
         <StackPanel>
             <DockPanel>
                 <Button Style="{StaticResource FlatLightButton}"
@@ -37,17 +35,33 @@
 
                     <DataGrid x:Name="DataGridUserBookings"
                               AutoGenerateColumns="False"
-                              IsReadOnly="True">
+                              IsReadOnly="True"
+                              d:ItemsSource="{d:SampleData ItemCount=3}">
+                        
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID"
-                                                Binding="{Binding BookingID}"
-                                                Width="Auto" />
-                            <DataGridTextColumn Header="Автомобиль"
-                                                Binding="{Binding Vehicle.Make}"
-                                                Width="*" />
-                            <DataGridTextColumn Header="Модель"
-                                                Binding="{Binding Vehicle.Model}"
-                                                Width="*" />
+                            <DataGridTemplateColumn Header="Фото" MaxWidth="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Source="{Binding Vehicle.VehicleImageSource}"
+                                               Stretch="UniformToFill"
+                                               RenderOptions.BitmapScalingMode="HighQuality" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Автомобиль"
+                                                    Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <Run Text="{Binding Vehicle.Make}" />
+                                            <Run Text="{Binding Vehicle.Model}" />
+                                            <Run Text="{Binding Vehicle.Year}" />
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Начало"
                                                 Binding="{Binding StartDate, StringFormat='{}{0:dd.MM.yyyy}'}"
                                                 Width="*" />
@@ -63,13 +77,9 @@
                             <DataGridTemplateColumn Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button x:Name="ButtonViewDetails"
-                                                Click="ButtonViewBookingDetails_Click"
-                                                Style="{StaticResource MaterialDesignFlatButton}">
-                                            <materialDesign:PackIcon Kind="Eye"
-                                                                     Width="20"
-                                                                     Height="20" />
-                                        </Button>
+                                        <Button x:Name="ButtonReview"
+                                                Click="ButtonReview_Click"
+                                                Content="{materialDesign:PackIcon Kind=RateReview,Size=16}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -194,5 +204,4 @@
                 </TabItem>
             </TabControl>
         </StackPanel>
-    </Border>
 </Page>

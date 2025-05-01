@@ -50,7 +50,7 @@ namespace WpfApp.Pages
             }
         }
 
-        private void ButtonViewBookingDetails_Click(object sender, RoutedEventArgs e)
+        private void ButtonReview_Click(object sender, RoutedEventArgs e)
         {
             /*
             var booking = (sender as Button).DataContext as Booking;
