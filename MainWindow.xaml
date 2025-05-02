@@ -10,10 +10,10 @@
         Style="{StaticResource MaterialDesignWindow}"
         FontFamily="{materialDesign:MaterialDesignFont}"
         Title="RENT-A-CAR"
-        Height="647"
-        MinHeight="647"
-        Width="1150"
-        MinWidth="1150"
+        Height="700"
+        MinHeight="700"
+        Width="1244"
+        MinWidth="1244"
         WindowStartupLocation="CenterScreen">
 
     <Grid>
@@ -66,9 +66,8 @@
             <Grid>
                 <ProgressBar x:Name="LoadingProgressBar"
                              IsIndeterminate="True"
-                             Visibility="Collapsed"
-                             Style="{StaticResource MaterialDesignCircularProgressBar}"
-                             Value="0" />
+                             Visibility="Visible"
+                             Style="{StaticResource MaterialDesignCircularProgressBar}"/>
                 <Frame x:Name="frameMainWindow"
                        HorizontalAlignment="Stretch"
                        VerticalAlignment="Stretch"

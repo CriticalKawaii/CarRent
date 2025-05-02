@@ -90,5 +90,10 @@ namespace WpfApp.Pages.Admin.Edit
                 MessageBox.Show("Ошибка при сохранении: " + ex.Message);
             }
         }
+
+        private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 using Word = Microsoft.Office.Interop.Word;
 using Excel = Microsoft.Office.Interop.Excel;
 using System;
+using WpfApp.Pages.Account;
 
 
 namespace WpfApp.Pages
@@ -52,24 +53,7 @@ namespace WpfApp.Pages
 
         private void ButtonReview_Click(object sender, RoutedEventArgs e)
         {
-            /*
-            var booking = (sender as Button).DataContext as Booking;
-            if (booking != null)
-            {
-                NavigationService.Navigate(new BookingDetailsPage(booking.BookingID));
-            }5
-            */
-
-            if ((sender as Button).DataContext is Booking booking)
-            {
-
-                var message = $"Бронирование №{booking.BookingID}\n" +
-                              $"Автомобиль: {booking.Vehicle.Make} {booking.Vehicle.Model}\n" +
-                              $"Период: {booking.StartDate:dd.MM.yyyy} - {booking.EndDate:dd.MM.yyyy}\n" +
-                              $"Стоимость: {booking.TotalCost:C}";
-
-                MessageBox.Show(message, "Детали бронирования", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+            NavigationService.Navigate(new ReviewPage((sender as Button).DataContext as Booking));
         }
 
         private void ButtonUsersPage_Checked(object sender, RoutedEventArgs e)

@@ -12,8 +12,6 @@
       Title="ExploreCarsPage"
       d:Height="800"
       d:Width="850"
-      HorizontalAlignment="Stretch"
-      VerticalAlignment="Stretch"
       FontFamily="{materialDesign:MaterialDesignFont}"
       IsVisibleChanged="Page_IsVisibleChanged">
     <Grid>
@@ -28,7 +26,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        
         <TextBox x:Name="TextBoxSearch"
                  MaxLength="25"
                  TextChanged="TextBoxSearch_TextChanged"
@@ -100,11 +98,12 @@
                                    LicensePlate="aa777"
                                    AvgRating="5"
                                    Model="Obunga"
-                                   Available="True" />
+                                   Available="True"
+                                   />
                     <local:Vehicle Make="Ford"
                                    LicensePlate="bb777"
                                    AvgRating="4.2"
-                                   Available="False" />
+                                   Available="False"/>
                     <local:Vehicle Make="Volkswagen"
                                    LicensePlate="cc777"
                                    AvgRating="3.7" />
@@ -142,12 +141,12 @@
                     <Grid>
                         <Border CornerRadius="12"
                                 ClipToBounds="True"
-                                MaxWidth="711">
+                                MaxWidth="711"
+                                >
                             <Image x:Name="imageVehicle"
-                                   Source="{Binding VehicleImageSource}"
+                                   Source="{Binding VehicleImageSource, TargetNullValue=Resources/Images/car_placeholder.png, FallbackValue=Resources/Images/car_placeholder.png}"
                                    Stretch="UniformToFill"
                                    RenderOptions.BitmapScalingMode="HighQuality">
-
                                 <Image.Effect>
                                     <DropShadowEffect ShadowDepth="0"
                                                       BlurRadius="20"
@@ -430,5 +429,12 @@
                 </GroupBox>
             </StackPanel>
         </ScrollViewer>
+        <ProgressBar x:Name="LoadingProgressBar"
+                     IsIndeterminate="True"
+                     Visibility="Visible"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Value="0"
+                     Grid.ColumnSpan="2"
+                     Grid.RowSpan="3" />
     </Grid>
 </Page>

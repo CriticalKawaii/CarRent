@@ -20,12 +20,6 @@ namespace WpfApp
         public ExploreCarsPage()
         {
             InitializeComponent();
-            Loaded += ExploreCarsPage_Loaded;
-            
-        }
-
-        private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
-        {
             Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
             ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
@@ -33,9 +27,17 @@ namespace WpfApp
             ComboBoxInsurance.ItemsSource = DBEntities.GetContext().Insurances.ToList();
             MainWindow = Application.Current.MainWindow as MainWindow;
 
+            Loaded += ExploreCarsPage_Loaded;
+            
+        }
+
+        private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
+        {
             DatePickerStart.DisplayDateStart = DateTime.Today.AddDays(1);
             DatePickerStart.SelectedDate = DatePickerStart.DisplayDateStart;
             DatePickerStart.DisplayDateEnd = DateTime.Today.AddMonths(1);
+
+            LoadingProgressBar.Visibility = Visibility.Collapsed;
         }
 
         private void ListViewItem_Selected(object sender, RoutedEventArgs e)

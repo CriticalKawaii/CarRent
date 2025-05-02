@@ -128,6 +128,9 @@
     <Compile Include="Pages\Account\AccountPage.xaml.cs">
       <DependentUpon>AccountPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Account\ReviewPage.xaml.cs">
+      <DependentUpon>ReviewPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Admin\BookingsOverviewPage.xaml.cs">
       <DependentUpon>BookingsOverviewPage.xaml</DependentUpon>
     </Compile>
@@ -201,6 +204,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Pages\Account\AccountPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Account\ReviewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

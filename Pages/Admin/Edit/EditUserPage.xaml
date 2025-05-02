@@ -12,6 +12,7 @@
       d:Background="White">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
@@ -20,37 +21,43 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
+        <Button Name="ButtonGoBack"
+                Content="{materialDesign:PackIcon Kind=ArrowBack,Size=20}"
+                Click="ButtonGoBack_Click"
+                Style="{StaticResource FlatLightButton}"
+                HorizontalAlignment="Left"
+                IsCancel="True" />
+        
         <ComboBox Name="ComboBoxRoles"
                   ItemsSource="{Binding Roles}"
                   DisplayMemberPath="Role1"
                   SelectedItem="{Binding Role}"
-                  Grid.Row="0"
+                  Grid.Row="1"
                   materialDesign:HintAssist.Hint="Роль"
                   Style="{StaticResource FloatingHintComboBox}" />
-        <TextBox Grid.Row="1"
+        <TextBox Grid.Row="2"
                  Text="{Binding Email}"
                  materialDesign:HintAssist.Hint="E-mail"
                  Style="{StaticResource FloatingHintTextBox}" />
-        <TextBox Grid.Row="2"
+        <TextBox Grid.Row="3"
                  Text="{Binding FirstName}"
                  materialDesign:HintAssist.Hint="Имя"
                  Style="{StaticResource FloatingHintTextBox}" />
-        <TextBox Grid.Row="3"
+        <TextBox Grid.Row="4"
                  Text="{Binding LastName}"
                  materialDesign:HintAssist.Hint="Фамилия"
                  Style="{StaticResource FloatingHintTextBox}" />
-        <TextBox Grid.Row="4"
+        <TextBox Grid.Row="5"
                  x:Name="TextBoxPassword"
                  Text="{Binding PasswordHash}"
                  materialDesign:HintAssist.Hint="Пароль"
                  Style="{StaticResource FloatingHintTextBox}" />
 
         <Button Name="ButtonSave"
-                Content="Сохранить"
-                Grid.Row="5"
+                Content="{materialDesign:PackIcon Kind=ContentSave,Size=20}"
+                Grid.Row="6"
                 Click="ButtonSave_Click"
                 HorizontalAlignment="Center"
-                Style="{StaticResource RaisedLightButton}"
                 IsDefault="True" />
     </Grid>
 </Page>
