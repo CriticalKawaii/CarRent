@@ -74,16 +74,39 @@
                             <DataGridTextColumn Header="Статус"
                                                 Binding="{Binding BookingStatus.BookingStatus1}"
                                                 Width="*" />
-                            <DataGridTemplateColumn Width="Auto">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button x:Name="ButtonReview"
-                                                Click="ButtonReview_Click"
-                                                Content="{materialDesign:PackIcon Kind=RateReview,Size=16}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
+                        <DataGridTemplateColumn Width="Auto">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button x:Name="ButtonReview"
+                                            Click="ButtonReview_Click">
+                                        <Button.Content>
+                                            <materialDesign:PackIcon Kind="RateReview"
+                                                                     Width="16"
+                                                                     Height="16" />
+                                        </Button.Content>
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource RaisedLightButton}">
+                                                <Setter Property="Visibility"
+                                                        Value="Collapsed" />
+                                                <Setter Property="IsEnabled"
+                                                        Value="False" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                 Value="Completed">
+                                                        <Setter Property="IsEnabled"
+                                                                Value="True" />
+                                                        <Setter Property="Visibility"
+                                                                Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
                     </DataGrid>
                 </TabItem>
 
