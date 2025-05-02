@@ -13,33 +13,39 @@
       d:Background="White"
       FontFamily="{materialDesign:MaterialDesignFont}">
 
-        <StackPanel>
-            <DockPanel>
-                <Button Style="{StaticResource FlatLightButton}"
-                        HorizontalAlignment="Center"
-                        Foreground="Red"
-                        ToolTip="Выход"
-                        Content="{materialDesign:PackIcon SignOut, Size=25}"
-                        Click="ButtonSignOut_Click">
-                </Button>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <DockPanel>
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                    BorderBrush="Red"
+                    Margin="10"
+                    HorizontalAlignment="Center"
+                    Foreground="Red"
+                    ToolTip="Выход"
+                    Content="{materialDesign:PackIcon SignOut, Size=25}"
+                    Click="ButtonSignOut_Click">
+            </Button>
 
-                <TextBlock d:Text="Личный кабинет"
-                           VerticalAlignment="Center"
-                           Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
-                           Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                           DockPanel.Dock="Right" />
-            </DockPanel>
-            <TabControl>
-                <TabItem Header="Мои аренды">
-
-
+            <TextBlock d:Text="Личный кабинет"
+                       VerticalAlignment="Center"
+                       Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
+                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                       DockPanel.Dock="Right" />
+        </DockPanel>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Мои аренды">
+                <Grid>
                     <DataGrid x:Name="DataGridUserBookings"
                               AutoGenerateColumns="False"
                               IsReadOnly="True"
-                              d:ItemsSource="{d:SampleData ItemCount=3}">
-                        
+                              d:ItemsSource="{d:SampleData ItemCount=8}">
+
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Фото" MaxWidth="150">
+                            <DataGridTemplateColumn Header="Фото"
+                                                    MaxWidth="150">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Image Source="{Binding Vehicle.VehicleImageSource}"
@@ -50,7 +56,9 @@
                             </DataGridTemplateColumn>
 
                             <DataGridTemplateColumn Header="Автомобиль"
-                                                    Width="*">
+                                                    Width="*"
+                                                    CanUserSort="True"
+                                                    SortMemberPath="Vehicle.Make">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock>
@@ -64,7 +72,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Начало"
                                                 Binding="{Binding StartDate, StringFormat='{}{0:dd.MM.yyyy}'}"
-                                                Width="*" />
+                                                Width="*"/>
                             <DataGridTextColumn Header="Окончание"
                                                 Binding="{Binding EndDate, StringFormat='{}{0:dd.MM.yyyy}'}"
                                                 Width="*" />
@@ -74,157 +82,202 @@
                             <DataGridTextColumn Header="Статус"
                                                 Binding="{Binding BookingStatus.BookingStatus1}"
                                                 Width="*" />
-                        <DataGridTemplateColumn Width="Auto">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button x:Name="ButtonReview"
-                                            Click="ButtonReview_Click">
-                                        <Button.Content>
-                                            <materialDesign:PackIcon Kind="RateReview"
-                                                                     Width="16"
-                                                                     Height="16" />
-                                        </Button.Content>
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource RaisedLightButton}">
-                                                <Setter Property="Visibility"
-                                                        Value="Collapsed" />
-                                                <Setter Property="IsEnabled"
-                                                        Value="False" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
-                                                                 Value="Completed">
-                                                        <Setter Property="IsEnabled"
-                                                                Value="True" />
-                                                        <Setter Property="Visibility"
-                                                                Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                    </DataGrid.Columns>
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button x:Name="ButtonReview"
+                                                Click="ButtonReview_Click">
+                                            <Button.Content>
+                                                <materialDesign:PackIcon Kind="RateReview"
+                                                                         Width="16"
+                                                                         Height="16" />
+                                            </Button.Content>
+                                            <Button.Style>
+                                                <Style TargetType="Button"
+                                                       BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                                    <Setter Property="Visibility"
+                                                            Value="Collapsed" />
+                                                    <Setter Property="IsEnabled"
+                                                            Value="False" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                     Value="Completed">
+                                                            <Setter Property="IsEnabled"
+                                                                    Value="True" />
+                                                            <Setter Property="Visibility"
+                                                                    Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
                     </DataGrid>
-                </TabItem>
+                    <TextBlock x:Name="TextBlockNoBookings"
+                               Text="Нет бронирований"
+                               FontStyle="Italic"
+                               Foreground="Gray"
+                               Visibility="Collapsed"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                </Grid>
+            </TabItem>
 
-                <TabItem Header="Личные данные">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+            <TabItem Header="Личные данные">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
 
-                        <TextBox Grid.Row="0"
-                                 Text="{Binding Email}"
-                                 materialDesign:HintAssist.Hint="E-mail"
-                                 Style="{StaticResource FloatingHintTextBox}" />
-                        <TextBox Grid.Row="1"
-                                 Text="{Binding FirstName}"
-                                 materialDesign:HintAssist.Hint="Имя"
-                                 Style="{StaticResource FloatingHintTextBox}" />
-                        <TextBox Grid.Row="2"
-                                 Text="{Binding LastName}"
-                                 materialDesign:HintAssist.Hint="Фамилия"
-                                 Style="{StaticResource FloatingHintTextBox}" />
-                    </Grid>
-                </TabItem>
+                    </Grid.RowDefinitions>
 
-                <TabItem Header="Отчеты"
-                         Name="TabItemReports"
-                         Visibility="Collapsed"
-                         d:Visibility="Visible">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <StackPanel HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Center">
-                                <ComboBox Name="ComboBoxVehicleCategory"
-                                          SelectedIndex="0"
-                                          Margin="5"
-                                          materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                                          DisplayMemberPath="VehicleCategory1"
-                                          SelectionChanged="UpdateChart"
-                                          Style="{StaticResource OutlinedComboBox}"
-                                          materialDesign:HintAssist.Hint="Категория авто" />
-                                <ComboBox Name="ComboBoxDiagram"
-                                          SelectedIndex="0"
-                                          Margin="5"
-                                          SelectionChanged="UpdateChart"
-                                          Style="{StaticResource OutlinedComboBox}"
-                                          materialDesign:HintAssist.Hint="Диаграмма" />
-                                <Button Content="{materialDesign:PackIcon Kind=MicrosoftWord,Size=25}"
-                                        Margin="5" 
-                                        ToolTip="Экспорт в Microsoft Word"
-                                        BorderThickness="0"
-                                        Click="ButtonWord_Click"
-                                        Background="#185abd" />
-                                <Button Content="{materialDesign:PackIcon Kind=MicrosoftExcel,Size=25}"
-                                        Margin="5"
-                                        ToolTip="Экспорт в Microsoft Excel"
-                                        BorderThickness="0"
-                                        Background="#107c41"
-                                        Click="ButtonExcel_Click"/>
-                            </StackPanel>
+                    <TextBox Grid.Row="0"
+                             Text="{Binding Email}"
+                             Name="TextBoxEmail"
+                             MaxLength="32"
+                             materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                             materialDesign:HintAssist.Hint="E-mail"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,8" />
+
+                    <TextBox Grid.Row="1"
+                             Text="{Binding FirstName}"
+                             Name="TextBoxFirstName"
+                             MaxLength="32"
+                             materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                             materialDesign:HintAssist.Hint="Имя"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,8" />
+
+                    <TextBox Grid.Row="2"
+                             Text="{Binding LastName}"
+                             Name="TextBoxLastName"
+                             MaxLength="32"
+                             materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                             materialDesign:HintAssist.Hint="Фамилия"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             Margin="0,8" />
+                    <PasswordBox Grid.Row="3"
+                                 Name="PasswordBoxNewPassword"
+                                 MaxLength="64"
+                                 materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                                 materialDesign:HintAssist.Hint="Новый пароль (оставьте пустым, чтобы не менять)"
+                                 Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                                 Margin="0,8" />
+                    <StackPanel Grid.Row="4"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center">
+                        <Button Content="Сохранить изменения"
+                                Name="ButtonSaveUserData"
+                                Click="ButtonSaveUserData_Click"
+                                Style="{StaticResource RaisedLightButton}" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Отчеты"
+                     Name="TabItemReports"
+                     Visibility="Collapsed"
+                     d:Visibility="Visible">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <ComboBox Name="ComboBoxVehicleCategory"
+                                      SelectedIndex="0"
+                                      Margin="5"
+                                      materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                      DisplayMemberPath="VehicleCategory1"
+                                      SelectionChanged="UpdateChart"
+                                      Style="{StaticResource OutlinedComboBox}"
+                                      materialDesign:HintAssist.Hint="Категория авто" />
+                            <ComboBox Name="ComboBoxDiagram"
+                                      SelectedIndex="0"
+                                      Margin="5"
+                                      SelectionChanged="UpdateChart"
+                                      Style="{StaticResource OutlinedComboBox}"
+                                      materialDesign:HintAssist.Hint="Диаграмма" />
+                            <Button Content="{materialDesign:PackIcon Kind=MicrosoftWord,Size=25}"
+                                    Margin="5"
+                                    ToolTip="Экспорт в Microsoft Word"
+                                    BorderThickness="0"
+                                    Click="ButtonWord_Click"
+                                    Background="#185abd" />
+                            <Button Content="{materialDesign:PackIcon Kind=MicrosoftExcel,Size=25}"
+                                    Margin="5"
+                                    ToolTip="Экспорт в Microsoft Excel"
+                                    BorderThickness="0"
+                                    Background="#107c41"
+                                    Click="ButtonExcel_Click" />
                         </StackPanel>
-                        <WindowsFormsHost Grid.Row="1">
-                            <charts:Chart x:Name="ChartBookings">
-                                <charts:Chart.Legends>
-                                    <charts:Legend>
+                    </StackPanel>
+                    <WindowsFormsHost Grid.Row="1">
+                        <charts:Chart x:Name="ChartBookings">
+                            <charts:Chart.Legends>
+                                <charts:Legend>
 
-                                    </charts:Legend>
-                                </charts:Chart.Legends>
-                            </charts:Chart>
-                        </WindowsFormsHost>
-                    </Grid>
-                </TabItem>
+                                </charts:Legend>
+                            </charts:Chart.Legends>
+                        </charts:Chart>
+                    </WindowsFormsHost>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="TabItemConfirmations"
+                     Header="Подтверждения"
+                     Visibility="Collapsed"
+                     d:Visibility="Visible">
 
-                <TabItem x:Name="TabItemAdministration"
-                         Header="Администрирование"
-                         Visibility="Collapsed"
-                         d:Visibility="Visible">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-                        <materialDesign:ColorZone Mode="PrimaryMid"
-                                                  HorizontalAlignment="Center">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton Content="Пользователи"
-                                             Name="ButtonUsersPage"
-                                             Checked="ButtonUsersPage_Checked"
-                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                                <RadioButton Content="Транспорт"
-                                             Name="ButtonVehiclesPage"
-                                             Checked="ButtonVehiclesPage_Checked"
-                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                                <RadioButton Content="Аренды"
-                                             Name="ButtonBookingsPage"
-                                             Checked="ButtonBookingsPage_Checked"
-                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                                <RadioButton Content="Отзывы"
-                                             Name="ButtonReviewsPage"
-                                             Checked="ButtonReviewsPage_Checked"
-                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                                <RadioButton Content="Оплаты"
-                                             Name="ButtonPaymentsPage"
-                                             Checked="ButtonPaymentsPage_Checked"
-                                             Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                            </StackPanel>
-                        </materialDesign:ColorZone>
-                        <Frame Grid.Row="1"
-                               x:Name="frameAdmin"
-                               NavigationUIVisibility="Hidden" />
-                    </Grid>
-                </TabItem>
-            </TabControl>
-        </StackPanel>
+            </TabItem>
+            <TabItem x:Name="TabItemAdministration"
+                     Header="Администрирование"
+                     Visibility="Collapsed"
+                     d:Visibility="Visible">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <materialDesign:ColorZone Mode="PrimaryMid"
+                                              HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <RadioButton Content="Пользователи"
+                                         Name="ButtonUsersPage"
+                                         Checked="ButtonUsersPage_Checked"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                            <RadioButton Content="Транспорт"
+                                         Name="ButtonVehiclesPage"
+                                         Checked="ButtonVehiclesPage_Checked"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                            <RadioButton Content="Аренды"
+                                         Name="ButtonBookingsPage"
+                                         Checked="ButtonBookingsPage_Checked"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                            <RadioButton Content="Отзывы"
+                                         Name="ButtonReviewsPage"
+                                         Checked="ButtonReviewsPage_Checked"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                            <RadioButton Content="Оплаты"
+                                         Name="ButtonPaymentsPage"
+                                         Checked="ButtonPaymentsPage_Checked"
+                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
+                        </StackPanel>
+                    </materialDesign:ColorZone>
+                    <Frame Grid.Row="1"
+                           x:Name="frameAdmin"
+                           NavigationUIVisibility="Hidden" />
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Page>

@@ -11,7 +11,8 @@ namespace WpfApp
 {
     using System;
     using System.Collections.Generic;
-    
+    using System.Linq;
+
     public partial class Booking
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
@@ -29,7 +30,22 @@ namespace WpfApp
         public Nullable<int> StatusID { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
         public Nullable<int> InsuranceID { get; set; }
-    
+
+        public bool HasReview
+        {
+            get
+            {
+                if (UserID.HasValue && VehicleID.HasValue)
+                {
+                    using (var context = new DBEntities())
+                    {
+                        return context.Reviews.Any(r => r.UserID == UserID && r.VehicleID == VehicleID);
+                    }
+                }
+                return false;
+            }
+        }
+
         public virtual Vehicle Vehicle { get; set; }
         public virtual Insurance Insurance { get; set; }
         public virtual User User { get; set; }

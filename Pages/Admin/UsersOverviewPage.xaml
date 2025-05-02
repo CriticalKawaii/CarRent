@@ -14,8 +14,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock Text="Пользователи"
                    Margin="5,10"
@@ -25,7 +25,6 @@
                   Name="DataGridUsers"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
-                  MaxHeight="225"
                   VerticalAlignment="Stretch"
                   ScrollViewer.CanContentScroll="True"
                   ScrollViewer.VerticalScrollBarVisibility="Visible">

@@ -4,11 +4,113 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApp.Pages.Account"
-      mc:Ignorable="d" 
+      mc:Ignorable="d"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      d:Background="White"
+      FontFamily="{materialDesign:MaterialDesignFont}"
       d:DesignHeight="450" d:DesignWidth="800"
       Title="ReviewPage">
 
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <Button Name="ButtonGoBack"
+                    Style="{StaticResource MaterialDesignIconButton}"
+                    ToolTip="Назад"
+                    Click="ButtonGoBack_Click">
+                <materialDesign:PackIcon Kind="ArrowBack"
+                                         Width="24"
+                                         Height="24" />
+            </Button>
+
+            <TextBlock Text="Отзыв о поездке"
+                       Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                       HorizontalAlignment="Center"
+                       Margin="0,0,0,20" />
+        </DockPanel>
+
+        <materialDesign:Card Grid.Row="1"
+                             Margin="0,10,0,20"
+                             UniformCornerRadius="8">
+            <Grid Margin="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Image Source="{Binding Booking.Vehicle.VehicleImageSource}"
+                       Width="150"
+                       Height="100"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       Stretch="UniformToFill"
+                       Margin="0,0,16,0" />
+
+                <StackPanel Grid.Column="1"
+                            VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                               Margin="0,0,0,8">
+                        <Run Text="{Binding Booking.Vehicle.Make}" />
+                        <Run Text="{Binding Booking.Vehicle.Model}" />
+                        <Run Text="{Binding Booking.Vehicle.Year}" />
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}">
+                        <Run Text="Начало аренды:" />
+                        <Run Text="{Binding Booking.StartDate, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}">
+                        <Run Text="Окончание аренды:" />
+                        <Run Text="{Binding Booking.EndDate, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </materialDesign:Card>
+
+        <TextBlock Grid.Row="2"
+                   Text="Оценка:"
+                   Style="{StaticResource MaterialDesignSubtitle1TextBlock}"
+                   Margin="0,20,0,10" />
+
+        <materialDesign:RatingBar Grid.Row="3"
+                                  Value="{Binding Review.Rating}"
+                                  x:Name="RatingBar"
+                                  HorizontalAlignment="Left"
+                                  Max="5"
+                                  Min="1"
+                                  Margin="0,0,0,20" />
+
+        <TextBox Grid.Row="4"
+                 materialDesign:HintAssist.Hint="Напишите свой отзыв о поездке"
+                 Text="{Binding Review.Comment}"
+                 Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                 MaxLength="500"
+                 FontSize="14"
+                 MinHeight="60"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalAlignment="Stretch"
+                 VerticalScrollBarVisibility="Auto" />
+
+        <StackPanel Grid.Row="5"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Content="Отмена"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="8,0"
+                    IsCancel="True"
+                    Click="ButtonCancel_Click" />
+            <Button Content="Сохранить"
+                    Style="{StaticResource RaisedLightButton}"
+                    IsDefault="True"
+                    Click="ButtonSave_Click" />
+        </StackPanel>
     </Grid>
 </Page>

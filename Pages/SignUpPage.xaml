@@ -15,53 +15,64 @@
       FontFamily="{materialDesign:MaterialDesignFont}">
 
     <Grid>
-            <StackPanel>
-                <TextBlock Text="Регистрация"
-                           Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
-                <TextBox x:Name="textBoxEmail"
-                         materialDesign:HintAssist.Hint="E-mail"
-                         Style="{StaticResource FloatingHintTextBox}" />
-                <TextBox x:Name="textBoxFirstName"
-                         materialDesign:HintAssist.Hint="Имя"
-                         Style="{StaticResource FloatingHintTextBox}" />
-                <TextBox x:Name="textBoxLastName"
-                         materialDesign:HintAssist.Hint="Фамилия"
-                         Style="{StaticResource FloatingHintTextBox}" />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="auto" />
-                    </Grid.ColumnDefinitions>
-                    <PasswordBox x:Name="passwordBoxPassword"
-                                 materialDesign:HintAssist.Hint="Пароль"
-                                 Style="{StaticResource FloatingHintPasswordBox}" />
-                    <TextBox Name="textBoxRevealedPassword"
-                             MaxLength="32"
-                             Visibility="Collapsed"
+        <StackPanel>
+            <TextBlock Text="Регистрация"
+                       Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
+            <TextBox x:Name="textBoxEmail"
+                     materialDesign:HintAssist.Hint="E-mail"
+                     MaxLength="32"
+                     materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                     Style="{StaticResource FloatingHintTextBox}" />
+            <TextBox x:Name="textBoxFirstName"
+                     MaxLength="32"
+                     materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                     materialDesign:HintAssist.Hint="Имя"
+                     Style="{StaticResource FloatingHintTextBox}" />
+            <TextBox x:Name="textBoxLastName"
+                     materialDesign:HintAssist.Hint="Фамилия"
+                     MaxLength="32"
+                     materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                     Style="{StaticResource FloatingHintTextBox}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="auto" />
+                </Grid.ColumnDefinitions>
+                <PasswordBox x:Name="passwordBoxPassword"
                              materialDesign:HintAssist.Hint="Пароль"
-                             Style="{StaticResource FloatingHintTextBox}" />
-                    <CheckBox x:Name="checkBoxRevealPassword"
-                              Grid.Column="1"
-                              d:IsChecked="True"
-                              Style="{StaticResource RevealPasswordCheckBox}"
-                              Checked="CheckBox_Checked"
-                              Unchecked="CheckBox_Unchecked" />
-                </Grid>
-                <PasswordBox x:Name="passwordBoxPasswordRepeat"
-                             materialDesign:HintAssist.Hint="Подтверждение пароля"
+                             MaxLength="64"
+                             materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
                              Style="{StaticResource FloatingHintPasswordBox}" />
-                <Button Content="Зарегистрироваться"
-                        Click="ButtonSignUp_Click"
-                        Style="{StaticResource RaisedLightButton}"
-                        HorizontalAlignment="Center"
-                        IsDefault="True" />
-                <TextBlock Text="Уже зарегистрированы?"
-                           HorizontalAlignment="Center"
-                           Style="{StaticResource MaterialDesignBodyMediumTextBlock}" />
-                <Button Content="Войти"
-                        Style="{StaticResource FlatLightButton}"
-                        HorizontalAlignment="Center"
-                        Click="ButtonSignIn_Click" />
-            </StackPanel>
+                <TextBox Name="textBoxRevealedPassword"
+                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                         MaxLength="64"
+                         Visibility="Collapsed"
+                         materialDesign:HintAssist.Hint="Пароль"
+                         Style="{StaticResource FloatingHintTextBox}" />
+                <CheckBox x:Name="checkBoxRevealPassword"
+                          Grid.Column="1"
+                          d:IsChecked="True"
+                          Style="{StaticResource RevealPasswordCheckBox}"
+                          Checked="CheckBox_Checked"
+                          Unchecked="CheckBox_Unchecked" />
+            </Grid>
+            <PasswordBox x:Name="passwordBoxPasswordRepeat"
+                         materialDesign:HintAssist.Hint="Подтверждение пароля"
+                         MaxLength="64"
+                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                         Style="{StaticResource FloatingHintPasswordBox}" />
+            <Button Content="Зарегистрироваться"
+                    Click="ButtonSignUp_Click"
+                    Style="{StaticResource RaisedLightButton}"
+                    HorizontalAlignment="Center"
+                    IsDefault="True" />
+            <TextBlock Text="Уже зарегистрированы?"
+                       HorizontalAlignment="Center"
+                       Style="{StaticResource MaterialDesignBodyMediumTextBlock}" />
+            <Button Content="Войти"
+                    Style="{StaticResource FlatLightButton}"
+                    HorizontalAlignment="Center"
+                    Click="ButtonSignIn_Click" />
+        </StackPanel>
     </Grid>
 </Page>

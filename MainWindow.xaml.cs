@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using WpfApp.Classes;
 using WpfApp.Pages;
@@ -37,6 +38,7 @@ namespace WpfApp
         private void RadioButtonExplore_Checked(object sender, RoutedEventArgs e)
         {
             Dispatcher.InvokeAsync( () => { frameMainWindow?.Navigate(ExploreCarsPage); } );
+            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
         }
 
         private void frameMainWindow_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)

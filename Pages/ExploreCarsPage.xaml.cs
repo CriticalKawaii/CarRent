@@ -22,7 +22,7 @@ namespace WpfApp
             InitializeComponent();
             Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
-            ComboBoxSort.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+            ComboBoxFilter.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
             ListViewExploreCars.SelectedIndex = 0;
             ComboBoxInsurance.ItemsSource = DBEntities.GetContext().Insurances.ToList();
             MainWindow = Application.Current.MainWindow as MainWindow;
@@ -40,17 +40,10 @@ namespace WpfApp
             LoadingProgressBar.Visibility = Visibility.Collapsed;
         }
 
-        private void ListViewItem_Selected(object sender, RoutedEventArgs e)
-        {
-            if (sender is ListViewItem viewItem)
-            {
-                MessageBox.Show(viewItem.Name);
-            }
-        }
-
         private void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DataContext = ListViewExploreCars.SelectedItem as Vehicle;
+            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
             CalculateRentCost();
         }
 
@@ -65,7 +58,7 @@ namespace WpfApp
                 (x.Model?.ToLowerInvariant().Contains(searchText) ?? false) ||
                 x.Year.ToString().Contains(searchText)).ToList();
 
-            if (ComboBoxSort.SelectedItem is VehicleCategory selectedCategory)
+            if (ComboBoxFilter.SelectedItem is VehicleCategory selectedCategory)
             {
                 filteredItems = filteredItems
                     .Where(x => x.VehicleCategoryID == selectedCategory.VehicleCategoryID)
@@ -83,14 +76,14 @@ namespace WpfApp
             UpdateItems();
         }
 
-        private void ComboBoxSort_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ComboBoxFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateItems();
         }
 
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
-            ComboBoxSort.SelectedIndex = -1;
+            ComboBoxFilter.SelectedIndex = -1;
         }
 
         private void ButtonRent_Click(object sender, RoutedEventArgs e)
@@ -184,6 +177,11 @@ namespace WpfApp
         {
             DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
             ListViewExploreCars.ItemsSource = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
+        }
+
+        private void Page_GotFocus(object sender, RoutedEventArgs e)
+        {
+            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
         }
     }
 }

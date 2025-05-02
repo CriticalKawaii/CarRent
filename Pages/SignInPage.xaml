@@ -13,72 +13,77 @@
       d:Background="White"
       Title="SignInPage"
       FontFamily="{materialDesign:MaterialDesignFont}">
-    
 
-        <StackPanel>
-            <TextBlock Text="Вход в личный кабинет"
-                       Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
 
-            <TextBox x:Name="textBoxEmail"
-                     materialDesign:HintAssist.Hint="E-mail"
-                     Style="{StaticResource FloatingHintTextBox}" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-                <PasswordBox x:Name="passwordBoxPassword"
-                             materialDesign:HintAssist.Hint="Пароль"
-                             Style="{StaticResource FloatingHintPasswordBox}" />
-                <TextBox Name="textBoxRevealedPassword"
-                         MaxLength="32"
-                         Visibility="Collapsed"
+    <StackPanel>
+        <TextBlock Text="Вход в личный кабинет"
+                   Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
+
+        <TextBox x:Name="textBoxEmail"
+                 MaxLength="32"
+                 materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
+                 materialDesign:HintAssist.Hint="E-mail"
+                 Style="{StaticResource FloatingHintTextBox}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <PasswordBox x:Name="passwordBoxPassword"
+                         MaxLength="64"
+                         materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
                          materialDesign:HintAssist.Hint="Пароль"
-                         Style="{StaticResource FloatingHintTextBox}" />
-                <CheckBox Name="checkBoxRevealPassword"
-                          Grid.Column="1"
-                          d:IsChecked="True"
-                          Style="{StaticResource RevealPasswordCheckBox}"
-                          Checked="CheckBox_Checked"
-                          Unchecked="CheckBox_Unchecked" />
-            </Grid>
-            <Button Content="Войти"
-                    Click="ButtonSignIn_Click"
-                    IsDefault="True"
-                    Style="{StaticResource RaisedLightButton}"
-                    HorizontalAlignment="Center" />
-
-            <TextBlock Text="Нет аккаунта?"
-                       HorizontalAlignment="Center"
-                       Style="{StaticResource MaterialDesignBodyMediumTextBlock}" />
-
-            <Button Content="Зарегистрируйтесь"
-                    Click="ButtonSignUp_Click"
-                    Style="{StaticResource FlatLightButton}"
-                    HorizontalAlignment="Center" />
-
-            <Image x:Name="captchaImage"
-                   Visibility="Collapsed"
-                   Height="50"
-                   Width="150"
-                   Margin="10" />
-
-            <TextBox x:Name="captchaInput"
+                         Style="{StaticResource FloatingHintPasswordBox}" />
+            <TextBox Name="textBoxRevealedPassword"
+                     MaxLength="64"
+                     materialDesign:TextFieldAssist.CharacterCounterVisibility="Hidden"
                      Visibility="Collapsed"
-                     materialDesign:HintAssist.Hint="Введите капчу"
-                     Style="{StaticResource FloatingHintTextBox}"
-                     materialDesign:TextFieldAssist.HasClearButton="True" />
-            
-            <TextBlock x:Name="captchaErrorText"
-                       Foreground="Red"
-                       Text=""
-                       HorizontalAlignment="Center" />
+                     materialDesign:HintAssist.Hint="Пароль"
+                     Style="{StaticResource FloatingHintTextBox}" />
+            <CheckBox Name="checkBoxRevealPassword"
+                      Grid.Column="1"
+                      d:IsChecked="True"
+                      Style="{StaticResource RevealPasswordCheckBox}"
+                      Checked="CheckBox_Checked"
+                      Unchecked="CheckBox_Unchecked" />
+        </Grid>
+        <Button Content="Войти"
+                Click="ButtonSignIn_Click"
+                IsDefault="True"
+                Style="{StaticResource RaisedLightButton}"
+                HorizontalAlignment="Center" />
 
-            <Button x:Name="refreshCaptchaButton"
-                    Content="Обновить капчу"
-                    Visibility="Collapsed"
-                    Click="RefreshCaptcha_Click"
-                    Style="{StaticResource FlatLightButton}"
-                    HorizontalAlignment="Center" />
-        </StackPanel>
+        <TextBlock Text="Нет аккаунта?"
+                   HorizontalAlignment="Center"
+                   Style="{StaticResource MaterialDesignBodyMediumTextBlock}" />
+
+        <Button Content="Зарегистрируйтесь"
+                Click="ButtonSignUp_Click"
+                Style="{StaticResource FlatLightButton}"
+                HorizontalAlignment="Center" />
+
+        <Image x:Name="captchaImage"
+               Visibility="Collapsed"
+               Height="50"
+               Width="150"
+               Margin="10" />
+
+        <TextBox x:Name="captchaInput"
+                 Visibility="Collapsed"
+                 materialDesign:HintAssist.Hint="Введите капчу"
+                 Style="{StaticResource FloatingHintTextBox}"
+                 materialDesign:TextFieldAssist.HasClearButton="True" />
+
+        <TextBlock x:Name="captchaErrorText"
+                   Foreground="Red"
+                   Text=""
+                   HorizontalAlignment="Center" />
+
+        <Button x:Name="refreshCaptchaButton"
+                Content="Обновить капчу"
+                Visibility="Collapsed"
+                Click="RefreshCaptcha_Click"
+                Style="{StaticResource FlatLightButton}"
+                HorizontalAlignment="Center" />
+    </StackPanel>
 </Page>

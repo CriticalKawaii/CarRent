@@ -24,7 +24,7 @@ namespace WpfApp
                 return string.Concat(hash.ComputeHash(Encoding.UTF8.GetBytes(password)).Select(s => s.ToString("X2")));
             }
         }
-        public static bool IsValidMail(string email)
+        public static bool IsValidEmail(string email)
         {
             return Regex.IsMatch(email, @"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$");
         }
@@ -46,7 +46,7 @@ namespace WpfApp
                     MessageBox.Show("E-mail не может быть пустым", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return false;
             }
-            else if (!IsValidMail(email))
+            else if (!IsValidEmail(email))
             {
                 if (!skip)
                     MessageBox.Show("Некорректный E-mail", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Warning);
