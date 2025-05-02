@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Bookings">
           <Key>
             <PropertyRef Name="BookingID" />
@@ -78,16 +78,6 @@
           <Property Name="RoleID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Role" Type="nvarchar" MaxLength="20" Nullable="false" />
         </EntityType>
-        <EntityType Name="sysdiagrams">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="principal_id" Type="int" Nullable="false" />
-          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="version" Type="int" />
-          <Property Name="definition" Type="varbinary(max)" />
-        </EntityType>
         <EntityType Name="Users">
           <Key>
             <PropertyRef Name="UserID" />
@@ -118,7 +108,6 @@
           <Property Name="VehicleImage" Type="varbinary(max)" />
           <Property Name="Year" Type="int" Nullable="false" />
           <Property Name="LicensePlate" Type="nvarchar" MaxLength="20" Nullable="false" />
-          <Property Name="VIN" Type="nvarchar" MaxLength="17" Nullable="false" />
           <Property Name="VehicleCategoryID" Type="int" />
           <Property Name="DailyRate" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="bit" />
@@ -227,18 +216,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Users__RoleID__3A81B327">
-          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
-          <End Role="Users" Type="Self.Users" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Roles">
-              <PropertyRef Name="RoleID" />
-            </Principal>
-            <Dependent Role="Users">
-              <PropertyRef Name="RoleID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK__Vehicles__Catego__4316F928">
           <End Role="VehicleCategories" Type="Self.VehicleCategories" Multiplicity="0..1" />
           <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
@@ -260,6 +237,18 @@
             </Principal>
             <Dependent Role="Reviews">
               <PropertyRef Name="VehicleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Roles">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="Users">
+              <PropertyRef Name="RoleID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -303,7 +292,6 @@
           <EntitySet Name="PaymentStatuses" EntityType="Self.PaymentStatuses" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Reviews" EntityType="Self.Reviews" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="VehicleCategories" EntityType="Self.VehicleCategories" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
@@ -339,10 +327,6 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
           </AssociationSet>
-          <AssociationSet Name="FK__Users__RoleID__3A81B327" Association="Self.FK__Users__RoleID__3A81B327">
-            <End Role="Roles" EntitySet="Roles" />
-            <End Role="Users" EntitySet="Users" />
-          </AssociationSet>
           <AssociationSet Name="FK__Vehicles__Catego__4316F928" Association="Self.FK__Vehicles__Catego__4316F928">
             <End Role="VehicleCategories" EntitySet="VehicleCategories" />
             <End Role="Vehicles" EntitySet="Vehicles" />
@@ -351,8 +335,13 @@
             <End Role="Vehicles" EntitySet="Vehicles" />
             <End Role="Reviews" EntitySet="Reviews" />
           </AssociationSet>
+          <AssociationSet Name="FK_Users_Roles" Association="Self.FK_Users_Roles">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Users" EntitySet="Users" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -428,13 +417,13 @@
             <PropertyRef Name="ReviewID" />
           </Key>
           <Property Name="ReviewID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VehicleID" Type="Int32" />
           <Property Name="UserID" Type="Int32" />
           <Property Name="Rating" Type="Int32" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <NavigationProperty Name="User" Relationship="Self.FK__Reviews__UserID__7A672E12" FromRole="Reviews" ToRole="Users" />
-          <Property Name="VehicleID" Type="Int32" />
-          <NavigationProperty Name="Vehicle" Relationship="DBModel.FK_Reviews_Vehicles" FromRole="Review" ToRole="Vehicle" />
+          <NavigationProperty Name="Vehicle" Relationship="Self.FK_Reviews_Vehicles" FromRole="Reviews" ToRole="Vehicles" />
         </EntityType>
         <EntityType Name="Role">
           <Key>
@@ -442,17 +431,7 @@
           </Key>
           <Property Name="RoleID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Role1" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Users" Relationship="Self.FK__Users__RoleID__3A81B327" FromRole="Roles" ToRole="Users" />
-        </EntityType>
-        <EntityType Name="sysdiagram">
-          <Key>
-            <PropertyRef Name="diagram_id" />
-          </Key>
-          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="principal_id" Type="Int32" Nullable="false" />
-          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="version" Type="Int32" />
-          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Users_Roles" FromRole="Roles" ToRole="Users" />
         </EntityType>
         <EntityType Name="User">
           <Key>
@@ -467,7 +446,7 @@
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Renter__4AB81AF0" FromRole="Users" ToRole="Bookings" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK__Reviews__UserID__7A672E12" FromRole="Users" ToRole="Reviews" />
-          <NavigationProperty Name="Role" Relationship="Self.FK__Users__RoleID__3A81B327" FromRole="Users" ToRole="Roles" />
+          <NavigationProperty Name="Role" Relationship="Self.FK_Users_Roles" FromRole="Users" ToRole="Roles" />
         </EntityType>
         <EntityType Name="VehicleCategory">
           <Key>
@@ -488,15 +467,14 @@
           <Property Name="VehicleImage" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="Year" Type="Int32" Nullable="false" />
           <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="VIN" Type="String" MaxLength="17" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="VehicleCategoryID" Type="Int32" />
           <Property Name="DailyRate" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="Boolean" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Vehicles" ToRole="Bookings" />
-          <NavigationProperty Name="VehicleCategory" Relationship="Self.FK__Vehicles__Catego__4316F928" FromRole="Vehicles" ToRole="VehicleCategories" />
-          <NavigationProperty Name="Reviews" Relationship="DBModel.FK_Reviews_Vehicles" FromRole="Vehicle" ToRole="Review" />
           <Property Name="AvgRating" Type="Decimal" Precision="3" Scale="2" />
+          <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Vehicles" ToRole="Bookings" />
+          <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Vehicles" FromRole="Vehicles" ToRole="Reviews" />
+          <NavigationProperty Name="VehicleCategory" Relationship="Self.FK__Vehicles__Catego__4316F928" FromRole="Vehicles" ToRole="VehicleCategories" />
         </EntityType>
         <Association Name="FK__Bookings__CarID__49C3F6B7">
           <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1">
@@ -600,7 +578,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Users__RoleID__3A81B327">
+        <Association Name="FK_Reviews_Vehicles">
+          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1" />
+          <End Role="Reviews" Type="Self.Review" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vehicles">
+              <PropertyRef Name="VehicleID" />
+            </Principal>
+            <Dependent Role="Reviews">
+              <PropertyRef Name="VehicleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Users_Roles">
           <End Role="Roles" Type="Self.Role" Multiplicity="1" />
           <End Role="Users" Type="Self.User" Multiplicity="*" />
           <ReferentialConstraint>
@@ -633,7 +623,6 @@
           <EntitySet Name="PaymentStatuses" EntityType="Self.PaymentStatus" />
           <EntitySet Name="Reviews" EntityType="Self.Review" />
           <EntitySet Name="Roles" EntityType="Self.Role" />
-          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
           <EntitySet Name="Users" EntityType="Self.User" />
           <EntitySet Name="VehicleCategories" EntityType="Self.VehicleCategory" />
           <EntitySet Name="Vehicles" EntityType="Self.Vehicle" />
@@ -669,17 +658,17 @@
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
           </AssociationSet>
-          <AssociationSet Name="FK__Users__RoleID__3A81B327" Association="Self.FK__Users__RoleID__3A81B327">
+          <AssociationSet Name="FK_Reviews_Vehicles" Association="Self.FK_Reviews_Vehicles">
+            <End Role="Vehicles" EntitySet="Vehicles" />
+            <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Users_Roles" Association="Self.FK_Users_Roles">
             <End Role="Roles" EntitySet="Roles" />
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
           <AssociationSet Name="FK__Vehicles__Catego__4316F928" Association="Self.FK__Vehicles__Catego__4316F928">
             <End Role="VehicleCategories" EntitySet="VehicleCategories" />
             <End Role="Vehicles" EntitySet="Vehicles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Reviews_Vehicles" Association="DBModel.FK_Reviews_Vehicles">
-            <End Role="Vehicle" EntitySet="Vehicles" />
-            <End Role="Review" EntitySet="Reviews" />
           </AssociationSet>
           <FunctionImport Name="sp_alterdiagram">
             <Parameter Name="diagramname" Mode="In" Type="String" />
@@ -712,18 +701,6 @@
           </FunctionImport>
           <FunctionImport Name="sp_upgraddiagrams" />
         </EntityContainer>
-        <Association Name="FK_Reviews_Vehicles">
-          <End Type="DBModel.Vehicle" Role="Vehicle" Multiplicity="0..1" />
-          <End Type="DBModel.Review" Role="Review" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Vehicle">
-              <PropertyRef Name="VehicleID" />
-            </Principal>
-            <Dependent Role="Review">
-              <PropertyRef Name="VehicleID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <ComplexType Name="sp_helpdiagramdefinition_Result">
           <Property Type="Int32" Name="version" Nullable="true" />
           <Property Type="Binary" Name="definition" Nullable="true" />
@@ -805,8 +782,8 @@
           <EntitySetMapping Name="Reviews">
             <EntityTypeMapping TypeName="DBModel.Review">
               <MappingFragment StoreEntitySet="Reviews">
-                <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="ReviewID" ColumnName="ReviewID" />
+                <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
                 <ScalarProperty Name="Rating" ColumnName="Rating" />
                 <ScalarProperty Name="Comment" ColumnName="Comment" />
@@ -819,17 +796,6 @@
               <MappingFragment StoreEntitySet="Roles">
                 <ScalarProperty Name="RoleID" ColumnName="RoleID" />
                 <ScalarProperty Name="Role1" ColumnName="Role" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="sysdiagrams">
-            <EntityTypeMapping TypeName="DBModel.sysdiagram">
-              <MappingFragment StoreEntitySet="sysdiagrams">
-                <ScalarProperty Name="name" ColumnName="name" />
-                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
-                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
-                <ScalarProperty Name="version" ColumnName="version" />
-                <ScalarProperty Name="definition" ColumnName="definition" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -858,18 +824,17 @@
           <EntitySetMapping Name="Vehicles">
             <EntityTypeMapping TypeName="DBModel.Vehicle">
               <MappingFragment StoreEntitySet="Vehicles">
-                <ScalarProperty Name="AvgRating" ColumnName="AvgRating" />
                 <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="Make" ColumnName="Make" />
                 <ScalarProperty Name="Model" ColumnName="Model" />
                 <ScalarProperty Name="VehicleImage" ColumnName="VehicleImage" />
                 <ScalarProperty Name="Year" ColumnName="Year" />
                 <ScalarProperty Name="LicensePlate" ColumnName="LicensePlate" />
-                <ScalarProperty Name="VIN" ColumnName="VIN" />
                 <ScalarProperty Name="VehicleCategoryID" ColumnName="VehicleCategoryID" />
                 <ScalarProperty Name="DailyRate" ColumnName="DailyRate" />
                 <ScalarProperty Name="Available" ColumnName="Available" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="AvgRating" ColumnName="AvgRating" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

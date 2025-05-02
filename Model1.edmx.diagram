@@ -4,19 +4,18 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="4a6ac6f4f28845f68f88f27169659120" Name="Diagram1" ZoomLevel="98">
-        <EntityTypeShape EntityType="DBModel.Booking" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.BookingStatus" Width="1.5" PointX="3" PointY="8.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.Insurance" Width="1.5" PointX="3" PointY="10.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.PaymentMethod" Width="1.5" PointX="5.25" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.Payment" Width="1.5" PointX="7.5" PointY="4.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.PaymentStatus" Width="1.5" PointX="5.25" PointY="13.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.Review" Width="1.5" PointX="5.25" PointY="9" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.Role" Width="1.5" PointX="0.75" PointY="4.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.sysdiagram" Width="1.5" PointX="11.5" PointY="8" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.User" Width="1.5" PointX="3" PointY="4.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.VehicleCategory" Width="1.5" PointX="0.75" PointY="14" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.Vehicle" Width="1.5" PointX="3" PointY="13.125" IsExpanded="true" />
+      <Diagram DiagramId="f333635bc2ad491ea8360e5e90000e63" Name="Diagram1" ZoomLevel="62">
+        <EntityTypeShape EntityType="DBModel.Booking" Width="1.5" PointX="5.25" PointY="2.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.BookingStatus" Width="1.5" PointX="3" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.Insurance" Width="1.5" PointX="3" PointY="9.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.PaymentMethod" Width="1.5" PointX="8.25" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.Payment" Width="1.5" PointX="10.5" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.PaymentStatus" Width="1.5" PointX="8.25" PointY="7.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.Review" Width="1.5" PointX="8.25" PointY="3.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.Role" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.User" Width="1.5" PointX="3" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.VehicleCategory" Width="1.5" PointX="0.75" PointY="13.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.Vehicle" Width="1.5" PointX="3" PointY="12.125" IsExpanded="true" />
         <AssociationConnector Association="DBModel.FK__Bookings__CarID__49C3F6B7" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Bookings__Insura__68487DD7" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Bookings__Renter__4AB81AF0" ManuallyRouted="false" />
@@ -25,9 +24,9 @@
         <AssociationConnector Association="DBModel.FK__Payments__Paymen__5441852A" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Payments__Paymen__5535A963" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Reviews__UserID__7A672E12" ManuallyRouted="false" />
-        <AssociationConnector Association="DBModel.FK__Users__RoleID__3A81B327" ManuallyRouted="false" />
+        <AssociationConnector Association="DBModel.FK_Reviews_Vehicles" ManuallyRouted="false" />
+        <AssociationConnector Association="DBModel.FK_Users_Roles" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Vehicles__Catego__4316F928" ManuallyRouted="false" />
-        <AssociationConnector Association="DBModel.FK_Reviews_Vehicles" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

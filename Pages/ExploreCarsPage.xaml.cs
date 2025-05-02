@@ -22,9 +22,13 @@ namespace WpfApp
             InitializeComponent();
             Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
+
             ComboBoxFilter.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+
             ListViewExploreCars.SelectedIndex = 0;
+
             ComboBoxInsurance.ItemsSource = DBEntities.GetContext().Insurances.ToList();
+
             MainWindow = Application.Current.MainWindow as MainWindow;
 
             Loaded += ExploreCarsPage_Loaded;
@@ -65,7 +69,6 @@ namespace WpfApp
                     .ToList();
             }
 
-            //filteredItems = filteredItems.OrderBy(v => v.DailyRate).ToList(); // or Year, Make, etc.
 
             ListViewExploreCars.ItemsSource = filteredItems;
             ListViewExploreCars.SelectedIndex = filteredItems.Any() ? 0 : -1;
@@ -99,11 +102,6 @@ namespace WpfApp
             }
             else
             {
-                //ListViewExploreCars.IsEnabled = false;
-                //TextBoxSearch.IsEnabled = false;
-                //ComboBoxSort.IsEnabled = false;
-                //ButtonRemove.IsEnabled = false;
-
 
             }
         }

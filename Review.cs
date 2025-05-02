@@ -15,11 +15,11 @@ namespace WpfApp
     public partial class Review
     {
         public int ReviewID { get; set; }
+        public Nullable<int> VehicleID { get; set; }
         public Nullable<int> UserID { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
-        public Nullable<int> VehicleID { get; set; }
     
         public virtual User User { get; set; }
         public virtual Vehicle Vehicle { get; set; }

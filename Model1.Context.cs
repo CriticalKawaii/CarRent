@@ -43,7 +43,6 @@ namespace WpfApp
         public virtual DbSet<PaymentStatus> PaymentStatuses { get; set; }
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
-        public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<VehicleCategory> VehicleCategories { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
