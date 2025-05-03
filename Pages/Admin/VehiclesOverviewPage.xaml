@@ -8,7 +8,9 @@
       mc:Ignorable="d"
       d:DesignHeight="450"
       d:DesignWidth="800"
-      Title="VehiclesOverviewPage">
+      Title="VehiclesOverviewPage"
+      FontFamily="{materialDesign:MaterialDesignFont}"
+      IsVisibleChanged="Page_IsVisibleChanged">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -48,13 +50,8 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button x:Name="ButtonEdit"
-                                    >
-                                <materialDesign:PackIcon Kind="EditOutline"
-                                                         VerticalAlignment="Center"
-                                                         HorizontalAlignment="Center"
-                                                         Width="16"
-                                                         Height="16" />
-                            </Button>
+                                    Content="{materialDesign:PackIcon Kind=EditOutline,Size=16}"
+                                    Click="ButtonEdit_Click" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -67,19 +64,13 @@
             <Button Margin="10"
                     Name="ButtonAdd"
                     HorizontalAlignment="Left"
-                    >
-                <materialDesign:PackIcon Kind="Add"
-                                         Width="16"
-                                         Height="16" />
-            </Button>
+                    Click="ButtonAdd_Click"
+                    Content="{materialDesign:PackIcon Kind=Add,Size=16}" />
             <Button Margin="10"
                     Name="ButtonDel"
                     HorizontalAlignment="Right"
-                    >
-                <materialDesign:PackIcon Kind="DeleteOutline"
-                                         Width="16"
-                                         Height="16" />
-            </Button>
+                    Click="ButtonDel_Click"
+                    Content="{materialDesign:PackIcon Kind=DeleteOutline,Size=16}" />
         </StackPanel>
     </Grid>
 </Page>
