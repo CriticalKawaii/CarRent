@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Bookings">
           <Key>
             <PropertyRef Name="BookingID" />
@@ -14,10 +14,12 @@
           <Property Name="UserID" Type="int" />
           <Property Name="StartDate" Type="datetime" Nullable="false" />
           <Property Name="EndDate" Type="datetime" Nullable="false" />
+          <Property Name="ReturnDate" Type="datetime" />
           <Property Name="TotalCost" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="StatusID" Type="int" />
+          <Property Name="StatusID" Type="int" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime" />
           <Property Name="InsuranceID" Type="int" />
+          <Property Name="ActualCost" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="BookingStatuses">
           <Key>
@@ -155,7 +157,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Bookings__Status__4BAC3F29">
-          <End Role="BookingStatuses" Type="Self.BookingStatuses" Multiplicity="0..1" />
+          <End Role="BookingStatuses" Type="Self.BookingStatuses" Multiplicity="1" />
           <End Role="Bookings" Type="Self.Bookings" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="BookingStatuses">
@@ -340,8 +342,7 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -354,8 +355,9 @@
           <Property Name="UserID" Type="Int32" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ReturnDate" Type="DateTime" Precision="3" />
           <Property Name="TotalCost" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="StatusID" Type="Int32" />
+          <Property Name="StatusID" Type="Int32" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <Property Name="InsuranceID" Type="Int32" />
           <NavigationProperty Name="Vehicle" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Bookings" ToRole="Vehicles" />
@@ -363,6 +365,7 @@
           <NavigationProperty Name="User" Relationship="Self.FK__Bookings__Renter__4AB81AF0" FromRole="Bookings" ToRole="Users" />
           <NavigationProperty Name="BookingStatus" Relationship="Self.FK__Bookings__Status__4BAC3F29" FromRole="Bookings" ToRole="BookingStatuses" />
           <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Bookin__534D60F1" FromRole="Bookings" ToRole="Payments" />
+          <Property Name="ActualCost" Type="Decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="BookingStatus">
           <Key>
@@ -517,7 +520,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Bookings__Status__4BAC3F29">
-          <End Role="BookingStatuses" Type="Self.BookingStatus" Multiplicity="0..1" />
+          <End Role="BookingStatuses" Type="Self.BookingStatus" Multiplicity="1" />
           <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="BookingStatuses">
@@ -721,11 +724,13 @@
           <EntitySetMapping Name="Bookings">
             <EntityTypeMapping TypeName="DBModel.Booking">
               <MappingFragment StoreEntitySet="Bookings">
+                <ScalarProperty Name="ActualCost" ColumnName="ActualCost" />
                 <ScalarProperty Name="BookingID" ColumnName="BookingID" />
                 <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
                 <ScalarProperty Name="StartDate" ColumnName="StartDate" />
                 <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="ReturnDate" ColumnName="ReturnDate" />
                 <ScalarProperty Name="TotalCost" ColumnName="TotalCost" />
                 <ScalarProperty Name="StatusID" ColumnName="StatusID" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />

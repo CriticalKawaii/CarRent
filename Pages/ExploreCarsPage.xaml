@@ -54,7 +54,7 @@
                       Grid.Column="1"
                       Style="{StaticResource OutlinedComboBox}"
                       materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                      DisplayMemberPath="VehicleCategory1"
+                      SelectionChanged="ComboBoxSort_SelectionChanged"
                       materialDesign:HintAssist.Hint="{materialDesign:PackIcon Kind=Sort,Size=25}"
                       Margin="5" />
             <Button x:Name="ButtonRemove"
@@ -218,7 +218,8 @@
                                     FontSize="14"
                                     materialDesign:TextFieldAssist.HasClearButton="True"
                                     SelectedDateChanged="DatePickerStart_SelectedDateChanged"
-                                    Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+                                    Style="{StaticResource MaterialDesignOutlinedDatePicker}">
+                        </DatePicker>
 
                         <DatePicker Name="DatePickerEnd"
                                     materialDesign:HintAssist.Hint="Дата окончания аренды"

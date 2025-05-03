@@ -137,12 +137,6 @@
     <Compile Include="Pages\Admin\Edit\EditUserPage.xaml.cs">
       <DependentUpon>EditUserPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Admin\PaymentsOverviewPage.xaml.cs">
-      <DependentUpon>PaymentsOverviewPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Admin\ReviewsOverviewPage.xaml.cs">
-      <DependentUpon>ReviewsOverviewPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\Admin\UsersOverviewPage.xaml.cs">
       <DependentUpon>UsersOverviewPage.xaml</DependentUpon>
     </Compile>
@@ -213,14 +207,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Admin\Edit\EditUserPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Admin\PaymentsOverviewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Admin\ReviewsOverviewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

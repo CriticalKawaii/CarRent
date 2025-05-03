@@ -138,16 +138,6 @@ namespace WpfApp.Pages
             frameAdmin.Navigate(new BookingsOverviewPage());
         }
 
-        private void ButtonReviewsPage_Checked(object sender, RoutedEventArgs e)
-        {
-            frameAdmin.Navigate(new ReviewsOverviewPage());
-        }
-
-        private void ButtonPaymentsPage_Checked(object sender, RoutedEventArgs e)
-        {
-            frameAdmin.Navigate(new PaymentsOverviewPage());
-        }
-
         private void ButtonSignOut_Click(object sender, RoutedEventArgs e)
         {
             SessionManager.SignOut();
