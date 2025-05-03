@@ -1,0 +1,114 @@
+﻿<Page x:Class="WpfApp.Pages.Admin.Edit.EditBookingPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:WpfApp.Pages.Admin.Edit"
+      xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+      mc:Ignorable="d"
+      d:DesignHeight="800"
+      d:DesignWidth="800"
+      Title="EditBookingPage"
+      d:Background="White">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+
+            <Button Name="ButtonGoBack"
+                    Content="{materialDesign:PackIcon Kind=ArrowBack,Size=20}"
+                    Click="ButtonGoBack_Click"
+                    Style="{StaticResource FlatLightButton}"
+                    HorizontalAlignment="Left"
+                    Margin="0,0,0,10"
+                    IsCancel="True" />
+
+            <ComboBox Name="ComboBoxUsers"
+                      ItemsSource="{Binding Users}"
+                      DisplayMemberPath="FullName"
+                      SelectedItem="{Binding User}"
+                      Grid.Row="1"
+                      Margin="0,0,0,10"
+                      materialDesign:HintAssist.Hint="Пользователь"
+                      Style="{StaticResource FloatingHintComboBox}" />
+
+            <ComboBox Name="ComboBoxVehicles"
+                      ItemsSource="{Binding Vehicles}"
+                      DisplayMemberPath="FullName"
+                      SelectedItem="{Binding Vehicle}"
+                      Grid.Row="2"
+                      Margin="0,0,0,10"
+                      materialDesign:HintAssist.Hint="Транспорт"
+                      Style="{StaticResource FloatingHintComboBox}" />
+
+            <DatePicker Grid.Row="3"
+                        SelectedDate="{Binding StartDate}"
+                        Margin="0,0,0,10"
+                        materialDesign:HintAssist.Hint="Дата начала"
+                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+            <DatePicker Grid.Row="4"
+                        SelectedDate="{Binding EndDate}"
+                        Margin="0,0,0,10"
+                        materialDesign:HintAssist.Hint="Дата окончания"
+                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+            <DatePicker Grid.Row="5"
+                        SelectedDate="{Binding ReturnDate}"
+                        Margin="0,0,0,10"
+                        materialDesign:HintAssist.Hint="Дата возврата (фактическая)"
+                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+            <ComboBox Name="ComboBoxBookingStatus"
+                      ItemsSource="{Binding BookingStatuses}"
+                      DisplayMemberPath="BookingStatus1"
+                      SelectedItem="{Binding BookingStatus}"
+                      Grid.Row="6"
+                      Margin="0,0,0,10"
+                      materialDesign:HintAssist.Hint="Статус бронирования"
+                      Style="{StaticResource FloatingHintComboBox}" />
+
+            <ComboBox Name="ComboBoxInsurance"
+                      ItemsSource="{Binding Insurances}"
+                      DisplayMemberPath="InsuranceName"
+                      SelectedItem="{Binding Insurance}"
+                      Grid.Row="7"
+                      Margin="0,0,0,10"
+                      materialDesign:HintAssist.Hint="Страховка"
+                      Style="{StaticResource FloatingHintComboBox}" />
+
+            <TextBox Grid.Row="8"
+                     Text="{Binding TotalCost}"
+                     Margin="0,0,0,10"
+                     materialDesign:HintAssist.Hint="Общая стоимость"
+                     Style="{StaticResource FloatingHintTextBox}" />
+
+            <TextBox Grid.Row="9"
+                     Text="{Binding ActualCost}"
+                     Margin="0,0,0,10"
+                     materialDesign:HintAssist.Hint="Фактическая стоимость"
+                     Style="{StaticResource FloatingHintTextBox}" />
+
+            <Button Name="ButtonSave"
+                    Content="{materialDesign:PackIcon Kind=ContentSave,Size=20}"
+                    Grid.Row="10"
+                    Click="ButtonSave_Click"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,20"
+                    IsDefault="True" />
+        </Grid>
+    </ScrollViewer>
+</Page>

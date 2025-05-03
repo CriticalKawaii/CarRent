@@ -187,14 +187,14 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Оплаты" />
-            <TabItem Header="Отзывы" />
-            <TabItem Header="Страховки" />
-            <TabItem Header="Категории Транспорта" />
-            <TabItem Header="Статусы бронирований" />
-            <TabItem Header="Статусы оплат" />
-            <TabItem Header="Способы оплат" />
-            <TabItem Header="Роли" />
+            <TabItem Header="Оплаты"></TabItem>
+            <TabItem Header="Отзывы"></TabItem>
+            <TabItem Header="Страховки"></TabItem>
+            <TabItem Header="Категории Транспорта"></TabItem>
+            <TabItem Header="Статусы бронирований"></TabItem>
+            <TabItem Header="Статусы оплат"></TabItem>
+            <TabItem Header="Способы оплат"></TabItem>
+            <TabItem Header="Роли"></TabItem>
         </TabControl>
     </Grid>
 </Page>

@@ -82,12 +82,14 @@ namespace WpfApp.Pages.Admin
         // Бронирования
         private void ButtonAddBooking_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigationService.Navigate(new EditBookingPage(null));
         }
 
         private void ButtonEditBooking_Click(object sender, RoutedEventArgs e)
         {
-            
+            var button = sender as Button;
+            var booking = button.DataContext as Booking;
+            NavigationService.Navigate(new EditBookingPage(booking));
         }
 
         private void ButtonDeleteBooking_Click(object sender, RoutedEventArgs e)
@@ -109,7 +111,10 @@ namespace WpfApp.Pages.Admin
             if (Visibility == Visibility.Visible)
             {
                 DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
+                
                 DataGridUsers.ItemsSource = DBEntities.GetContext().Users.ToList();
+                DataGridVehicles.ItemsSource = DBEntities.GetContext().Vehicles.ToList();
+                DataGridBookings.ItemsSource = DBEntities.GetContext().Bookings.ToList();
             }
         }
     }
