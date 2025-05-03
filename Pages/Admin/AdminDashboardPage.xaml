@@ -187,14 +187,371 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Оплаты"></TabItem>
-            <TabItem Header="Отзывы"></TabItem>
-            <TabItem Header="Страховки"></TabItem>
-            <TabItem Header="Категории Транспорта"></TabItem>
-            <TabItem Header="Статусы бронирований"></TabItem>
-            <TabItem Header="Статусы оплат"></TabItem>
-            <TabItem Header="Способы оплат"></TabItem>
-            <TabItem Header="Роли"></TabItem>
+            <TabItem Header="Оплаты">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridPayments"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding PaymentID}" />
+                            <DataGridTextColumn Header="Бронирование"
+                                                Binding="{Binding BookingID}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Сумма"
+                                                Binding="{Binding Amount, StringFormat=C}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Способ оплаты"
+                                                Binding="{Binding PaymentMethod.PaymentMethod1}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Статус"
+                                                Binding="{Binding PaymentStatus.PaymentStatus1}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Дата"
+                                                Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy}}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditPayment_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddPayment_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeletePayment_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Отзывы">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridReviews"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding ReviewID}" />
+                            <DataGridTextColumn Header="Пользователь"
+                                                Binding="{Binding User.FullName}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Транспорт"
+                                                Binding="{Binding Vehicle.FullName}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Рейтинг"
+                                                Binding="{Binding Rating}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Комментарий"
+                                                Binding="{Binding Comment}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Дата"
+                                                Binding="{Binding CreatedAt, StringFormat={}{0:dd.MM.yyyy}}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditReview_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddReview_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeleteReview_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Страховки">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridInsurances"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding InsuranceID}" />
+                            <DataGridTextColumn Header="Название"
+                                                Binding="{Binding InsuranceName}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Описание"
+                                                Binding="{Binding InsuranceDetails}"
+                                                Width="*" />
+                            <DataGridTextColumn Header="Цена"
+                                                Binding="{Binding InsurancePrice, StringFormat=C}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditInsurance_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddInsurance_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeleteInsurance_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Категории Транспорта">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridVehicleCategories"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding VehicleCategoryID}" />
+                            <DataGridTextColumn Header="Название"
+                                                Binding="{Binding VehicleCategory1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditVehicleCategory_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddVehicleCategory_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeleteVehicleCategory_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Статусы бронирований">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridBookingStatuses"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding BookingStatusID}" />
+                            <DataGridTextColumn Header="Статус"
+                                                Binding="{Binding BookingStatus1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditBookingStatus_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddBookingStatus_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeleteBookingStatus_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Статусы оплат">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridPaymentStatuses"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding PaymentStatusID}" />
+                            <DataGridTextColumn Header="Статус"
+                                                Binding="{Binding PaymentStatus1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditPaymentStatus_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddPaymentStatus_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeletePaymentStatus_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Способы оплат">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridPaymentMethods"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding PaymentMethodID}" />
+                            <DataGridTextColumn Header="Способ оплаты"
+                                                Binding="{Binding PaymentMethod1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditPaymentMethod_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddPaymentMethod_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeletePaymentMethod_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="Роли">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <DataGrid Name="DataGridRoles"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID"
+                                                Binding="{Binding RoleID}" />
+                            <DataGridTextColumn Header="Роль"
+                                                Binding="{Binding Role1}"
+                                                Width="*" />
+                            <DataGridTemplateColumn Width="Auto">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
+                                                    Click="ButtonEditRoleMethod_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Bottom">
+                        <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
+                                Click="ButtonAddRoleMethod_Click"
+                                Margin="10" />
+                        <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
+                                Click="ButtonDeleteRoleMethod_Click"
+                                Margin="10" />
+                    </StackPanel>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </Page>

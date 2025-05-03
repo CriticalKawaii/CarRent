@@ -94,4 +94,3 @@ namespace WpfApp
         public virtual VehicleCategory VehicleCategory { get; set; }
     }
 }
-

@@ -17,6 +17,7 @@ namespace WpfApp
     
     public partial class DBEntities : DbContext
     {
+
         private static DBEntities _context;
         public static DBEntities GetContext()
         {

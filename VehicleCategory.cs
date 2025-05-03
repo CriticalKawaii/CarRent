@@ -22,7 +22,6 @@ namespace WpfApp
     
         public int VehicleCategoryID { get; set; }
         public string VehicleCategory1 { get; set; }
-        public byte[] VehicleCategoryIcon { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Vehicle> Vehicles { get; set; }

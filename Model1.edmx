@@ -98,7 +98,6 @@
           </Key>
           <Property Name="VehicleCategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="VehicleCategory" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="VehicleCategoryIcon" Type="varbinary(max)" />
         </EntityType>
         <EntityType Name="Vehicles">
           <Key>
@@ -112,7 +111,7 @@
           <Property Name="LicensePlate" Type="nvarchar" MaxLength="20" Nullable="false" />
           <Property Name="VehicleCategoryID" Type="int" />
           <Property Name="DailyRate" Type="decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="Available" Type="bit" />
+          <Property Name="Available" Type="bit" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime" />
           <Property Name="AvgRating" Type="decimal" Precision="3" Scale="2" />
         </EntityType>
@@ -457,7 +456,6 @@
           </Key>
           <Property Name="VehicleCategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="VehicleCategory1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="VehicleCategoryIcon" Type="Binary" MaxLength="Max" FixedLength="false" />
           <NavigationProperty Name="Vehicles" Relationship="Self.FK__Vehicles__Catego__4316F928" FromRole="VehicleCategories" ToRole="Vehicles" />
         </EntityType>
         <EntityType Name="Vehicle">
@@ -472,7 +470,7 @@
           <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="VehicleCategoryID" Type="Int32" />
           <Property Name="DailyRate" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
-          <Property Name="Available" Type="Boolean" />
+          <Property Name="Available" Type="Boolean" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <Property Name="AvgRating" Type="Decimal" Precision="3" Scale="2" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Vehicles" ToRole="Bookings" />
@@ -822,7 +820,6 @@
               <MappingFragment StoreEntitySet="VehicleCategories">
                 <ScalarProperty Name="VehicleCategoryID" ColumnName="VehicleCategoryID" />
                 <ScalarProperty Name="VehicleCategory1" ColumnName="VehicleCategory" />
-                <ScalarProperty Name="VehicleCategoryIcon" ColumnName="VehicleCategoryIcon" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
