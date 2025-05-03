@@ -118,7 +118,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                     <TextBlock x:Name="TextBlockNoBookings"
-                               Text="Нет бронирований"
+                               Text="Нет аренд"
                                FontStyle="Italic"
                                Foreground="Gray"
                                Visibility="Collapsed"

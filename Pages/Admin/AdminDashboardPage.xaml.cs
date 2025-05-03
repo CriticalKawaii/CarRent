@@ -21,6 +21,14 @@ namespace WpfApp.Pages.Admin
             DataGridUsers.ItemsSource = context.Users.ToList();
             DataGridVehicles.ItemsSource = context.Vehicles.ToList();
             DataGridBookings.ItemsSource = context.Bookings.ToList();
+            DataGridPayments.ItemsSource = context.Payments.ToList();
+            DataGridReviews.ItemsSource = context.Reviews.ToList();
+            DataGridInsurances.ItemsSource = context.Insurances.ToList();
+            DataGridVehicleCategories.ItemsSource = context.VehicleCategories.ToList();
+            DataGridBookingStatuses.ItemsSource = context.BookingStatuses.ToList();
+            DataGridPaymentStatuses.ItemsSource = context.PaymentStatuses.ToList();
+            DataGridPaymentMethods.ItemsSource = context.PaymentMethods.ToList();
+            DataGridRoles.ItemsSource = context.Roles.ToList();
         }
 
         // Пользователи
@@ -189,26 +197,26 @@ namespace WpfApp.Pages.Admin
         }
 
         //Категории Транспорта
-        private void ButtonAddCategory_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddVehicleCategory_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new EditCategoryPage(null));
+            NavigationService.Navigate(new EditVehicleCategoryPage(null));
         }
 
-        private void ButtonEditCategory_Click(object sender, RoutedEventArgs e)
+        private void ButtonEditVehicleCategory_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new EditCategoryPage((sender as Button).DataContext as TransportCategory));
+            NavigationService.Navigate(new EditVehicleCategoryPage((sender as Button).DataContext as VehicleCategory));
         }
 
-        private void ButtonDeleteCategory_Click(object sender, RoutedEventArgs e)
+        private void ButtonDeleteVehicleCategory_Click(object sender, RoutedEventArgs e)
         {
-            var categoriesForRemoving = DataGridCategories.SelectedItems.Cast<TransportCategory>().ToList();
+            var categoriesForRemoving = DataGridVehicleCategories.SelectedItems.Cast<VehicleCategory>().ToList();
             if (categoriesForRemoving.Any() && MessageBox.Show($"Удалить записи? ({categoriesForRemoving.Count})", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
-                    DBEntities.GetContext().TransportCategories.RemoveRange(categoriesForRemoving);
+                    DBEntities.GetContext().VehicleCategories.RemoveRange(categoriesForRemoving);
                     DBEntities.GetContext().SaveChanges();
-                    DataGridCategories.ItemsSource = DBEntities.GetContext().TransportCategories.ToList();
+                    DataGridVehicleCategories.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
                 }
                 catch (Exception ex) { MessageBox.Show(ex.Message, "Attention", MessageBoxButton.OK, MessageBoxImage.Warning); }
             }
@@ -241,30 +249,31 @@ namespace WpfApp.Pages.Admin
         }
 
         //Статусы оплат
-        private void ButtonAddPayment_Click(object sender, RoutedEventArgs e)
+        private void ButtonAddPaymentStatus_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new EditPaymentPage(null));
+            NavigationService.Navigate(new EditPaymentStatusPage(null));
         }
 
-        private void ButtonEditPayment_Click(object sender, RoutedEventArgs e)
+        private void ButtonEditPaymentStatus_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new EditPaymentPage((sender as Button).DataContext as Payment));
+            NavigationService.Navigate(new EditPaymentStatusPage((sender as Button).DataContext as PaymentStatus));
         }
 
-        private void ButtonDeletePayment_Click(object sender, RoutedEventArgs e)
+        private void ButtonDeletePaymentStatus_Click(object sender, RoutedEventArgs e)
         {
-            var paymentsForRemoving = DataGridPayments.SelectedItems.Cast<Payment>().ToList();
-            if (paymentsForRemoving.Any() && MessageBox.Show($"Удалить записи? ({paymentsForRemoving.Count})", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            var statusesForRemoving = DataGridPaymentStatuses.SelectedItems.Cast<PaymentStatus>().ToList();
+            if (statusesForRemoving.Any() && MessageBox.Show($"Удалить записи? ({statusesForRemoving.Count})", "Внимание!", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 try
                 {
-                    DBEntities.GetContext().Payments.RemoveRange(paymentsForRemoving);
+                    DBEntities.GetContext().PaymentStatuses.RemoveRange(statusesForRemoving);
                     DBEntities.GetContext().SaveChanges();
-                    DataGridPayments.ItemsSource = DBEntities.GetContext().Payments.ToList();
+                    DataGridPaymentStatuses.ItemsSource = DBEntities.GetContext().PaymentStatuses.ToList();
                 }
                 catch (Exception ex) { MessageBox.Show(ex.Message, "Attention", MessageBoxButton.OK, MessageBoxImage.Warning); }
             }
         }
+
         //Способы оплат
         private void ButtonAddPaymentMethod_Click(object sender, RoutedEventArgs e)
         {
@@ -323,10 +332,18 @@ namespace WpfApp.Pages.Admin
             if (Visibility == Visibility.Visible)
             {
                 DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-                
+
                 DataGridUsers.ItemsSource = DBEntities.GetContext().Users.ToList();
                 DataGridVehicles.ItemsSource = DBEntities.GetContext().Vehicles.ToList();
                 DataGridBookings.ItemsSource = DBEntities.GetContext().Bookings.ToList();
+                DataGridPayments.ItemsSource = DBEntities.GetContext().Payments.ToList();
+                DataGridReviews.ItemsSource = DBEntities.GetContext().Reviews.ToList();
+                DataGridInsurances.ItemsSource = DBEntities.GetContext().Insurances.ToList();
+                DataGridVehicleCategories.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+                DataGridBookingStatuses.ItemsSource = DBEntities.GetContext().BookingStatuses.ToList();
+                DataGridPaymentStatuses.ItemsSource = DBEntities.GetContext().PaymentStatuses.ToList();
+                DataGridPaymentMethods.ItemsSource = DBEntities.GetContext().PaymentMethods.ToList();
+                DataGridRoles.ItemsSource = DBEntities.GetContext().Roles.ToList();
             }
         }
     }

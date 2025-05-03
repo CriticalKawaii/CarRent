@@ -137,8 +137,32 @@
     <Compile Include="Pages\Admin\Edit\EditBookingPage.xaml.cs">
       <DependentUpon>EditBookingPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Admin\Edit\EditBookingStatusPage.xaml.cs">
+      <DependentUpon>EditBookingStatusPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditInsurancePage.xaml.cs">
+      <DependentUpon>EditInsurancePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditPaymentMethodPage.xaml.cs">
+      <DependentUpon>EditPaymentMethodPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditPaymentPage.xaml.cs">
+      <DependentUpon>EditPaymentPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditPaymentStatusPage.xaml.cs">
+      <DependentUpon>EditPaymentStatusPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditReviewPage.xaml.cs">
+      <DependentUpon>EditReviewPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditRolePage.xaml.cs">
+      <DependentUpon>EditRolePage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Admin\Edit\EditUserPage.xaml.cs">
       <DependentUpon>EditUserPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Admin\Edit\EditVehicleCategoryPage.xaml.cs">
+      <DependentUpon>EditVehicleCategoryPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Admin\Edit\EditVehiclePage.xaml.cs">
       <DependentUpon>EditVehiclePage.xaml</DependentUpon>
@@ -210,7 +234,39 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\Admin\Edit\EditBookingStatusPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditInsurancePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditPaymentMethodPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditPaymentPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditPaymentStatusPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditReviewPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditRolePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\Admin\Edit\EditUserPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Admin\Edit\EditVehicleCategoryPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

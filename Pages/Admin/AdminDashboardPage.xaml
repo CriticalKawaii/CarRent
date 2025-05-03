@@ -14,17 +14,7 @@
       IsVisibleChanged="Page_IsVisibleChanged">
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-
-        <TextBlock Grid.Row="0"
-                   Text="Панель администрирования"
-                   Style="{StaticResource MaterialDesignHeadline5TextBlock}"
-                   Margin="10" />
-        <TabControl Grid.Row="1"
-                    x:Name="AdminTabs"
+        <TabControl x:Name="AdminTabs"
                     TabStripPlacement="Left">
             <TabItem Header="Пользователи">
                 <Grid>
@@ -119,7 +109,7 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    
+
                     <StackPanel Grid.Row="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center"
@@ -173,7 +163,7 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    
+
                     <StackPanel Grid.Row="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center"
@@ -510,7 +500,7 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            
+
             <TabItem Header="Роли">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -531,7 +521,7 @@
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
                                             <Button Content="{materialDesign:PackIcon Kind=Edit,Size=16}"
-                                                    Click="ButtonEditRoleMethod_Click" />
+                                                    Click="ButtonEditRole_Click" />
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -544,10 +534,10 @@
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Bottom">
                         <Button Content="{materialDesign:PackIcon Kind=Add,Size=16}"
-                                Click="ButtonAddRoleMethod_Click"
+                                Click="ButtonAddRole_Click"
                                 Margin="10" />
                         <Button Content="{materialDesign:PackIcon Kind=Delete,Size=16}"
-                                Click="ButtonDeleteRoleMethod_Click"
+                                Click="ButtonDeleteRole_Click"
                                 Margin="10" />
                     </StackPanel>
                 </Grid>
