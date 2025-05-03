@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using WpfApp.Classes;
-using WpfApp.Pages.admin;
 using System.Windows.Forms.DataVisualization.Charting;
 using Word = Microsoft.Office.Interop.Word;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -10,6 +9,7 @@ using System;
 using WpfApp.Pages.Account;
 using System.Text;
 using System.Text.RegularExpressions;
+using WpfApp.Pages.Admin;
 
 
 namespace WpfApp.Pages
@@ -24,6 +24,8 @@ namespace WpfApp.Pages
                 TabItemAdministration.Visibility = Visibility.Visible;
                 TabItemReports.Visibility = Visibility.Visible;
                 TabItemConfirmations.Visibility = Visibility.Visible;
+                frameAdmin.Navigate(new AdminDashboardPage());
+
                 ChartBookings.ChartAreas.Add(new ChartArea("Main"));
                 var currentSeries = new Series("Бронирования") { 
                     IsValueShownAsLabel = true
@@ -121,21 +123,6 @@ namespace WpfApp.Pages
             {
                 MessageBox.Show($"Ошибка при сохранении данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-
-        private void ButtonUsersPage_Checked(object sender, RoutedEventArgs e)
-        {
-            frameAdmin.Navigate(new UsersOverviewPage());
-        }
-
-        private void ButtonVehiclesPage_Checked(object sender, RoutedEventArgs e)
-        {
-            frameAdmin.Navigate(new VehiclesOverviewPage());
-        }
-
-        private void ButtonBookingsPage_Checked(object sender, RoutedEventArgs e)
-        {
-            frameAdmin.Navigate(new BookingsOverviewPage());
         }
 
         private void ButtonSignOut_Click(object sender, RoutedEventArgs e)

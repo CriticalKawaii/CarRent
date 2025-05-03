@@ -131,20 +131,14 @@
     <Compile Include="Pages\Account\ReviewPage.xaml.cs">
       <DependentUpon>ReviewPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Admin\BookingsOverviewPage.xaml.cs">
-      <DependentUpon>BookingsOverviewPage.xaml</DependentUpon>
+    <Compile Include="Pages\Admin\AdminDashboardPage.xaml.cs">
+      <DependentUpon>AdminDashboardPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Admin\Edit\EditUserPage.xaml.cs">
       <DependentUpon>EditUserPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Admin\Edit\EditVehiclePage.xaml.cs">
       <DependentUpon>EditVehiclePage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Admin\UsersOverviewPage.xaml.cs">
-      <DependentUpon>UsersOverviewPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Pages\Admin\VehiclesOverviewPage.xaml.cs">
-      <DependentUpon>VehiclesOverviewPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ExploreCarsPage.xaml.cs">
       <DependentUpon>ExploreCarsPage.xaml</DependentUpon>
@@ -205,7 +199,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Admin\BookingsOverviewPage.xaml">
+    <Page Include="Pages\Admin\AdminDashboardPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -214,14 +208,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\Admin\Edit\EditVehiclePage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Admin\UsersOverviewPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Pages\Admin\VehiclesOverviewPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -244,32 +244,10 @@
                      Header="Администрирование"
                      Visibility="Collapsed"
                      d:Visibility="Visible">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <materialDesign:ColorZone Mode="PrimaryMid"
-                                              HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <RadioButton Content="Пользователи"
-                                         Name="ButtonUsersPage"
-                                         Checked="ButtonUsersPage_Checked"
-                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                            <RadioButton Content="Транспорт"
-                                         Name="ButtonVehiclesPage"
-                                         Checked="ButtonVehiclesPage_Checked"
-                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                            <RadioButton Content="Аренды"
-                                         Name="ButtonBookingsPage"
-                                         Checked="ButtonBookingsPage_Checked"
-                                         Style="{StaticResource MaterialDesignTabRadioButtonBottom}" />
-                        </StackPanel>
-                    </materialDesign:ColorZone>
+                
                     <Frame Grid.Row="1"
                            x:Name="frameAdmin"
                            NavigationUIVisibility="Hidden" />
-                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

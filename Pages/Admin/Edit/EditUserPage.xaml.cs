@@ -9,12 +9,12 @@ using System.Windows.Navigation;
 namespace WpfApp.Pages.Admin.Edit
 {
 
-    public partial class EditUsersPage : Page
+    public partial class EditUserPage : Page
     {
         private User _user = new User();
         private readonly string _originalPassword;
 
-        public EditUsersPage(User selectedUser)
+        public EditUserPage(User selectedUser)
         {
             InitializeComponent();
             if (selectedUser != null)
