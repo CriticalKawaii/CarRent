@@ -20,7 +20,6 @@
         <TextBlock Text="Пользователи"
                    Margin="5,10"
                    FontSize="16"/>
-
         <DataGrid Grid.Row="1"
                   Name="DataGridUsers"
                   AutoGenerateColumns="False"
