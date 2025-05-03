@@ -38,15 +38,10 @@
         <TabControl Grid.Row="1">
             <TabItem Header="Мои аренды">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="163*" />
-                        <ColumnDefinition Width="67*" />
-                    </Grid.ColumnDefinitions>
                     <DataGrid x:Name="DataGridUserBookings"
                               AutoGenerateColumns="False"
                               IsReadOnly="True"
-                              d:ItemsSource="{d:SampleData ItemCount=8}"
-                              Grid.ColumnSpan="2">
+                              d:ItemsSource="{d:SampleData ItemCount=8}">
 
                         <DataGrid.Columns>
                             <DataGridTemplateColumn Header="Фото"
@@ -128,8 +123,7 @@
                                Foreground="Gray"
                                Visibility="Collapsed"
                                VerticalAlignment="Center"
-                               HorizontalAlignment="Left"
-                               Margin="575,0,0,0" />
+                               HorizontalAlignment="Center"/>
                 </Grid>
             </TabItem>
 

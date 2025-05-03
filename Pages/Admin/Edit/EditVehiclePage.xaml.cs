@@ -83,10 +83,23 @@ namespace WpfApp.Pages.Admin.Edit
 
             if (openFileDialog.ShowDialog() == true)
             {
-                byte[] imageBytes = File.ReadAllBytes(openFileDialog.FileName);
-                _vehicle.VehicleImage = imageBytes;
-                _vehicle.OnPropertyChanged("VehicleImageSource");
+                try
+                {
+                    byte[] imageBytes = File.ReadAllBytes(openFileDialog.FileName);
+                    _vehicle.VehicleImage = imageBytes;
+
+                    _vehicle.OnPropertyChanged("VehicleImage");
+                    _vehicle.OnPropertyChanged("VehicleImageSource");
+
+                    DataContext = null;
+                    DataContext = _vehicle;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при загрузке изображения: {ex.Message}");
+                }
             }
         }
+
     }
 }

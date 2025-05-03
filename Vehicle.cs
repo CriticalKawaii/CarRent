@@ -24,11 +24,24 @@ namespace WpfApp
             this.Bookings = new HashSet<Booking>();
             this.Reviews = new HashSet<Review>();
         }
-    
+
         public int VehicleID { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
-        public byte[] VehicleImage { get; set; }
+
+        private byte[] _vehicleImage;
+        public byte[] VehicleImage
+        {
+            get => _vehicleImage;
+            set
+            {
+                _vehicleImage = value;
+                _vehicleImageSource = null;
+                OnPropertyChanged(nameof(VehicleImage));
+                OnPropertyChanged(nameof(VehicleImageSource));
+            }
+        }
+
         public int Year { get; set; }
         public string LicensePlate { get; set; }
         public Nullable<int> VehicleCategoryID { get; set; }
@@ -63,6 +76,7 @@ namespace WpfApp
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
                 bitmapImage.StreamSource = stream;
                 bitmapImage.EndInit();
+                bitmapImage.Freeze();
                 return bitmapImage;
             }
         }
@@ -80,3 +94,4 @@ namespace WpfApp
         public virtual VehicleCategory VehicleCategory { get; set; }
     }
 }
+
