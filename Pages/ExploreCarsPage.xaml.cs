@@ -181,6 +181,11 @@ namespace WpfApp
                 }
                 return;
             }
+            else if(SessionManager.CurrentUser.RoleID == 2)
+            {
+                MessageBox.Show("Администратор не может оформлять аренды.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
             else
             {
                 if (ListViewExploreCars.SelectedItem is Vehicle selectedVehicle &&

@@ -7,7 +7,7 @@
       mc:Ignorable="d"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:charts="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
-      d:DesignHeight="450"
+      d:DesignHeight="700"
       d:DesignWidth="1150"
       Title="AccountPage"
       d:Background="White"
@@ -42,7 +42,7 @@
             </StackPanel>
         </DockPanel>
         <TabControl Grid.Row="1">
-            <TabItem Header="Мои аренды">
+            <TabItem x:Name="TabRents" Header="Мои аренды">
                 <Grid>
                     <DataGrid x:Name="DataGridUserBookings"
                               AutoGenerateColumns="False"
@@ -267,51 +267,146 @@
                      d:Visibility="Visible">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <StackPanel HorizontalAlignment="Center">
-                        <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center">
-                            <ComboBox Name="ComboBoxVehicleCategory"
-                                      SelectedIndex="0"
-                                      Margin="5"
-                                      materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                                      DisplayMemberPath="VehicleCategory1"
-                                      SelectionChanged="UpdateChart"
-                                      Style="{StaticResource OutlinedComboBox}"
-                                      materialDesign:HintAssist.Hint="Категория авто" />
-                            <ComboBox Name="ComboBoxDiagram"
-                                      SelectedIndex="0"
-                                      Margin="5"
-                                      SelectionChanged="UpdateChart"
-                                      Style="{StaticResource OutlinedComboBox}"
-                                      materialDesign:HintAssist.Hint="Диаграмма" />
-                            <Button Content="{materialDesign:PackIcon Kind=MicrosoftWord,Size=25}"
-                                    Margin="5"
-                                    ToolTip="Экспорт в Microsoft Word"
-                                    BorderThickness="0"
-                                    Click="ButtonWord_Click"
-                                    Background="#185abd" />
-                            <Button Content="{materialDesign:PackIcon Kind=MicrosoftExcel,Size=25}"
-                                    Margin="5"
-                                    ToolTip="Экспорт в Microsoft Excel"
-                                    BorderThickness="0"
-                                    Background="#107c41"
-                                    Click="ButtonExcel_Click" />
-                        </StackPanel>
-                    </StackPanel>
-                    <WindowsFormsHost Grid.Row="1">
-                        <charts:Chart x:Name="ChartBookings">
-                            <charts:Chart.Legends>
-                                <charts:Legend>
 
-                                </charts:Legend>
-                            </charts:Chart.Legends>
-                        </charts:Chart>
-                    </WindowsFormsHost>
+                    <StackPanel Grid.Row="0"
+                                Margin="10">
+                        <TextBlock Text="Тип отчета:"
+                                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                   Margin="0,0,0,10" />
+                        <ComboBox Name="ComboBoxReportType"
+                                  Style="{StaticResource OutlinedComboBox}"
+                                  SelectionChanged="ComboBoxReportType_SelectionChanged"
+                                  Margin="0,0,0,10"
+                                  Width="300"
+                                  HorizontalAlignment="Left">
+                            <ComboBoxItem Content="Активность пользователей" />
+                            <ComboBoxItem Content="Финансовый отчет" />
+                            <ComboBoxItem Content="Популярность категорий транспорта" />
+                            <ComboBoxItem Content="Эффективность транспорта" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Border Grid.Row="1"
+                            BorderBrush="{DynamicResource MaterialDesignDivider}"
+                            BorderThickness="0,0,0,1"
+                            Padding="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ComboBox Name="ComboBoxReportPeriod"
+                                      Width="150"
+                                      Grid.Column="0"
+                                      Margin="0,0,20,0"
+                                      Style="{StaticResource OutlinedComboBox}"
+                                      SelectionChanged="ComboBoxReportPeriod_SelectionChanged"
+                                      materialDesign:HintAssist.Hint="Период">
+                                <ComboBoxItem Content="Все время" />
+                                <ComboBoxItem Content="Текущий месяц" />
+                                <ComboBoxItem Content="Последние 3 месяца" />
+                                <ComboBoxItem Content="Последние 6 месяцев" />
+                                <ComboBoxItem Content="Текущий год" />
+                                <ComboBoxItem Content="Произвольный период" />
+                            </ComboBox>
+
+
+                            <DatePicker Name="DatePickerStartDate"
+                                        Grid.Column="1"
+                                        Width="150"
+                                        Margin="0,0,20,0"
+                                        IsEnabled="False"
+                                        VerticalAlignment="Center"
+                                        materialDesign:HintAssist.Hint="Начало"
+                                        SelectedDateChanged="DatePickerReportDate_SelectedDateChanged"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+
+                            <DatePicker Name="DatePickerEndDate"
+                                        Width="150"
+                                        Grid.Column="2"
+                                        Margin="0,0,20,0"
+                                        IsEnabled="False"
+                                        VerticalAlignment="Center"
+                                        materialDesign:HintAssist.Hint="Конец"
+                                        SelectedDateChanged="DatePickerReportDate_SelectedDateChanged"
+                                        Style="{StaticResource MaterialDesignOutlinedDatePicker}" />
+
+                            <ComboBox Name="ComboBoxVehicleCategory"
+                                      Width="150"
+                                      Grid.Column="3"
+                                      materialDesign:HintAssist.Hint="Категория"
+                                      DisplayMemberPath="VehicleCategory1"
+                                      materialDesign:TextFieldAssist.HasClearButton="True"
+                                      SelectionChanged="ReportFilter_Changed"
+                                      Style="{StaticResource OutlinedComboBox}" />
+                            <Button Content="Применить фильтры"
+                                    Grid.Column="5"
+                                    Name="ButtonApplyFilters"
+                                    Click="ButtonApplyFilters_Click"
+                                    Style="{StaticResource MaterialDesignOutlinedButton}" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Report Data Display -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Chart Display -->
+                        <WindowsFormsHost Grid.Column="0"
+                                          Margin="10">
+                            <charts:Chart x:Name="ChartReport">
+                                <charts:Chart.Legends>
+                                    <charts:Legend Docking="Top"
+                                                   Alignment="Center" />
+                                </charts:Chart.Legends>
+                            </charts:Chart>
+                        </WindowsFormsHost>
+
+                        <!-- Report Data Grid -->
+                        <DataGrid Grid.Column="1"
+                                  Name="DataGridReportData"
+                                  Width="400"
+                                  Margin="0,10,10,10"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True">
+                            <!-- Columns will be added dynamically in code -->
+                        </DataGrid>
+                    </Grid>
+
+                    <StackPanel Grid.Row="3"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                Margin="10">
+                        <Button Content="{materialDesign:PackIcon Kind=MicrosoftWord,Size=25}"
+                                Margin="5,0"
+                                ToolTip="Экспорт в Microsoft Word"
+                                BorderThickness="0"
+                                Click="ButtonExportWord_Click"
+                                Background="#185abd" />
+                        <Button Content="{materialDesign:PackIcon Kind=MicrosoftExcel,Size=25}"
+                                Margin="5,0"
+                                ToolTip="Экспорт в Microsoft Excel"
+                                BorderThickness="0"
+                                Background="#107c41"
+                                Click="ButtonExportExcel_Click" />
+                    </StackPanel>
                 </Grid>
             </TabItem>
+
             <TabItem x:Name="TabItemConfirmations"
                      Header="Подтверждения"
                      Visibility="Collapsed"
@@ -323,7 +418,6 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!-- Header buttons -->
                     <materialDesign:ColorZone Background="{StaticResource MaterialDesign.Brush.Primary}">
                         <StackPanel Orientation="Horizontal"
                                     Grid.Row="0"
