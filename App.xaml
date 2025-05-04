@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WpfApp"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:controls="clr-namespace:WpfApp.Controls"
              StartupUri="MainWindow.xaml"
              >
     <Application.Resources>
@@ -10,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ResourceDictionaries/RentACarStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <controls:BooleanToSelectionBorderConverter x:Key="BooleanToSelectionBorderConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

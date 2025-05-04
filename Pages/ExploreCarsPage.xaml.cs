@@ -5,6 +5,8 @@ using System.Windows;
 using System.Windows.Controls;
 using WpfApp.Classes;
 using System.Collections.Generic;
+using WpfApp.Controls;
+using MaterialDesignThemes.Wpf;
 
 namespace WpfApp
 {
@@ -25,9 +27,16 @@ namespace WpfApp
         private decimal rentCost;
         private List<SortOption> sortOptions;
 
+        private VehicleImageManager _imageManager;
+        private GalleryDialog _galleryDialog;
+        private Grid _dialogHost;
+
         public ExploreCarsPage()
         {
             InitializeComponent();
+
+            _imageManager = new VehicleImageManager();
+
             Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
 
@@ -44,6 +53,18 @@ namespace WpfApp
             MainWindow = Application.Current.MainWindow as MainWindow;
 
             Loaded += ExploreCarsPage_Loaded;
+
+            imageVehicle.MouseLeftButtonDown += ImageVehicle_MouseLeftButtonDown;
+
+            _dialogHost = new Grid();
+            _dialogHost.Background = new System.Windows.Media.SolidColorBrush(
+                System.Windows.Media.Color.FromArgb(150, 0, 0, 0));
+            _dialogHost.Visibility = Visibility.Collapsed;
+            Grid.SetColumnSpan(_dialogHost, 2);
+            Grid.SetRowSpan(_dialogHost, 3);
+            this.RegisterName("DialogHost", _dialogHost);
+
+            (this.Content as Grid).Children.Add(_dialogHost);
 
         }
 
@@ -65,6 +86,47 @@ namespace WpfApp
 
             LoadingProgressBar.Visibility = Visibility.Collapsed;
         }
+
+        private void ImageVehicle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            Vehicle selectedVehicle = DataContext as Vehicle;
+            if (selectedVehicle != null && selectedVehicle.VehicleID > 0)
+            {
+                ShowGalleryDialog(selectedVehicle);
+            }
+        }
+
+        private void ShowGalleryDialog(Vehicle vehicle)
+        {
+            // Get the images for this vehicle
+            var vehicleImages = _imageManager.GetVehicleImages(vehicle.VehicleID);
+
+            if (vehicleImages.Count == 0)
+            {
+                MessageBox.Show("Для этого автомобиля нет доступных изображений.",
+                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            _galleryDialog = new GalleryDialog();
+            _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Галерея");
+            _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
+
+            var imageUrls = vehicleImages.Select(vi => vi.ImagePath).ToList();
+            _galleryDialog.LoadImages(imageUrls);
+
+            _dialogHost.Children.Clear();
+            _dialogHost.Children.Add(_galleryDialog);
+            _dialogHost.Visibility = Visibility.Visible;
+        }
+
+        private void GalleryDialog_CloseRequested(object sender, EventArgs e)
+        {
+            _dialogHost.Visibility = Visibility.Collapsed;
+            _dialogHost.Children.Clear();
+            _galleryDialog = null;
+        }
+
 
         private void InitializeSortOptions()
         {
@@ -334,9 +396,5 @@ namespace WpfApp
             UpdateItems();
         }
 
-        private void Page_GotFocus(object sender, RoutedEventArgs e)
-        {
-            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-        }
     }
 }

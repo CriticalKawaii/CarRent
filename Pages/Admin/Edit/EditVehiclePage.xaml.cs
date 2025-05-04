@@ -1,21 +1,27 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using WpfApp.Classes;
 
 namespace WpfApp.Pages.Admin.Edit
 {
     public partial class EditVehiclePage : Page
     {
         private Vehicle _vehicle = new Vehicle();
+        private VehicleImageManager _imageManager;
+        private List<VehicleImage> _vehicleImages = new List<VehicleImage>();
 
         public EditVehiclePage(Vehicle selectedVehicle)
         {
             InitializeComponent();
+            _imageManager = new VehicleImageManager();
+
             if (selectedVehicle != null)
             {
                 _vehicle = selectedVehicle;
@@ -24,10 +30,26 @@ namespace WpfApp.Pages.Admin.Edit
             Loaded += Page_Loaded;
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             ComboBoxCategories.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
+
+            if (_vehicle.VehicleID > 0)
+            {
+                // Load vehicle images from the VehicleImages table
+                _vehicleImages = _imageManager.GetVehicleImages(_vehicle.VehicleID);
+
+                // Load images into the gallery
+                await LoadImagesIntoGallery();
+            }
         }
+
+        private async System.Threading.Tasks.Task LoadImagesIntoGallery()
+        {
+            var imageUrls = _vehicleImages.Select(vi => vi.ImagePath).ToList();
+            VehicleImageGallery.LoadImages(imageUrls);
+        }
+
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
@@ -57,49 +79,79 @@ namespace WpfApp.Pages.Admin.Edit
                 _vehicle.CreatedAt = DateTime.Now;
                 _vehicle.Available = true;
                 DBEntities.GetContext().Vehicles.Add(_vehicle);
+
+                // Save first to get the VehicleID
+                try
+                {
+                    DBEntities.GetContext().SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при сохранении: " + ex.Message);
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    DBEntities.GetContext().SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Ошибка при сохранении: " + ex.Message);
+                    return;
+                }
             }
 
-            try
-            {
-                DBEntities.GetContext().SaveChanges();
-                MessageBox.Show("Данные успешно сохранены");
-                NavigationService.GoBack();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ошибка при сохранении: " + ex.Message);
-            }
+            MessageBox.Show("Данные успешно сохранены");
+            NavigationService.GoBack();
         }
+
 
         private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
         }
 
-        private void ButtonSelectImage_Click(object sender, RoutedEventArgs e)
+        private async void ButtonAddImage_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Image files (*.png;*.jpeg;*.jpg)|*.png;*.jpeg;*.jpg|All files (*.*)|*.*";
-
-            if (openFileDialog.ShowDialog() == true)
+            if (_vehicle.VehicleID == 0)
             {
-                try
-                {
-                    byte[] imageBytes = File.ReadAllBytes(openFileDialog.FileName);
-                    _vehicle.VehicleImage = imageBytes;
+                MessageBox.Show("Пожалуйста, сначала сохраните основные данные автомобиля.", "Информация",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
 
-                    _vehicle.OnPropertyChanged("VehicleImage");
-                    _vehicle.OnPropertyChanged("VehicleImageSource");
-
-                    DataContext = null;
-                    DataContext = _vehicle;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при загрузке изображения: {ex.Message}");
-                }
+            var newImage = await _imageManager.BrowseAndUploadImageAsync(_vehicle.VehicleID);
+            if (newImage != null)
+            {
+                _vehicleImages.Add(newImage);
+                await LoadImagesIntoGallery();
             }
         }
 
+        private async void ButtonDeleteImage_Click(object sender, RoutedEventArgs e)
+        {
+            string currentImageUrl = VehicleImageGallery.GetCurrentImageUrl();
+            if (string.IsNullOrEmpty(currentImageUrl))
+            {
+                MessageBox.Show("Нет выбранного изображения для удаления.", "Информация",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (MessageBox.Show("Вы уверены, что хотите удалить это изображение?", "Подтверждение",
+                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                var imageToDelete = _vehicleImages.FirstOrDefault(img => img.ImagePath == currentImageUrl);
+                if (imageToDelete != null)
+                {
+                    _imageManager.DeleteVehicleImage(imageToDelete.ImageID);
+                    _vehicleImages.Remove(imageToDelete);
+                    await LoadImagesIntoGallery();
+                }
+            }
+        }
     }
 }

@@ -1,18 +1,21 @@
 ﻿<Page x:Class="WpfApp.Pages.Admin.Edit.EditVehiclePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:local="clr-namespace:WpfApp.Pages.Admin.Edit"
+      xmlns:controls="clr-namespace:WpfApp.Controls"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-      mc:Ignorable="d" 
-      d:DesignHeight="700" d:DesignWidth="800"
+      mc:Ignorable="d"
+      d:DesignHeight="700"
+      d:DesignWidth="800"
       Title="EditVehiclesPage"
       d:Background="White">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
@@ -71,17 +74,37 @@
                       IsChecked="{Binding Available}"
                       Margin="0,0,0,10"
                       Content="Доступен" />
-            <Image Grid.Row="8"
-                   Source="{Binding VehicleImageSource}"
-                   Height="200"
-                   Margin="0,0,0,10"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
-            <Button Grid.Row="9"
-                    Content="Выбрать изображение"
-                    Click="ButtonSelectImage_Click"
-                    Margin="0,0,0,20"
-                    HorizontalAlignment="Center" />
+
+            <GroupBox Grid.Row="9"
+                      Header="Галерея изображений"
+                      Margin="0,0,0,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="300" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <controls:ImageGallery x:Name="VehicleImageGallery"
+                                           Grid.Row="0" />
+
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,10,0,0">
+                        <Button Content="Добавить изображение"
+                                Click="ButtonAddImage_Click"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Margin="0,0,10,0"
+                                HorizontalAlignment="Center" />
+                        <Button Content="Удалить текущее"
+                                Click="ButtonDeleteImage_Click"
+                                Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Foreground="Red"
+                                BorderBrush="Red"
+                                HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
 
             <Button Name="ButtonSave"
                     Content="{materialDesign:PackIcon Kind=ContentSave,Size=20}"

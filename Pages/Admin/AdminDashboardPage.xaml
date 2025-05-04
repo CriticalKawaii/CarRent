@@ -14,6 +14,7 @@
       IsVisibleChanged="Page_IsVisibleChanged">
 
     <Grid>
+        
         <TabControl x:Name="AdminTabs"
                     TabStripPlacement="Left">
             <TabItem Header="Пользователи">
@@ -543,5 +544,6 @@
                 </Grid>
             </TabItem>
         </TabControl>
+
     </Grid>
 </Page>

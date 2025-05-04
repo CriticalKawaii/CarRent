@@ -13,8 +13,7 @@
       d:Height="800"
       d:Width="1100"
       FontFamily="{materialDesign:MaterialDesignFont}"
-      IsVisibleChanged="Page_IsVisibleChanged"
-      GotFocus="Page_GotFocus">
+      IsVisibleChanged="Page_IsVisibleChanged">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"
