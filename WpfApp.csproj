@@ -138,7 +138,6 @@
     </Compile>
     <Compile Include="Classes\Core.cs" />
     <Compile Include="Classes\SessionManager.cs" />
-    <Compile Include="Classes\VehicleImageManager.cs" />
     <Compile Include="Controls\GalleryDialog.xaml.cs">
       <DependentUpon>GalleryDialog.xaml</DependentUpon>
     </Compile>
@@ -229,7 +228,6 @@
     <Compile Include="Role.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
-    <Compile Include="Services\ImgBBService.cs" />
     <Compile Include="sp_helpdiagramdefinition_Result.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>

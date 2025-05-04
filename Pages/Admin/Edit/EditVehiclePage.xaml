@@ -7,7 +7,7 @@
       xmlns:controls="clr-namespace:WpfApp.Controls"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       mc:Ignorable="d"
-      d:DesignHeight="700"
+      d:DesignHeight="800"
       d:DesignWidth="800"
       Title="EditVehiclesPage"
       d:Background="White">
@@ -92,12 +92,10 @@
                                 HorizontalAlignment="Center"
                                 Margin="0,10,0,0">
                         <Button Content="Добавить изображение"
-                                Click="ButtonAddImage_Click"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Margin="0,0,10,0"
                                 HorizontalAlignment="Center" />
                         <Button Content="Удалить текущее"
-                                Click="ButtonDeleteImage_Click"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Foreground="Red"
                                 BorderBrush="Red"

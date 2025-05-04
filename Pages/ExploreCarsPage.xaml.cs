@@ -27,7 +27,6 @@ namespace WpfApp
         private decimal rentCost;
         private List<SortOption> sortOptions;
 
-        private VehicleImageManager _imageManager;
         private GalleryDialog _galleryDialog;
         private Grid _dialogHost;
 
@@ -35,7 +34,6 @@ namespace WpfApp
         {
             InitializeComponent();
 
-            _imageManager = new VehicleImageManager();
 
             Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
             ListViewExploreCars.ItemsSource = Vehicles;
@@ -98,33 +96,13 @@ namespace WpfApp
 
         private void ShowGalleryDialog(Vehicle vehicle)
         {
-            // Get the images for this vehicle
-            var vehicleImages = _imageManager.GetVehicleImages(vehicle.VehicleID);
+            
 
-            if (vehicleImages.Count == 0)
-            {
-                MessageBox.Show("Для этого автомобиля нет доступных изображений.",
-                    "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            _galleryDialog = new GalleryDialog();
-            _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Галерея");
-            _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
-
-            var imageUrls = vehicleImages.Select(vi => vi.ImagePath).ToList();
-            _galleryDialog.LoadImages(imageUrls);
-
-            _dialogHost.Children.Clear();
-            _dialogHost.Children.Add(_galleryDialog);
-            _dialogHost.Visibility = Visibility.Visible;
         }
 
         private void GalleryDialog_CloseRequested(object sender, EventArgs e)
         {
-            _dialogHost.Visibility = Visibility.Collapsed;
-            _dialogHost.Children.Clear();
-            _galleryDialog = null;
+            
         }
 
 

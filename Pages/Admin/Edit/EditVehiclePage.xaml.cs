@@ -14,13 +14,11 @@ namespace WpfApp.Pages.Admin.Edit
     public partial class EditVehiclePage : Page
     {
         private Vehicle _vehicle = new Vehicle();
-        private VehicleImageManager _imageManager;
         private List<VehicleImage> _vehicleImages = new List<VehicleImage>();
 
         public EditVehiclePage(Vehicle selectedVehicle)
         {
             InitializeComponent();
-            _imageManager = new VehicleImageManager();
 
             if (selectedVehicle != null)
             {
@@ -34,14 +32,7 @@ namespace WpfApp.Pages.Admin.Edit
         {
             ComboBoxCategories.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
 
-            if (_vehicle.VehicleID > 0)
-            {
-                // Load vehicle images from the VehicleImages table
-                _vehicleImages = _imageManager.GetVehicleImages(_vehicle.VehicleID);
-
-                // Load images into the gallery
-                await LoadImagesIntoGallery();
-            }
+           
         }
 
         private async System.Threading.Tasks.Task LoadImagesIntoGallery()
@@ -114,44 +105,8 @@ namespace WpfApp.Pages.Admin.Edit
             NavigationService.GoBack();
         }
 
-        private async void ButtonAddImage_Click(object sender, RoutedEventArgs e)
-        {
-            if (_vehicle.VehicleID == 0)
-            {
-                MessageBox.Show("Пожалуйста, сначала сохраните основные данные автомобиля.", "Информация",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
+        
 
-            var newImage = await _imageManager.BrowseAndUploadImageAsync(_vehicle.VehicleID);
-            if (newImage != null)
-            {
-                _vehicleImages.Add(newImage);
-                await LoadImagesIntoGallery();
-            }
-        }
-
-        private async void ButtonDeleteImage_Click(object sender, RoutedEventArgs e)
-        {
-            string currentImageUrl = VehicleImageGallery.GetCurrentImageUrl();
-            if (string.IsNullOrEmpty(currentImageUrl))
-            {
-                MessageBox.Show("Нет выбранного изображения для удаления.", "Информация",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-
-            if (MessageBox.Show("Вы уверены, что хотите удалить это изображение?", "Подтверждение",
-                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-            {
-                var imageToDelete = _vehicleImages.FirstOrDefault(img => img.ImagePath == currentImageUrl);
-                if (imageToDelete != null)
-                {
-                    _imageManager.DeleteVehicleImage(imageToDelete.ImageID);
-                    _vehicleImages.Remove(imageToDelete);
-                    await LoadImagesIntoGallery();
-                }
-            }
-        }
+        
     }
 }
