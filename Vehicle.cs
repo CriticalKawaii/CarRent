@@ -13,6 +13,7 @@ namespace WpfApp
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
+    using System.Linq;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
 
@@ -25,11 +26,13 @@ namespace WpfApp
             this.Reviews = new HashSet<Review>();
             this.VehicleImages = new HashSet<VehicleImage>();
         }
-    
+
         public int VehicleID { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
 
+        // VehicleImage is now deprecated but kept for backward compatibility
+        // This property will be gradually phased out as we move to VehicleImages collection
         private byte[] _vehicleImage;
         public byte[] VehicleImage
         {
@@ -61,29 +64,52 @@ namespace WpfApp
         {
             get
             {
-                if (_vehicleImageSource == null && VehicleImage != null && VehicleImage.Length > 0)
+                // First try to get image from VehicleImages collection
+                if (_vehicleImageSource == null && VehicleImages != null && VehicleImages.Count > 0)
                 {
-                    _vehicleImageSource = ByteArrayToImageSource(VehicleImage);
+                    var firstImage = VehicleImages.FirstOrDefault();
+                    if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
+                    {
+                        try
+                        {
+                            _vehicleImageSource = new BitmapImage(new Uri(firstImage.ImagePath));
+                        }
+                        catch
+                        {
+                            // If there's an error loading from URL, fall back to placeholder
+                            _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
+                        }
+                    }
                 }
+                // Fall back to legacy VehicleImage if needed
+                else if (_vehicleImageSource == null && VehicleImage != null && VehicleImage.Length > 0)
+                {
+                    try
+                    {
+                        using (var stream = new System.IO.MemoryStream(VehicleImage))
+                        {
+                            var bitmapImage = new BitmapImage();
+                            bitmapImage.BeginInit();
+                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                            bitmapImage.StreamSource = stream;
+                            bitmapImage.EndInit();
+                            bitmapImage.Freeze();
+                            _vehicleImageSource = bitmapImage;
+                        }
+                    }
+                    catch
+                    {
+                        // If there's an error with the binary data, use placeholder
+                        _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
+                    }
+                }
+                // Use placeholder if no images available
                 else if (_vehicleImageSource == null)
                 {
                     _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
                 }
-                return _vehicleImageSource;
-            }
-        }
 
-        private ImageSource ByteArrayToImageSource(byte[] imageData)
-        {
-            using (var stream = new MemoryStream(imageData))
-            {
-                var bitmapImage = new BitmapImage();
-                bitmapImage.BeginInit();
-                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                bitmapImage.StreamSource = stream;
-                bitmapImage.EndInit();
-                bitmapImage.Freeze();
-                return bitmapImage;
+                return _vehicleImageSource;
             }
         }
 
@@ -101,4 +127,5 @@ namespace WpfApp
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<VehicleImage> VehicleImages { get; set; }
     }
+
 }

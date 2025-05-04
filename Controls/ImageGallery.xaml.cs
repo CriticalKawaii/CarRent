@@ -145,6 +145,21 @@ namespace WpfApp.Controls
             }
             return null;
         }
+
+        public List<string> GetAllImageUrls()
+        {
+            List<string> urls = new List<string>();
+            foreach (var thumbnail in _thumbnails)
+            {
+                urls.Add(thumbnail.ImageUrl);
+            }
+            return urls;
+        }
+
+        public int GetCurrentIndex()
+        {
+            return _currentIndex;
+        }
     }
 
     // Add this converter to your App.xaml resources

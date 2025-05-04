@@ -30,6 +30,7 @@
                    HorizontalAlignment="Center"
                    MouseLeftButtonDown="Window_MouseDown"
                    Margin="40,0"
+                   ToolTip="ул. Мира, 42, Сочи, 354375"
                    Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
                    FontStyle="Italic"
                    VerticalAlignment="Center"

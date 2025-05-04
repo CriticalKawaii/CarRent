@@ -54,6 +54,7 @@ namespace WpfApp
 
             imageVehicle.MouseLeftButtonDown += ImageVehicle_MouseLeftButtonDown;
 
+            // Initialize dialog host
             _dialogHost = new Grid();
             _dialogHost.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(150, 0, 0, 0));
@@ -63,14 +64,13 @@ namespace WpfApp
             this.RegisterName("DialogHost", _dialogHost);
 
             (this.Content as Grid).Children.Add(_dialogHost);
-
         }
 
         private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
         {
             DatePickerStart.DisplayDateStart = DateTime.Today.AddDays(1);
             DatePickerStart.DisplayDateEnd = DateTime.Today.AddMonths(1);
-           
+
             foreach (var booking in DBEntities.GetContext().Bookings
                 .Where(x => x.BookingStatus.BookingStatus1 == "Confirmed")
                 .ToList())
@@ -96,13 +96,39 @@ namespace WpfApp
 
         private void ShowGalleryDialog(Vehicle vehicle)
         {
-            
+            // Get all images for this vehicle
+            var vehicleImages = DBEntities.GetContext().VehicleImages
+                .Where(vi => vi.VehicleID == vehicle.VehicleID)
+                .ToList();
 
+            if (vehicleImages == null || vehicleImages.Count == 0)
+            {
+                MessageBox.Show("No images available for this vehicle", "Gallery", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Create the gallery dialog
+            _galleryDialog = new GalleryDialog();
+            _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Images");
+
+            // Extract image URLs
+            var imageUrls = vehicleImages.Select(vi => vi.ImagePath).ToList();
+            _galleryDialog.LoadImages(imageUrls);
+
+            // Handle close event
+            _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
+
+            // Show the dialog
+            _dialogHost.Children.Clear();
+            _dialogHost.Children.Add(_galleryDialog);
+            _dialogHost.Visibility = Visibility.Visible;
         }
 
         private void GalleryDialog_CloseRequested(object sender, EventArgs e)
         {
-            
+            _dialogHost.Visibility = Visibility.Collapsed;
+            _dialogHost.Children.Clear();
+            _galleryDialog = null;
         }
 
 
@@ -155,14 +181,36 @@ namespace WpfApp
 
         private void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataContext = ListViewExploreCars.SelectedItem as Vehicle;
+            Vehicle selectedVehicle = ListViewExploreCars.SelectedItem as Vehicle;
+            DataContext = selectedVehicle;
+
+            if (selectedVehicle != null)
+            {
+                // Load the primary image for the selected vehicle
+                var vehicleImage = DBEntities.GetContext().VehicleImages
+                    .Where(vi => vi.VehicleID == selectedVehicle.VehicleID)
+                    .FirstOrDefault();
+
+                if (vehicleImage != null)
+                {
+                    selectedVehicle.VehicleImage = null; // Clear the old binary image
+                    imageVehicle.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(vehicleImage.ImagePath));
+                }
+                else
+                {
+                    // Load placeholder image
+                    imageVehicle.Source = new System.Windows.Media.Imaging.BitmapImage(
+                        new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
+                }
+            }
+
             DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
             CalculateRentCost();
         }
 
         private void UpdateItems()
         {
-            var allVehicles = Vehicles;
+            var allVehicles = DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true);
 
             string searchText = TextBoxSearch.Text?.Trim().ToLowerInvariant() ?? "";
 
@@ -183,7 +231,8 @@ namespace WpfApp
                 filteredItems = selectedSort.SortFunction(filteredItems).ToList();
             }
 
-            ListViewExploreCars.ItemsSource = filteredItems;
+            Vehicles = new ObservableCollection<Vehicle>(filteredItems);
+            ListViewExploreCars.ItemsSource = Vehicles;
             ListViewExploreCars.SelectedIndex = filteredItems.Any() ? 0 : -1;
         }
 
@@ -221,7 +270,7 @@ namespace WpfApp
                 }
                 return;
             }
-            else if(SessionManager.CurrentUser.RoleID == 2)
+            else if (SessionManager.CurrentUser.RoleID == 2)
             {
                 MessageBox.Show("Администратор не может оформлять аренды.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -253,7 +302,7 @@ namespace WpfApp
                         {
                             BookingID = booking.BookingID,
                             Amount = rentCost,
-                            PaymentMethodID = null, 
+                            PaymentMethodID = null,
                             PaymentStatusID = 1,
                             CreatedAt = DateTime.Now
                         };
@@ -369,10 +418,7 @@ namespace WpfApp
         private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-            Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
-            ListViewExploreCars.ItemsSource = Vehicles;
             UpdateItems();
         }
-
     }
 }

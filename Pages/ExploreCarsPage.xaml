@@ -130,6 +130,7 @@
                                 ClipToBounds="True"
                                 MaxWidth="711">
                             <Image x:Name="imageVehicle"
+                                   Cursor="Hand"
                                    Source="{Binding VehicleImageSource, FallbackValue='pack://application:,,,/Resources/Images/car_placeholder.png'}"
                                    Stretch="UniformToFill"
                                    RenderOptions.BitmapScalingMode="HighQuality">

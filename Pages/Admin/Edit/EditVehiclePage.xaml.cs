@@ -1,9 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -14,7 +16,10 @@ namespace WpfApp.Pages.Admin.Edit
     public partial class EditVehiclePage : Page
     {
         private Vehicle _vehicle = new Vehicle();
-        private List<VehicleImage> _vehicleImages = new List<VehicleImage>();
+        private ObservableCollection<VehicleImage> _vehicleImages = new ObservableCollection<VehicleImage>();
+        private List<string> _tempImagePaths = new List<string>();
+        private List<VehicleImage> _imagesToDelete = new List<VehicleImage>();
+        private readonly string _imgBBApiKey = "f4f86515362892ae57c23e650747804b";
 
         public EditVehiclePage(Vehicle selectedVehicle)
         {
@@ -23,6 +28,12 @@ namespace WpfApp.Pages.Admin.Edit
             if (selectedVehicle != null)
             {
                 _vehicle = selectedVehicle;
+
+                if (_vehicle.VehicleID != 0)
+                {
+                    _vehicleImages = new ObservableCollection<VehicleImage>(
+                        DBEntities.GetContext().VehicleImages.Where(vi => vi.VehicleID == _vehicle.VehicleID).ToList());
+                }
             }
             DataContext = _vehicle;
             Loaded += Page_Loaded;
@@ -32,17 +43,67 @@ namespace WpfApp.Pages.Admin.Edit
         {
             ComboBoxCategories.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
 
-           
+            await LoadImagesIntoGallery();
         }
 
-        private async System.Threading.Tasks.Task LoadImagesIntoGallery()
+        private async Task LoadImagesIntoGallery()
         {
             var imageUrls = _vehicleImages.Select(vi => vi.ImagePath).ToList();
             VehicleImageGallery.LoadImages(imageUrls);
         }
 
+        private async void ButtonAddImage_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dialog = new OpenFileDialog
+            {
+                Filter = "Image files (*.jpg, *.jpeg, *.png, *.bmp) | *.jpg; *.jpeg; *.png; *.bmp",
+                Multiselect = true
+            };
 
-        private void ButtonSave_Click(object sender, RoutedEventArgs e)
+            if (dialog.ShowDialog() == true)
+            {
+                foreach (string filename in dialog.FileNames)
+                {
+                    _tempImagePaths.Add(filename);
+                }
+
+                // Show the temp images in the gallery
+                var currentImages = _vehicleImages.Select(vi => vi.ImagePath).ToList();
+                VehicleImageGallery.LoadImages(currentImages.Concat(_tempImagePaths).ToList());
+            }
+        }
+
+
+        private void ButtonDeleteCurrentImage_Click(object sender, RoutedEventArgs e)
+        {
+            // Get current image
+            string currentImageUrl = VehicleImageGallery.GetCurrentImageUrl();
+
+            if (string.IsNullOrEmpty(currentImageUrl))
+                return;
+
+            // Check if it's a temp image or a saved one
+            if (_tempImagePaths.Contains(currentImageUrl))
+            {
+                _tempImagePaths.Remove(currentImageUrl);
+            }
+            else
+            {
+                // Find the VehicleImage entity
+                var imageToDelete = _vehicleImages.FirstOrDefault(vi => vi.ImagePath == currentImageUrl);
+                if (imageToDelete != null)
+                {
+                    _vehicleImages.Remove(imageToDelete);
+                    _imagesToDelete.Add(imageToDelete);
+                }
+            }
+
+            // Refresh gallery
+            var remainingImages = _vehicleImages.Select(vi => vi.ImagePath).Concat(_tempImagePaths).ToList();
+            VehicleImageGallery.LoadImages(remainingImages);
+        }
+
+        private async void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder errors = new StringBuilder();
 
@@ -65,48 +126,67 @@ namespace WpfApp.Pages.Admin.Edit
                 return;
             }
 
-            if (_vehicle.VehicleID == 0)
+            try
             {
-                _vehicle.CreatedAt = DateTime.Now;
-                _vehicle.Available = true;
-                DBEntities.GetContext().Vehicles.Add(_vehicle);
+                // Show loading indicator
+                LoadingIndicator.Visibility = Visibility.Visible;
+                SavePanel.IsEnabled = false;
 
-                // Save first to get the VehicleID
-                try
+                // Save vehicle first to get ID if new
+                if (_vehicle.VehicleID == 0)
                 {
-                    DBEntities.GetContext().SaveChanges();
+                    _vehicle.CreatedAt = DateTime.Now;
+                    _vehicle.Available = true;
+                    DBEntities.GetContext().Vehicles.Add(_vehicle);
+                    await Task.Run(() => DBEntities.GetContext().SaveChanges());
                 }
-                catch (Exception ex)
+
+                // Upload new images to ImgBB
+                if (_tempImagePaths.Count > 0)
                 {
-                    MessageBox.Show("Ошибка при сохранении: " + ex.Message);
-                    return;
+                    var imgBBService = new ImgBBService(_imgBBApiKey);
+                    var uploadedUrls = await imgBBService.UploadImagesAsync(_tempImagePaths);
+
+                    // Save uploaded URLs to database
+                    foreach (var url in uploadedUrls)
+                    {
+                        var newImage = new VehicleImage
+                        {
+                            VehicleID = _vehicle.VehicleID,
+                            ImagePath = url
+                        };
+                        DBEntities.GetContext().VehicleImages.Add(newImage);
+                    }
                 }
+
+                // Delete images marked for deletion
+                foreach (var image in _imagesToDelete)
+                {
+                    DBEntities.GetContext().VehicleImages.Remove(image);
+                }
+
+                // Save all changes
+                await Task.Run(() => DBEntities.GetContext().SaveChanges());
+
+                MessageBox.Show("Данные успешно сохранены");
+                NavigationService.GoBack();
             }
-            else
+            catch (Exception ex)
             {
-                try
-                {
-                    DBEntities.GetContext().SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Ошибка при сохранении: " + ex.Message);
-                    return;
-                }
+                MessageBox.Show("Ошибка при сохранении: " + ex.Message);
             }
-
-            MessageBox.Show("Данные успешно сохранены");
-            NavigationService.GoBack();
+            finally
+            {
+                // Hide loading indicator
+                LoadingIndicator.Visibility = Visibility.Collapsed;
+                SavePanel.IsEnabled = true;
+            }
         }
-
 
         private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
         }
 
-        
-
-        
     }
 }

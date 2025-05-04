@@ -90,14 +90,19 @@
                     <StackPanel Grid.Row="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Center"
-                                Margin="0,10,0,0">
+                                Margin="0,10,0,0"
+                                Name="SavePanel">
                         <Button Content="Добавить изображение"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Margin="0,0,10,0"
+                                Name="ButtonAddImage"
+                                Click="ButtonAddImage_Click"
                                 HorizontalAlignment="Center" />
                         <Button Content="Удалить текущее"
                                 Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Foreground="Red"
+                                Name="ButtonDeleteCurrentImage"
+                                Click="ButtonDeleteCurrentImage_Click"
                                 BorderBrush="Red"
                                 HorizontalAlignment="Center" />
                     </StackPanel>
@@ -111,6 +116,20 @@
                     HorizontalAlignment="Center"
                     Margin="0,0,0,20"
                     IsDefault="True" />
+
+            <materialDesign:Card x:Name="LoadingIndicator"
+                                 Grid.RowSpan="12"
+                                 Background="#99000000"
+                                 Visibility="Collapsed"
+                                 UniformCornerRadius="0">
+                <ProgressBar Style="{StaticResource MaterialDesignCircularProgressBar}"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"
+                             IsIndeterminate="True"
+                             Value="0"
+                             Width="60"
+                             Height="60" />
+            </materialDesign:Card>
         </Grid>
     </ScrollViewer>
 </Page>
