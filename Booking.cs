@@ -20,7 +20,7 @@ namespace WpfApp
         {
             this.Payments = new HashSet<Payment>();
         }
-
+    
         public int BookingID { get; set; }
         public Nullable<int> VehicleID { get; set; }
         public Nullable<int> UserID { get; set; }

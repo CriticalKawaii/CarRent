@@ -28,7 +28,7 @@ namespace WpfApp
         public string PasswordHash { get; set; }
         public int RoleID { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
-
+        
         public string FullName
         {
             get { return $"{FirstName} {LastName}"; }

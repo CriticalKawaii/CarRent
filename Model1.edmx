@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Bookings">
           <Key>
             <PropertyRef Name="BookingID" />
@@ -99,6 +99,14 @@
           <Property Name="VehicleCategoryID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="VehicleCategory" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
+        <EntityType Name="VehicleImages">
+          <Key>
+            <PropertyRef Name="ImageID" />
+          </Key>
+          <Property Name="ImageID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="VehicleID" Type="int" />
+          <Property Name="ImagePath" Type="nvarchar" MaxLength="500" Nullable="false" />
+        </EntityType>
         <EntityType Name="Vehicles">
           <Key>
             <PropertyRef Name="VehicleID" />
@@ -181,7 +189,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Payments__Paymen__5441852A">
+        <Association Name="FK__Payments__Paymen__59FA5E80">
           <End Role="PaymentMethods" Type="Self.PaymentMethods" Multiplicity="0..1" />
           <End Role="Payments" Type="Self.Payments" Multiplicity="*" />
           <ReferentialConstraint>
@@ -193,7 +201,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Payments__Paymen__5535A963">
+        <Association Name="FK__Payments__Paymen__5AEE82B9">
           <End Role="PaymentStatuses" Type="Self.PaymentStatuses" Multiplicity="0..1" />
           <End Role="Payments" Type="Self.Payments" Multiplicity="*" />
           <ReferentialConstraint>
@@ -205,7 +213,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Reviews__UserID__7A672E12">
+        <Association Name="FK__Reviews__UserID__5BE2A6F2">
           <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
           <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
           <ReferentialConstraint>
@@ -214,6 +222,18 @@
             </Principal>
             <Dependent Role="Reviews">
               <PropertyRef Name="UserID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__VehicleIm__Vehic__5EBF139D">
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="0..1" />
+          <End Role="VehicleImages" Type="Self.VehicleImages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vehicles">
+              <PropertyRef Name="VehicleID" />
+            </Principal>
+            <Dependent Role="VehicleImages">
+              <PropertyRef Name="VehicleID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -295,6 +315,7 @@
           <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="VehicleCategories" EntityType="Self.VehicleCategories" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="VehicleImages" EntityType="Self.VehicleImages" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK__Bookings__CarID__49C3F6B7" Association="Self.FK__Bookings__CarID__49C3F6B7">
             <End Role="Vehicles" EntitySet="Vehicles" />
@@ -316,17 +337,21 @@
             <End Role="Bookings" EntitySet="Bookings" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Payments__Paymen__5441852A" Association="Self.FK__Payments__Paymen__5441852A">
+          <AssociationSet Name="FK__Payments__Paymen__59FA5E80" Association="Self.FK__Payments__Paymen__59FA5E80">
             <End Role="PaymentMethods" EntitySet="PaymentMethods" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Payments__Paymen__5535A963" Association="Self.FK__Payments__Paymen__5535A963">
+          <AssociationSet Name="FK__Payments__Paymen__5AEE82B9" Association="Self.FK__Payments__Paymen__5AEE82B9">
             <End Role="PaymentStatuses" EntitySet="PaymentStatuses" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Reviews__UserID__7A672E12" Association="Self.FK__Reviews__UserID__7A672E12">
+          <AssociationSet Name="FK__Reviews__UserID__5BE2A6F2" Association="Self.FK__Reviews__UserID__5BE2A6F2">
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
+          </AssociationSet>
+          <AssociationSet Name="FK__VehicleIm__Vehic__5EBF139D" Association="Self.FK__VehicleIm__Vehic__5EBF139D">
+            <End Role="Vehicles" EntitySet="Vehicles" />
+            <End Role="VehicleImages" EntitySet="VehicleImages" />
           </AssociationSet>
           <AssociationSet Name="FK__Vehicles__Catego__4316F928" Association="Self.FK__Vehicles__Catego__4316F928">
             <End Role="VehicleCategories" EntitySet="VehicleCategories" />
@@ -341,7 +366,8 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -359,12 +385,12 @@
           <Property Name="StatusID" Type="Int32" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <Property Name="InsuranceID" Type="Int32" />
+          <Property Name="ActualCost" Type="Decimal" Precision="10" Scale="2" />
           <NavigationProperty Name="Vehicle" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Bookings" ToRole="Vehicles" />
           <NavigationProperty Name="Insurance" Relationship="Self.FK__Bookings__Insura__68487DD7" FromRole="Bookings" ToRole="Insurances" />
           <NavigationProperty Name="User" Relationship="Self.FK__Bookings__Renter__4AB81AF0" FromRole="Bookings" ToRole="Users" />
           <NavigationProperty Name="BookingStatus" Relationship="Self.FK__Bookings__Status__4BAC3F29" FromRole="Bookings" ToRole="BookingStatuses" />
           <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Bookin__534D60F1" FromRole="Bookings" ToRole="Payments" />
-          <Property Name="ActualCost" Type="Decimal" Precision="10" Scale="2" />
         </EntityType>
         <EntityType Name="BookingStatus">
           <Key>
@@ -390,7 +416,7 @@
           </Key>
           <Property Name="PaymentMethodID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="PaymentMethod1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Paymen__5441852A" FromRole="PaymentMethods" ToRole="Payments" />
+          <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Paymen__59FA5E80" FromRole="PaymentMethods" ToRole="Payments" />
         </EntityType>
         <EntityType Name="Payment">
           <Key>
@@ -403,8 +429,8 @@
           <Property Name="PaymentStatusID" Type="Int32" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Booking" Relationship="Self.FK__Payments__Bookin__534D60F1" FromRole="Payments" ToRole="Bookings" />
-          <NavigationProperty Name="PaymentMethod" Relationship="Self.FK__Payments__Paymen__5441852A" FromRole="Payments" ToRole="PaymentMethods" />
-          <NavigationProperty Name="PaymentStatus" Relationship="Self.FK__Payments__Paymen__5535A963" FromRole="Payments" ToRole="PaymentStatuses" />
+          <NavigationProperty Name="PaymentMethod" Relationship="Self.FK__Payments__Paymen__59FA5E80" FromRole="Payments" ToRole="PaymentMethods" />
+          <NavigationProperty Name="PaymentStatus" Relationship="Self.FK__Payments__Paymen__5AEE82B9" FromRole="Payments" ToRole="PaymentStatuses" />
         </EntityType>
         <EntityType Name="PaymentStatus">
           <Key>
@@ -412,7 +438,7 @@
           </Key>
           <Property Name="PaymentStatusID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="PaymentStatus1" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Paymen__5535A963" FromRole="PaymentStatuses" ToRole="Payments" />
+          <NavigationProperty Name="Payments" Relationship="Self.FK__Payments__Paymen__5AEE82B9" FromRole="PaymentStatuses" ToRole="Payments" />
         </EntityType>
         <EntityType Name="Review">
           <Key>
@@ -424,7 +450,7 @@
           <Property Name="Rating" Type="Int32" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="User" Relationship="Self.FK__Reviews__UserID__7A672E12" FromRole="Reviews" ToRole="Users" />
+          <NavigationProperty Name="User" Relationship="Self.FK__Reviews__UserID__5BE2A6F2" FromRole="Reviews" ToRole="Users" />
           <NavigationProperty Name="Vehicle" Relationship="Self.FK_Reviews_Vehicles" FromRole="Reviews" ToRole="Vehicles" />
         </EntityType>
         <EntityType Name="Role">
@@ -447,7 +473,7 @@
           <Property Name="RoleID" Type="Int32" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Renter__4AB81AF0" FromRole="Users" ToRole="Bookings" />
-          <NavigationProperty Name="Reviews" Relationship="Self.FK__Reviews__UserID__7A672E12" FromRole="Users" ToRole="Reviews" />
+          <NavigationProperty Name="Reviews" Relationship="Self.FK__Reviews__UserID__5BE2A6F2" FromRole="Users" ToRole="Reviews" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Users_Roles" FromRole="Users" ToRole="Roles" />
         </EntityType>
         <EntityType Name="VehicleCategory">
@@ -457,6 +483,15 @@
           <Property Name="VehicleCategoryID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="VehicleCategory1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Vehicles" Relationship="Self.FK__Vehicles__Catego__4316F928" FromRole="VehicleCategories" ToRole="Vehicles" />
+        </EntityType>
+        <EntityType Name="VehicleImage">
+          <Key>
+            <PropertyRef Name="ImageID" />
+          </Key>
+          <Property Name="ImageID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VehicleID" Type="Int32" />
+          <Property Name="ImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Vehicle" Relationship="Self.FK__VehicleIm__Vehic__5EBF139D" FromRole="VehicleImages" ToRole="Vehicles" />
         </EntityType>
         <EntityType Name="Vehicle">
           <Key>
@@ -476,6 +511,7 @@
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Vehicles" ToRole="Bookings" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Vehicles" FromRole="Vehicles" ToRole="Reviews" />
           <NavigationProperty Name="VehicleCategory" Relationship="Self.FK__Vehicles__Catego__4316F928" FromRole="Vehicles" ToRole="VehicleCategories" />
+          <NavigationProperty Name="VehicleImages" Relationship="Self.FK__VehicleIm__Vehic__5EBF139D" FromRole="Vehicles" ToRole="VehicleImages" />
         </EntityType>
         <Association Name="FK__Bookings__CarID__49C3F6B7">
           <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1">
@@ -543,7 +579,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Payments__Paymen__5441852A">
+        <Association Name="FK__Payments__Paymen__59FA5E80">
           <End Role="PaymentMethods" Type="Self.PaymentMethod" Multiplicity="0..1" />
           <End Role="Payments" Type="Self.Payment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -555,7 +591,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Payments__Paymen__5535A963">
+        <Association Name="FK__Payments__Paymen__5AEE82B9">
           <End Role="PaymentStatuses" Type="Self.PaymentStatus" Multiplicity="0..1" />
           <End Role="Payments" Type="Self.Payment" Multiplicity="*" />
           <ReferentialConstraint>
@@ -567,7 +603,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Reviews__UserID__7A672E12">
+        <Association Name="FK__Reviews__UserID__5BE2A6F2">
           <End Role="Users" Type="Self.User" Multiplicity="0..1" />
           <End Role="Reviews" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
@@ -615,6 +651,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__VehicleIm__Vehic__5EBF139D">
+          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1" />
+          <End Role="VehicleImages" Type="Self.VehicleImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vehicles">
+              <PropertyRef Name="VehicleID" />
+            </Principal>
+            <Dependent Role="VehicleImages">
+              <PropertyRef Name="VehicleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="DBEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Bookings" EntityType="Self.Booking" />
           <EntitySet Name="BookingStatuses" EntityType="Self.BookingStatus" />
@@ -626,6 +674,7 @@
           <EntitySet Name="Roles" EntityType="Self.Role" />
           <EntitySet Name="Users" EntityType="Self.User" />
           <EntitySet Name="VehicleCategories" EntityType="Self.VehicleCategory" />
+          <EntitySet Name="VehicleImages" EntityType="Self.VehicleImage" />
           <EntitySet Name="Vehicles" EntityType="Self.Vehicle" />
           <AssociationSet Name="FK__Bookings__CarID__49C3F6B7" Association="Self.FK__Bookings__CarID__49C3F6B7">
             <End Role="Vehicles" EntitySet="Vehicles" />
@@ -647,15 +696,15 @@
             <End Role="Bookings" EntitySet="Bookings" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Payments__Paymen__5441852A" Association="Self.FK__Payments__Paymen__5441852A">
+          <AssociationSet Name="FK__Payments__Paymen__59FA5E80" Association="Self.FK__Payments__Paymen__59FA5E80">
             <End Role="PaymentMethods" EntitySet="PaymentMethods" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Payments__Paymen__5535A963" Association="Self.FK__Payments__Paymen__5535A963">
+          <AssociationSet Name="FK__Payments__Paymen__5AEE82B9" Association="Self.FK__Payments__Paymen__5AEE82B9">
             <End Role="PaymentStatuses" EntitySet="PaymentStatuses" />
             <End Role="Payments" EntitySet="Payments" />
           </AssociationSet>
-          <AssociationSet Name="FK__Reviews__UserID__7A672E12" Association="Self.FK__Reviews__UserID__7A672E12">
+          <AssociationSet Name="FK__Reviews__UserID__5BE2A6F2" Association="Self.FK__Reviews__UserID__5BE2A6F2">
             <End Role="Users" EntitySet="Users" />
             <End Role="Reviews" EntitySet="Reviews" />
           </AssociationSet>
@@ -670,6 +719,10 @@
           <AssociationSet Name="FK__Vehicles__Catego__4316F928" Association="Self.FK__Vehicles__Catego__4316F928">
             <End Role="VehicleCategories" EntitySet="VehicleCategories" />
             <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+          <AssociationSet Name="FK__VehicleIm__Vehic__5EBF139D" Association="Self.FK__VehicleIm__Vehic__5EBF139D">
+            <End Role="Vehicles" EntitySet="Vehicles" />
+            <End Role="VehicleImages" EntitySet="VehicleImages" />
           </AssociationSet>
           <FunctionImport Name="sp_alterdiagram">
             <Parameter Name="diagramname" Mode="In" Type="String" />
@@ -722,7 +775,6 @@
           <EntitySetMapping Name="Bookings">
             <EntityTypeMapping TypeName="DBModel.Booking">
               <MappingFragment StoreEntitySet="Bookings">
-                <ScalarProperty Name="ActualCost" ColumnName="ActualCost" />
                 <ScalarProperty Name="BookingID" ColumnName="BookingID" />
                 <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
                 <ScalarProperty Name="UserID" ColumnName="UserID" />
@@ -733,6 +785,7 @@
                 <ScalarProperty Name="StatusID" ColumnName="StatusID" />
                 <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
                 <ScalarProperty Name="InsuranceID" ColumnName="InsuranceID" />
+                <ScalarProperty Name="ActualCost" ColumnName="ActualCost" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -820,6 +873,15 @@
               <MappingFragment StoreEntitySet="VehicleCategories">
                 <ScalarProperty Name="VehicleCategoryID" ColumnName="VehicleCategoryID" />
                 <ScalarProperty Name="VehicleCategory1" ColumnName="VehicleCategory" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="VehicleImages">
+            <EntityTypeMapping TypeName="DBModel.VehicleImage">
+              <MappingFragment StoreEntitySet="VehicleImages">
+                <ScalarProperty Name="ImageID" ColumnName="ImageID" />
+                <ScalarProperty Name="VehicleID" ColumnName="VehicleID" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

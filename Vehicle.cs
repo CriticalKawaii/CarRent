@@ -23,8 +23,9 @@ namespace WpfApp
         {
             this.Bookings = new HashSet<Booking>();
             this.Reviews = new HashSet<Review>();
+            this.VehicleImages = new HashSet<VehicleImage>();
         }
-
+    
         public int VehicleID { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
@@ -46,7 +47,7 @@ namespace WpfApp
         public string LicensePlate { get; set; }
         public Nullable<int> VehicleCategoryID { get; set; }
         public decimal DailyRate { get; set; }
-        public Nullable<bool> Available { get; set; }
+        public bool Available { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
         public Nullable<decimal> AvgRating { get; set; }
 
@@ -97,5 +98,7 @@ namespace WpfApp
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Review> Reviews { get; set; }
         public virtual VehicleCategory VehicleCategory { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<VehicleImage> VehicleImages { get; set; }
     }
 }
