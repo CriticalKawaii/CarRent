@@ -364,18 +364,6 @@
                                                         <Run Text="{Binding User.FirstName}" />
                                                         <Run Text="{Binding User.LastName}" />
                                                 </TextBlock>
-
-                                                <Separator Width="20"
-                                                           Visibility="Hidden" />
-
-                                                <materialDesign:PackIcon Kind="Car"
-                                                                         VerticalAlignment="Center"
-                                                                         Margin="0,0,8,0" />
-                                                <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}">
-                                                    <Run Text="{Binding VehicleMake}" />
-                                                    <Run Text="{Binding VehicleModel}"/>
-                                                    <Run Text="{Binding Year}"/>
-                                                </TextBlock>
                                             </StackPanel>
                                         </Grid>
 

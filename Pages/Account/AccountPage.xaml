@@ -29,11 +29,17 @@
                     Click="ButtonSignOut_Click">
             </Button>
 
-            <TextBlock d:Text="Личный кабинет"
-                       VerticalAlignment="Center"
-                       Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
-                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                       DockPanel.Dock="Right" />
+            <StackPanel Orientation="Horizontal"
+                        VerticalAlignment="Center"
+                        DockPanel.Dock="Right">
+                <materialDesign:PackIcon Name="AccountPageHeaderIcon"
+                                         Kind="User"
+                                         Width="24"
+                                         Height="24" />
+                <TextBlock x:Name="AccountPageHeader"
+                           Text="{Binding Email, StringFormat='Личный кабинет {0}'}"
+                           Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
+            </StackPanel>
         </DockPanel>
         <TabControl Grid.Row="1">
             <TabItem Header="Мои аренды">
@@ -82,36 +88,107 @@
                             <DataGridTextColumn Header="Статус"
                                                 Binding="{Binding BookingStatus.BookingStatus1}"
                                                 Width="*" />
-                            <!--MORE BUTTONS FOR BOOKING LOGIC-->
+
                             <DataGridTemplateColumn Width="Auto">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button x:Name="ButtonReview"
-                                                Click="ButtonReview_Click">
-                                            <Button.Content>
-                                                <materialDesign:PackIcon Kind="RateReview"
-                                                                         Width="16"
-                                                                         Height="16" />
-                                            </Button.Content>
-                                            <Button.Style>
-                                                <Style TargetType="Button"
-                                                       BasedOn="{StaticResource MaterialDesignOutlinedButton}">
-                                                    <Setter Property="Visibility"
-                                                            Value="Collapsed" />
-                                                    <Setter Property="IsEnabled"
-                                                            Value="False" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
-                                                                     Value="Completed">
-                                                            <Setter Property="IsEnabled"
-                                                                    Value="True" />
-                                                            <Setter Property="Visibility"
-                                                                    Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!-- Cancel Confirmed Booking -->
+                                            <Button x:Name="ButtonCancelBooking"
+                                                    Content="Отменить"
+                                                    Click="ButtonCancelBooking_Click"
+                                                    Margin="2">
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                         Value="Confirmed">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <!-- Withdraw Cancellation -->
+                                            <Button x:Name="ButtonWithdrawCancellation"
+                                                    Content="Отозвать отмену"
+                                                    Click="ButtonWithdrawCancellation_Click"
+                                                    Margin="2">
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                         Value="Pending Cancellation">
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <!-- Confirm Completion -->
+                                            <Button x:Name="ButtonConfirmCompletion"
+                                                    Content="Подтвердить сдачу"
+                                                    Click="ButtonUserConfirmCompletion_Click"
+                                                    Margin="2">
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Style.Triggers>
+                                                            <MultiDataTrigger>
+                                                                <MultiDataTrigger.Conditions>
+                                                                    <Condition Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                               Value="Confirmed" />
+                                                                    <Condition Binding="{Binding IsStarted}"
+                                                                               Value="True" />
+                                                                </MultiDataTrigger.Conditions>
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </MultiDataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <!-- Review Button -->
+                                            <Button x:Name="ButtonReview"
+                                                    Click="ButtonReview_Click">
+                                                <Button.Content>
+                                                    <materialDesign:PackIcon Kind="RateReview"
+                                                                             Width="16"
+                                                                             Height="16" />
+                                                </Button.Content>
+                                                <Button.Style>
+                                                    <Style TargetType="Button"
+                                                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                                                        <Setter Property="Visibility"
+                                                                Value="Collapsed" />
+                                                        <Setter Property="IsEnabled"
+                                                                Value="False" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BookingStatus.BookingStatus1}"
+                                                                         Value="Completed">
+                                                                <Setter Property="IsEnabled"
+                                                                        Value="True" />
+                                                                <Setter Property="Visibility"
+                                                                        Value="Visible" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -123,11 +200,12 @@
                                Foreground="Gray"
                                Visibility="Collapsed"
                                VerticalAlignment="Center"
-                               HorizontalAlignment="Center"/>
+                               HorizontalAlignment="Center" />
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Личные данные">
+            <TabItem Name="TabPersonalData"
+                     Header="Личные данные">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -238,16 +316,202 @@
                      Header="Подтверждения"
                      Visibility="Collapsed"
                      d:Visibility="Visible">
-                <!--Can be two tabs here to managee payments and users-->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Header buttons -->
+                    <materialDesign:ColorZone Background="{StaticResource MaterialDesign.Brush.Primary}">
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    Margin="10">
+
+                            <RadioButton x:Name="ToggleButtonPendingPayments"
+                                         Content="Оплаты на подтверждение"
+                                         Margin="5"
+                                         IsChecked="True"
+                                         Checked="ToggleButtonConfirmations_Checked"
+                                         Style="{StaticResource TabRadioButtonBottom}"
+                                         FontSize="14" />
+                            <RadioButton x:Name="ToggleButtonPendingCancellations"
+                                         Content="Отмены на подтверждение"
+                                         Margin="5"
+                                         Checked="ToggleButtonConfirmations_Checked"
+                                         Style="{StaticResource TabRadioButtonBottom}"
+                                         FontSize="14" />
+                            <RadioButton x:Name="ToggleButtonPendingCompletions"
+                                         Content="Завершения на подтверждение"
+                                         Margin="5"
+                                         Checked="ToggleButtonConfirmations_Checked"
+                                         Style="{StaticResource TabRadioButtonBottom}"
+                                         FontSize="14" />
+
+                        </StackPanel>
+                    </materialDesign:ColorZone>
+                    <!-- Pending Payments -->
+                    <Grid Grid.Row="2"
+                          x:Name="GridPendingPayments">
+                        <DataGrid x:Name="DataGridPendingPayments"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID"
+                                                    Binding="{Binding Booking.BookingID}"
+                                                    Width="50" />
+                                <DataGridTextColumn Header="Пользователь"
+                                                    Binding="{Binding Booking.User.FullName}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="Автомобиль"
+                                                    Binding="{Binding Booking.Vehicle.FullName}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="Сумма"
+                                                    Binding="{Binding Booking.TotalCost, StringFormat={}{0:C}}"
+                                                    Width="100" />
+                                <DataGridTextColumn Header="Даты"
+                                                    Width="150">
+                                    <DataGridTextColumn.Binding>
+                                        <MultiBinding StringFormat="{}{0:dd.MM} - {1:dd.MM}">
+                                            <Binding Path="Booking.StartDate" />
+                                            <Binding Path="Booking.EndDate" />
+                                        </MultiBinding>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="Способ оплаты"
+                                                        Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ComboBox ItemsSource="{Binding DataContext.PaymentMethods, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                      DisplayMemberPath="PaymentMethod1"
+                                                      SelectedItem="{Binding SelectedPaymentMethod, UpdateSourceTrigger=PropertyChanged}"
+                                                      Width="140" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Действия"
+                                                        Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Подтвердить"
+                                                        Click="ButtonConfirmPayment_Click"
+                                                        Margin="2" />
+                                                <Button Content="Отменить"
+                                                        Click="ButtonCancelPayment_Click"
+                                                        Margin="2" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <!-- Pending Cancellations -->
+                    <Grid Grid.Row="2"
+                          x:Name="GridPendingCancellations"
+                          Visibility="Collapsed">
+                        <DataGrid x:Name="DataGridPendingCancellations"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID"
+                                                    Binding="{Binding BookingID}"
+                                                    Width="50" />
+                                <DataGridTextColumn Header="Пользователь"
+                                                    Binding="{Binding User.FullName}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="Автомобиль"
+                                                    Binding="{Binding Vehicle.FullName}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="Даты"
+                                                    Width="150">
+                                    <DataGridTextColumn.Binding>
+                                        <MultiBinding StringFormat="{}{0:dd.MM} - {1:dd.MM}">
+                                            <Binding Path="StartDate" />
+                                            <Binding Path="EndDate" />
+                                        </MultiBinding>
+                                    </DataGridTextColumn.Binding>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="Действия"
+                                                        Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="Подтвердить отмену"
+                                                        Click="ButtonConfirmCancellation_Click"
+                                                        Margin="2" />
+                                                <Button Content="Отклонить отмену"
+                                                        Click="ButtonDenyCancellation_Click"
+                                                        Margin="2" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+
+                    <!-- Pending Completions -->
+                    <Grid Grid.Row="2"
+                          x:Name="GridPendingCompletions"
+                          Visibility="Collapsed">
+                        <DataGrid x:Name="DataGridPendingCompletions"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID"
+                                                    Binding="{Binding BookingID}"
+                                                    Width="50" />
+                                <DataGridTextColumn Header="Пользователь"
+                                                    Binding="{Binding User.FullName}"
+                                                    Width="*" />
+                                <DataGridTextColumn Header="Автомобиль"
+                                                    Binding="{Binding Vehicle.FullName}"
+                                                    Width="*" />
+                                <DataGridTemplateColumn Header="Дата сдачи"
+                                                        Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <DatePicker SelectedDate="{Binding ReturnDateInput, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Фактическая стоимость"
+                                                        Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding ActualCostInput, UpdateSourceTrigger=PropertyChanged}"
+                                                     Width="140" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Действия"
+                                                        Width="Auto">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Подтвердить"
+                                                    Click="ButtonConfirmCompletion_Click"
+                                                    Margin="2" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Grid>
             </TabItem>
             <TabItem x:Name="TabItemAdministration"
                      Header="Администрирование"
                      Visibility="Collapsed"
                      d:Visibility="Visible">
-                
-                    <Frame Grid.Row="1"
-                           x:Name="frameAdmin"
-                           NavigationUIVisibility="Hidden" />
+
+                <Frame Grid.Row="1"
+                       x:Name="frameAdmin"
+                       NavigationUIVisibility="Hidden" />
             </TabItem>
         </TabControl>
     </Grid>

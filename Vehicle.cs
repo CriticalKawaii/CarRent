@@ -50,6 +50,11 @@ namespace WpfApp
         public Nullable<System.DateTime> CreatedAt { get; set; }
         public Nullable<decimal> AvgRating { get; set; }
 
+        public string FullName
+        {
+            get { return $"{Make} {Model} {Year}"; }
+        }
+
         private ImageSource _vehicleImageSource;
         public ImageSource VehicleImageSource
         {

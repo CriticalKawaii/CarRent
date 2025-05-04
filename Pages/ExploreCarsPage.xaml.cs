@@ -204,7 +204,19 @@ namespace WpfApp
                         DBEntities.GetContext().Bookings.Add(booking);
                         DBEntities.GetContext().SaveChanges();
 
-                        MessageBox.Show("Аренда успешно оформлена!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        var payment = new Payment
+                        {
+                            BookingID = booking.BookingID,
+                            Amount = rentCost,
+                            PaymentMethodID = null, 
+                            PaymentStatusID = 1,
+                            CreatedAt = DateTime.Now
+                        };
+
+                        DBEntities.GetContext().Payments.Add(payment);
+                        DBEntities.GetContext().SaveChanges();
+
+                        MessageBox.Show("Бронирование отправлено на подтверждение администратору.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
 
                         DatePickerStart.SelectedDate = DatePickerStart.DisplayDateStart;
                         DatePickerEnd.SelectedDate = null;
@@ -217,6 +229,7 @@ namespace WpfApp
                 }
             }
         }
+
         private void AdjustDatesForBlackout()
         {
             foreach (var range in DatePickerStart.BlackoutDates)

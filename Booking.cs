@@ -32,6 +32,7 @@ namespace WpfApp
         public Nullable<System.DateTime> CreatedAt { get; set; }
         public Nullable<int> InsuranceID { get; set; }
         public Nullable<decimal> ActualCost { get; set; }
+
         public bool HasReview
         {
             get
@@ -46,6 +47,15 @@ namespace WpfApp
                 return false;
             }
         }
+
+        public bool IsStarted
+        {
+            get
+            {
+                return StartDate.Date <= DateTime.Today;
+            }
+        }
+
         public virtual Vehicle Vehicle { get; set; }
         public virtual Insurance Insurance { get; set; }
         public virtual User User { get; set; }

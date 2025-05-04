@@ -28,7 +28,12 @@ namespace WpfApp
         public string PasswordHash { get; set; }
         public int RoleID { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
-    
+
+        public string FullName
+        {
+            get { return $"{FirstName} {LastName}"; }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Booking> Bookings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
