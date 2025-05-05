@@ -147,7 +147,8 @@
                     Value="30" />
             <Setter Property="Padding"
                     Value="20" />
-            <Setter Property="Margin" Value="20"/>
+            <Setter Property="Margin"
+                    Value="20" />
         </Style.Setters>
     </Style>
 
@@ -176,25 +177,26 @@
                                          materialDesign:RippleAssist.RippleOnTop="True"
                                          UniformCornerRadius="15">
 
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                                <materialDesign:Card Width="150"
-                                                     Height="100"
-                                                     UniformCornerRadius="17"
-                                                     ClipToBounds="True"
-                                                     Margin="2">
-                                    <Image Source="{Binding VehicleImageSource}"
-                                           Stretch="UniformToFill"
+                            <materialDesign:Card Width="150"
+                                                 Height="100"
+                                                 UniformCornerRadius="17"
+                                                 ClipToBounds="True"
+                                                 Margin="2">
+                                <Image x:Name="ThumbnailImage"
+                                       Source="{Binding VehicleImageSource, FallbackValue='pack://application:,,,/Resources/Images/car_placeholder.png'}"
+                                       Stretch="UniformToFill"
                                        RenderOptions.BitmapScalingMode="HighQuality" />
-                                </materialDesign:Card>
+                            </materialDesign:Card>
 
-                                <StackPanel Grid.Column="1"
-                                            Margin="10,0"
-                                            VerticalAlignment="Center">
+                            <StackPanel Grid.Column="1"
+                                        Margin="10,0"
+                                        VerticalAlignment="Center">
                                 <TextBlock FontSize="18"
                                            FontWeight="SemiBold">
                                     <TextBlock.Text>
@@ -210,18 +212,18 @@
                                 </TextBlock>
 
                                 <TextBlock FontSize="16"
-                                               Foreground="Black"
-                                               Margin="0,6,0,0"
-                                               FontWeight="Medium"
-                                               Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} / день'}" />
+                                           Foreground="Black"
+                                           Margin="0,6,0,0"
+                                           FontWeight="Medium"
+                                           Text="{Binding DailyRate, TargetNullValue='N/A', StringFormat='{}{0:C} / день'}" />
 
-                                    <materialDesign:RatingBar Margin="0,8,0,0"
-                                                              Value="{Binding AvgRating, TargetNullValue=0}"
-                                                              IsReadOnly="True"/>
+                                <materialDesign:RatingBar Margin="0,8,0,0"
+                                                          Value="{Binding AvgRating, TargetNullValue=0}"
+                                                          IsReadOnly="True" />
 
-                                
+
                             </StackPanel>
-                            </Grid>
+                        </Grid>
                     </materialDesign:Card>
                 </ControlTemplate>
             </Setter.Value>

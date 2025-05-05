@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WpfApp.Classes;
 
 namespace WpfApp.Pages.Account
@@ -57,7 +49,42 @@ namespace WpfApp.Pages.Account
             DataContext = _booking;
 
             this.DataContext = new { Booking = _booking, Review = _review };
+            
+            Loaded += ReviewPage_Loaded;
         }
+
+        private async void ReviewPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Make sure we have the vehicle with all necessary properties
+                if (_booking.Vehicle == null)
+                {
+                    using (var context = new DBEntities())
+                    {
+                        _booking.Vehicle = await context.Vehicles
+                            .Include("VehicleImages")
+                            .FirstOrDefaultAsync(v => v.VehicleID == _booking.VehicleID);
+                    }
+                }
+
+                // Load vehicle image
+                if (_booking.Vehicle != null)
+                {
+                    // Ensure image is loaded
+                    await _booking.Vehicle.GetImageSourceAsync();
+
+                    // Refresh the binding
+                    this.DataContext = null;
+                    this.DataContext = new { Booking = _booking, Review = _review };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading vehicle image: {ex.Message}");
+            }
+        }
+
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
             _review.Rating = (int)RatingBar.Value;

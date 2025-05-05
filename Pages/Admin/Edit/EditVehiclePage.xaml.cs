@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -48,8 +49,59 @@ namespace WpfApp.Pages.Admin.Edit
 
         private async Task LoadImagesIntoGallery()
         {
-            var imageUrls = _vehicleImages.Select(vi => vi.ImagePath).ToList();
-            VehicleImageGallery.LoadImages(imageUrls);
+            try
+            {
+                // Show loading indicator if there are images to load
+                if (_vehicleImages.Count > 0)
+                {
+                    LoadingIndicator.Visibility = Visibility.Visible;
+                }
+
+                List<string> imageUrls;
+
+                if (_vehicleImages.Count > 0)
+                {
+                    // Use existing vehicle images
+                    imageUrls = _vehicleImages.Select(vi => vi.ImagePath).ToList();
+                }
+                else if (_vehicle.VehicleID != 0)
+                {
+                    // Try loading from database if not already loaded
+                    using (var context = new DBEntities())
+                    {
+                        var images = await context.VehicleImages
+                            .Where(vi => vi.VehicleID == _vehicle.VehicleID)
+                            .ToListAsync();
+
+                        _vehicleImages.Clear();
+                        foreach (var img in images)
+                        {
+                            _vehicleImages.Add(img);
+                        }
+
+                        imageUrls = images.Select(vi => vi.ImagePath).ToList();
+                    }
+                }
+                else
+                {
+                    // New vehicle, no images yet
+                    imageUrls = new List<string>();
+                }
+
+                // Add temp images to the display list
+                imageUrls.AddRange(_tempImagePaths);
+
+                // Load images in the gallery
+                VehicleImageGallery.LoadImages(imageUrls);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading images: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingIndicator.Visibility = Visibility.Collapsed;
+            }
         }
 
         private async void ButtonAddImage_Click(object sender, RoutedEventArgs e)

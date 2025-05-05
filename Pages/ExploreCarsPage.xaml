@@ -12,8 +12,7 @@
       Title="ExploreCarsPage"
       d:Height="800"
       d:Width="1100"
-      FontFamily="{materialDesign:MaterialDesignFont}"
-      IsVisibleChanged="Page_IsVisibleChanged">
+      FontFamily="{materialDesign:MaterialDesignFont}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"

@@ -84,16 +84,50 @@ namespace WpfApp
 
         public async Task<ImageSource> GetImageSourceAsync()
         {
-            // Return existing task if we're already loading the image
-            if (_imageLoadingTask != null)
+            try
             {
-                return await _imageLoadingTask;
-            }
+                // First try to get image from VehicleImages collection
+                if (VehicleImages != null && VehicleImages.Count > 0)
+                {
+                    var firstImage = VehicleImages.FirstOrDefault();
+                    if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
+                    {
+                        // Use the ImageCache for efficient image loading
+                        var imageSource = await ImageCache.GetImageAsync(firstImage.ImagePath);
+                        _vehicleImageSource = imageSource; // Store the loaded image
+                        return imageSource;
+                    }
+                }
+                else
+                {
+                    // If VehicleImages is empty, try to load from database
+                    using (var context = new DBEntities())
+                    {
+                        var images = await context.VehicleImages
+                            .Where(vi => vi.VehicleID == VehicleID)
+                            .ToListAsync();
 
-            // Create a new task for loading the image
-            _imageLoadingTask = LoadImageSourceAsync();
-            return await _imageLoadingTask;
+                        if (images.Count > 0 && !string.IsNullOrEmpty(images[0].ImagePath))
+                        {
+                            var imageSource = await ImageCache.GetImageAsync(images[0].ImagePath);
+                            _vehicleImageSource = imageSource; // Store the loaded image
+                            return imageSource;
+                        }
+                    }
+                }
+
+                // Use placeholder if no images available
+                _vehicleImageSource = GetPlaceholderImage();
+                return _vehicleImageSource;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in LoadImageSourceAsync: {ex.Message}");
+                _vehicleImageSource = GetPlaceholderImage();
+                return _vehicleImageSource;
+            }
         }
+
 
         private async Task<ImageSource> LoadImageSourceAsync()
         {

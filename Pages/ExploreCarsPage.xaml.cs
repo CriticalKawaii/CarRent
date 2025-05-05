@@ -326,6 +326,12 @@ namespace WpfApp
             }
         }
 
+        private async Task PreloadThumbnailsAsync(IEnumerable<Vehicle> vehicles)
+        {
+            var loadingTasks = vehicles.Select(v => v.GetImageSourceAsync()).ToList();
+
+            await Task.WhenAll(loadingTasks);
+        }
 
         private async void UpdateItemsAsync()
         {
@@ -366,7 +372,7 @@ namespace WpfApp
                     {
                         vehicles = selectedSort.SortFunction(vehicles).ToList();
                     }
-
+                    await PreloadThumbnailsAsync(vehicles);
                     // Update the observable collection
                     Dispatcher.Invoke(() =>
                     {

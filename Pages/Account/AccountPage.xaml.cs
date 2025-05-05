@@ -16,6 +16,7 @@ using MaterialDesignThemes.Wpf;
 using System.Windows.Input;
 using System.Threading.Tasks;
 using System.Data.Entity;
+using System.IO;
 
 namespace WpfApp.Pages
 {
@@ -174,10 +175,30 @@ namespace WpfApp.Pages
                     .OrderByDescending(b => b.CreatedAt)
                     .ToListAsync();
 
+                // Preload images for each vehicle
+                foreach (var booking in bookings)
+                {
+                    if (booking.Vehicle != null)
+                    {
+                        try
+                        {
+                            // Ensure image is loaded
+                            await booking.Vehicle.GetImageSourceAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error loading vehicle image: {ex.Message}");
+                            // Continue with next booking if there's an error
+                        }
+                    }
+                }
+
+                // Set the ItemsSource
                 DataGridUserBookings.ItemsSource = bookings;
                 DataGridUserBookings.Visibility = bookings.Any() ? Visibility.Visible : Visibility.Collapsed;
                 TextBlockNoBookings.Visibility = bookings.Any() ? Visibility.Collapsed : Visibility.Visible;
             }
+
         }
 
         /// <summary>
@@ -425,9 +446,27 @@ namespace WpfApp.Pages
 
             try
             {
+                // Completely recreate the chart to avoid reusing elements
                 ChartReport.Series.Clear();
-                DataGridReportData.Columns.Clear();
+                ChartReport.ChartAreas.Clear();
+                ChartReport.Titles.Clear();
 
+                // Create a new chart area with a unique name
+                ChartReport.ChartAreas.Add(new ChartArea("ChartArea_" + DateTime.Now.Ticks));
+
+                // Configure chart area
+                var area = ChartReport.ChartAreas[0];
+                area.AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+                area.AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+                area.AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
+                area.AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
+                area.Area3DStyle.Enable3D = false; // Reset 3D effect
+
+                // Clear DataGrid
+                DataGridReportData.Columns.Clear();
+                DataGridReportData.ItemsSource = null;
+
+                // Generate appropriate report
                 switch (_currentReportType)
                 {
                     case ReportType.UserActivity:
@@ -447,13 +486,15 @@ namespace WpfApp.Pages
             catch (Exception ex)
             {
                 MessageBox.Show($"Error generating report: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Console.WriteLine($"Report generation exception: {ex}");
             }
             finally
             {
                 LoadingProgressBar.Visibility = Visibility.Collapsed;
             }
         }
-        
+
+
         private async void ComboBoxReportType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ComboBoxReportType.SelectedIndex < 0) return;
@@ -564,7 +605,7 @@ namespace WpfApp.Pages
         /// </summary>
         private async Task GenerateUserActivityReportAsync()
         {
-            // Set chart title
+            // Set chart title with a unique ID
             ChartReport.Titles.Clear();
             ChartReport.Titles.Add(new Title("Активность пользователей"));
             ChartReport.Titles[0].Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
@@ -573,20 +614,21 @@ namespace WpfApp.Pages
             {
                 // Get data asynchronously
                 var bookings = await context.Bookings
-                    .Include(b => b.User)
+                    .Include("User")
                     .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
                     .ToListAsync();
 
                 // Process the data (in memory to avoid complex EF queries)
                 var userBookings = bookings
+                    .Where(b => b.User != null)
                     .GroupBy(b => b.User)
                     .Select(g => new { User = g.Key, BookingCount = g.Count() })
                     .OrderByDescending(x => x.BookingCount)
                     .Take(10) // Top 10 users
                     .ToList();
 
-                // Create series for number of bookings per user
-                var seriesBookings = new Series("Количество бронирований");
+                // Create series for number of bookings per user - use timestamp to ensure uniqueness
+                var seriesBookings = new Series("UserBookings_" + DateTime.Now.Ticks);
                 seriesBookings.ChartType = SeriesChartType.Column;
                 seriesBookings.IsValueShownAsLabel = true;
 
@@ -626,6 +668,7 @@ namespace WpfApp.Pages
             }
         }
 
+
         /// <summary>
         /// Asynchronously generates the financial report
         /// </summary>
@@ -643,14 +686,15 @@ namespace WpfApp.Pages
                     .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
                     .ToListAsync();
 
-                // Create series for revenue by month
-                var seriesRevenue = new Series("Доход");
+                // Create series for revenue by month - use timestamp for uniqueness
+                var seriesRevenue = new Series("Revenue_" + DateTime.Now.Ticks);
                 seriesRevenue.ChartType = SeriesChartType.Column;
                 seriesRevenue.Color = System.Drawing.Color.ForestGreen;
                 seriesRevenue.IsValueShownAsLabel = true;
 
                 // Group by month and sum revenue
                 var monthlyRevenue = bookings
+                    .Where(b => b.CreatedAt.HasValue)
                     .GroupBy(b => new { Month = b.CreatedAt.Value.Month, Year = b.CreatedAt.Value.Year })
                     .Select(g => new {
                         Period = new DateTime(g.Key.Year, g.Key.Month, 1),
@@ -669,8 +713,8 @@ namespace WpfApp.Pages
 
                 ChartReport.Series.Add(seriesRevenue);
 
-                // Add booking count series
-                var seriesCount = new Series("Количество бронирований");
+                // Add booking count series - with unique name
+                var seriesCount = new Series("BookingCount_" + DateTime.Now.Ticks);
                 seriesCount.ChartType = SeriesChartType.Line;
                 seriesCount.Color = System.Drawing.Color.RoyalBlue;
                 seriesCount.BorderWidth = 3;
@@ -718,6 +762,7 @@ namespace WpfApp.Pages
             }
         }
 
+
         /// <summary>
         /// Asynchronously generates the category popularity report
         /// </summary>
@@ -732,12 +777,12 @@ namespace WpfApp.Pages
             {
                 // Get data asynchronously
                 var bookings = await context.Bookings
-                    .Include(b => b.Vehicle.VehicleCategory)
+                    .Include("Vehicle.VehicleCategory")
                     .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
                     .ToListAsync();
 
-                // Create series for vehicle categories
-                var seriesCategories = new Series("Количество бронирований");
+                // Create series for vehicle categories - with unique name
+                var seriesCategories = new Series("Categories_" + DateTime.Now.Ticks);
                 seriesCategories.ChartType = SeriesChartType.Pie;
                 seriesCategories.IsValueShownAsLabel = true;
 
@@ -806,6 +851,7 @@ namespace WpfApp.Pages
             }
         }
 
+
         /// <summary>
         /// Asynchronously generates the vehicle performance report
         /// </summary>
@@ -820,7 +866,7 @@ namespace WpfApp.Pages
             {
                 // Create a query with optional category filter
                 var query = context.Bookings
-                    .Include(b => b.Vehicle)
+                    .Include("Vehicle")
                     .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate);
 
                 if (_selectedCategory != null)
@@ -830,8 +876,8 @@ namespace WpfApp.Pages
 
                 var bookings = await query.ToListAsync();
 
-                // Create a series for the chart
-                var seriesVehicles = new Series("Доход на автомобиль");
+                // Create a series for the chart - with unique name
+                var seriesVehicles = new Series("VehiclePerformance_" + DateTime.Now.Ticks);
                 seriesVehicles.ChartType = SeriesChartType.Bar;
                 seriesVehicles.IsValueShownAsLabel = true;
 
@@ -917,6 +963,7 @@ namespace WpfApp.Pages
             }
         }
 
+
         private System.Drawing.Color GetRandomColor(int seed)
         {
             // Use a consistent method to generate colors based on seed
@@ -976,15 +1023,81 @@ namespace WpfApp.Pages
                     dateParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
                     dateParagraph.Range.InsertParagraphAfter();
 
-                    // Add chart image
+                    // Save chart to temporary file using a separate thread
+                    string tempChartFilePath = Path.Combine(Path.GetTempPath(), "tempChart_" + DateTime.Now.Ticks + ".png");
+
+                    // Create a clone of the chart for export to avoid UI thread issues
+                    var exportChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                    exportChart.Width = ChartReport.Width;
+                    exportChart.Height = ChartReport.Height;
+
+                    // Copy the chart configuration
+                    foreach (var area in ChartReport.ChartAreas)
+                    {
+                        exportChart.ChartAreas.Add(new ChartArea(area.Name + "_export"));
+                        var newArea = exportChart.ChartAreas[exportChart.ChartAreas.Count - 1];
+
+                        // Copy important properties
+                        newArea.AxisX.MajorGrid.LineColor = area.AxisX.MajorGrid.LineColor;
+                        newArea.AxisY.MajorGrid.LineColor = area.AxisY.MajorGrid.LineColor;
+                        newArea.Area3DStyle.Enable3D = area.Area3DStyle.Enable3D;
+                        if (area.Area3DStyle.Enable3D)
+                        {
+                            newArea.Area3DStyle.Inclination = area.Area3DStyle.Inclination;
+                        }
+                    }
+
+                    // Copy the series
+                    foreach (var series in ChartReport.Series)
+                    {
+                        var newSeries = exportChart.Series.Add(series.Name + "_export");
+                        newSeries.ChartType = series.ChartType;
+                        newSeries.IsValueShownAsLabel = series.IsValueShownAsLabel;
+
+                        // Copy the data points
+                        foreach (var point in series.Points)
+                        {
+                            var idx = newSeries.Points.AddXY(point.XValue, point.YValues[0]);
+                            newSeries.Points[idx].Label = point.Label;
+                            newSeries.Points[idx].Color = point.Color;
+                        }
+                    }
+
+                    // Copy titles
+                    foreach (var title in ChartReport.Titles)
+                    {
+                        exportChart.Titles.Add(new Title(title.Text, title.Docking));
+                        exportChart.Titles[exportChart.Titles.Count - 1].Font = title.Font;
+                    }
+
+                    // Save to file from a separate thread
                     await Task.Run(() => {
-                        ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
+                        try
+                        {
+                            exportChart.SaveImage(tempChartFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error saving chart image: {ex.Message}");
+                        }
                     });
-                    
-                    Word.Paragraph chartParagraph = document.Paragraphs.Add();
-                    Word.Range chartRange = chartParagraph.Range;
-                    chartRange.InlineShapes.AddPicture(System.IO.Path.GetTempPath() + "tempChart.png");
-                    chartRange.InsertParagraphAfter();
+
+                    // Check if file was created
+                    if (File.Exists(tempChartFilePath))
+                    {
+                        Word.Paragraph chartParagraph = document.Paragraphs.Add();
+                        Word.Range chartRange = chartParagraph.Range;
+                        chartRange.InlineShapes.AddPicture(tempChartFilePath);
+                        chartRange.InsertParagraphAfter();
+                    }
+                    else
+                    {
+                        Word.Paragraph errorParagraph = document.Paragraphs.Add();
+                        errorParagraph.Range.Text = "[График не может быть вставлен]";
+                        errorParagraph.Range.Font.Italic = 1;
+                        errorParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                        errorParagraph.Range.InsertParagraphAfter();
+                    }
 
                     // Add table with data
                     Word.Paragraph tableParagraph = document.Paragraphs.Add();
@@ -1057,9 +1170,9 @@ namespace WpfApp.Pages
 
                     // Delete temporary files
                     await Task.Run(() => {
-                        try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
+                        try { if (File.Exists(tempChartFilePath)) File.Delete(tempChartFilePath); } catch { }
                     });
-                    
+
                     return true;
                 }
                 catch (Exception ex)
@@ -1073,6 +1186,7 @@ namespace WpfApp.Pages
                 }
             }, LoadingProgressBar);
         }
+
 
         private async void ButtonExportExcel_Click(object sender, RoutedEventArgs e)
         {
@@ -1121,17 +1235,83 @@ namespace WpfApp.Pages
                     dateRange.Font.Italic = true;
                     dateRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
-                    // Insert chart image
+                    // Save chart to temporary file using a separate thread
+                    string tempChartFilePath = Path.Combine(Path.GetTempPath(), "tempChart_" + DateTime.Now.Ticks + ".png");
+
+                    // Create a clone of the chart for export to avoid UI thread issues
+                    var exportChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
+                    exportChart.Width = ChartReport.Width;
+                    exportChart.Height = ChartReport.Height;
+
+                    // Copy the chart configuration
+                    foreach (var area in ChartReport.ChartAreas)
+                    {
+                        exportChart.ChartAreas.Add(new ChartArea(area.Name + "_export"));
+                        var newArea = exportChart.ChartAreas[exportChart.ChartAreas.Count - 1];
+
+                        // Copy important properties
+                        newArea.AxisX.MajorGrid.LineColor = area.AxisX.MajorGrid.LineColor;
+                        newArea.AxisY.MajorGrid.LineColor = area.AxisY.MajorGrid.LineColor;
+                        newArea.Area3DStyle.Enable3D = area.Area3DStyle.Enable3D;
+                        if (area.Area3DStyle.Enable3D)
+                        {
+                            newArea.Area3DStyle.Inclination = area.Area3DStyle.Inclination;
+                        }
+                    }
+
+                    // Copy the series
+                    foreach (var series in ChartReport.Series)
+                    {
+                        var newSeries = exportChart.Series.Add(series.Name + "_export");
+                        newSeries.ChartType = series.ChartType;
+                        newSeries.IsValueShownAsLabel = series.IsValueShownAsLabel;
+
+                        // Copy the data points
+                        foreach (var point in series.Points)
+                        {
+                            var idx = newSeries.Points.AddXY(point.XValue, point.YValues[0]);
+                            newSeries.Points[idx].Label = point.Label;
+                            newSeries.Points[idx].Color = point.Color;
+                        }
+                    }
+
+                    // Copy titles
+                    foreach (var title in ChartReport.Titles)
+                    {
+                        exportChart.Titles.Add(new Title(title.Text, title.Docking));
+                        exportChart.Titles[exportChart.Titles.Count - 1].Font = title.Font;
+                    }
+
+                    // Save to file from a separate thread
                     await Task.Run(() => {
-                        ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
+                        try
+                        {
+                            exportChart.SaveImage(tempChartFilePath, System.Drawing.Imaging.ImageFormat.Png);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error saving chart image: {ex.Message}");
+                        }
                     });
-                    
-                    Excel.Range chartRange = worksheet.Range["A4:E20"];
-                    worksheet.Shapes.AddPicture(
-                        System.IO.Path.GetTempPath() + "tempChart.png",
-                        Microsoft.Office.Core.MsoTriState.msoFalse,
-                        Microsoft.Office.Core.MsoTriState.msoTrue,
-                        chartRange.Left, chartRange.Top, chartRange.Width, chartRange.Height);
+
+                    // Insert chart image
+                    if (File.Exists(tempChartFilePath))
+                    {
+                        Excel.Range chartRange = worksheet.Range["A4:E20"];
+                        worksheet.Shapes.AddPicture(
+                            tempChartFilePath,
+                            Microsoft.Office.Core.MsoTriState.msoFalse,
+                            Microsoft.Office.Core.MsoTriState.msoTrue,
+                            chartRange.Left, chartRange.Top, chartRange.Width, chartRange.Height);
+                    }
+                    else
+                    {
+                        worksheet.Cells[4, 1] = "[График не может быть вставлен]";
+                        Excel.Range errorRange = worksheet.Range["A4:E4"];
+                        errorRange.Merge();
+                        errorRange.Font.Italic = true;
+                        errorRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    }
 
                     // Get data from DataGrid
                     var dataItems = DataGridReportData.ItemsSource as System.Collections.IEnumerable;
@@ -1220,9 +1400,9 @@ namespace WpfApp.Pages
 
                     // Delete temporary files
                     await Task.Run(() => {
-                        try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
+                        try { if (File.Exists(tempChartFilePath)) File.Delete(tempChartFilePath); } catch { }
                     });
-                    
+
                     return true;
                 }
                 catch (Exception ex)

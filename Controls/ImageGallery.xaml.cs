@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using WpfApp.Classes;
 
 namespace WpfApp.Controls
 {
@@ -49,12 +51,20 @@ namespace WpfApp.Controls
             NoImagesText.Visibility = Visibility.Collapsed;
             MainImage.Visibility = Visibility.Visible;
 
+            // Load images asynchronously
+            LoadImagesAsync(imageUrls);
+        }
+
+        private async void LoadImagesAsync(List<string> imageUrls)
+        {
             for (int i = 0; i < imageUrls.Count; i++)
             {
                 try
                 {
                     var imageUrl = imageUrls[i];
-                    var bitmap = new BitmapImage(new Uri(imageUrl));
+
+                    // Use ImageCache for efficient loading
+                    var bitmap = await ImageCache.GetImageAsync(imageUrl);
 
                     _thumbnails.Add(new ThumbnailItem
                     {
@@ -63,6 +73,12 @@ namespace WpfApp.Controls
                         IsSelected = i == 0,
                         ImageUrl = imageUrl
                     });
+
+                    // If this is the first image, set it as the main image
+                    if (i == 0)
+                    {
+                        MainImage.Source = bitmap;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -71,18 +87,18 @@ namespace WpfApp.Controls
                 }
             }
 
-            if (_thumbnails.Count > 0)
-            {
-                _currentIndex = 0;
-                MainImage.Source = _thumbnails[0].ImageSource;
-
-                // Only show navigation buttons if we have multiple images
-                PreviousButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-                NextButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
-            }
+            // Only show navigation buttons if we have multiple images
+            PreviousButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
+            NextButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
             UpdateNavigationButtons();
+
+            // Force refresh of the thumbnails
+            var temp = _thumbnails.ToList();
+            ThumbnailsControl.ItemsSource = null;
+            ThumbnailsControl.ItemsSource = temp;
         }
+
 
         private void UpdateNavigationButtons()
         {
