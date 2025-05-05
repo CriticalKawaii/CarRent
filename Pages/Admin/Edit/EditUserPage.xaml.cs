@@ -91,9 +91,6 @@ namespace WpfApp.Pages.Admin.Edit
             }
         }
 
-        private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.GoBack();
-        }
+        private async void ButtonGoBack_Click(object sender, RoutedEventArgs e) => NavigationService.GoBack();
     }
 }

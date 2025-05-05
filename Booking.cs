@@ -11,6 +11,7 @@ namespace WpfApp
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     public partial class Booking
     {
@@ -31,7 +32,7 @@ namespace WpfApp
         public System.DateTime CreatedAt { get; set; }
         public Nullable<int> InsuranceID { get; set; }
         public Nullable<decimal> ActualCost { get; set; }
-
+    
         public bool HasReview
         {
             get
