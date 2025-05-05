@@ -24,16 +24,13 @@ namespace WpfApp.Classes
             {
                 using (HttpClient client = new HttpClient())
                 {
-                    // Convert image to base64
                     byte[] imageBytes = File.ReadAllBytes(imagePath);
                     string base64Image = Convert.ToBase64String(imageBytes);
 
-                    // Create form content
                     var formContent = new MultipartFormDataContent();
                     formContent.Add(new StringContent(_apiKey), "key");
                     formContent.Add(new StringContent(base64Image), "image");
 
-                    // Send request
                     var response = await client.PostAsync(ApiBaseUrl, formContent);
                     string jsonResponse = await response.Content.ReadAsStringAsync();
 
@@ -41,10 +38,8 @@ namespace WpfApp.Classes
                     {
                         try
                         {
-                            // Parse JSON response using JObject for flexibility
                             JObject jsonObj = JObject.Parse(jsonResponse);
 
-                            // Extract the image URL directly from the JSON
                             bool success = jsonObj["success"]?.Value<bool>() ?? false;
                             if (success)
                             {
@@ -82,7 +77,6 @@ namespace WpfApp.Classes
             }
         }
 
-        // Add this method to upload multiple images
         public async Task<List<string>> UploadImagesAsync(List<string> imagePaths)
         {
             List<string> uploadedUrls = new List<string>();

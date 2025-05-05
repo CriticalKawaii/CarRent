@@ -54,12 +54,9 @@ namespace WpfApp
         {
             get
             {
-                // If we already have a loaded image, return it
                 if (_vehicleImageSource != null)
                     return _vehicleImageSource;
 
-                // Otherwise attempt to load it synchronously (not recommended for new code)
-                // First try to get image from VehicleImages collection
                 if (VehicleImages != null && VehicleImages.Count > 0)
                 {
                     var firstImage = VehicleImages.FirstOrDefault();
@@ -71,7 +68,6 @@ namespace WpfApp
                         }
                         catch
                         {
-                            // If there's an error loading from URL, fall back to placeholder
                             _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
                         }
                     }
@@ -86,21 +82,18 @@ namespace WpfApp
         {
             try
             {
-                // First try to get image from VehicleImages collection
                 if (VehicleImages != null && VehicleImages.Count > 0)
                 {
                     var firstImage = VehicleImages.FirstOrDefault();
                     if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
                     {
-                        // Use the ImageCache for efficient image loading
                         var imageSource = await ImageCache.GetImageAsync(firstImage.ImagePath);
-                        _vehicleImageSource = imageSource; // Store the loaded image
+                        _vehicleImageSource = imageSource; 
                         return imageSource;
                     }
                 }
                 else
                 {
-                    // If VehicleImages is empty, try to load from database
                     using (var context = new DBEntities())
                     {
                         var images = await context.VehicleImages
@@ -110,13 +103,11 @@ namespace WpfApp
                         if (images.Count > 0 && !string.IsNullOrEmpty(images[0].ImagePath))
                         {
                             var imageSource = await ImageCache.GetImageAsync(images[0].ImagePath);
-                            _vehicleImageSource = imageSource; // Store the loaded image
+                            _vehicleImageSource = imageSource;
                             return imageSource;
                         }
                     }
                 }
-
-                // Use placeholder if no images available
                 _vehicleImageSource = GetPlaceholderImage();
                 return _vehicleImageSource;
             }
@@ -133,19 +124,14 @@ namespace WpfApp
         {
             try
             {
-                // First try to get image from VehicleImages collection
                 if (VehicleImages != null && VehicleImages.Count > 0)
                 {
                     var firstImage = VehicleImages.FirstOrDefault();
                     if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
                     {
-                        // Use the ImageCache for efficient image loading
                         return await ImageCache.GetImageAsync(firstImage.ImagePath);
                     }
                 }
-
-
-                // Use placeholder if no images available
                 return GetPlaceholderImage();
             }
             catch (Exception ex)
@@ -160,14 +146,10 @@ namespace WpfApp
             return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
         }
 
-        /// <summary>
-        /// Gets all images for this vehicle asynchronously
-        /// </summary>
         public async Task<string[]> GetAllImageUrlsAsync()
         {
             if (VehicleImages == null || VehicleImages.Count == 0)
             {
-                // Try to load images from database if not already loaded
                 using (var context = new DBEntities())
                 {
                     var images = await context.VehicleImages
@@ -179,7 +161,6 @@ namespace WpfApp
                 }
             }
 
-            // Use already loaded images
             return VehicleImages.Select(vi => vi.ImagePath).ToArray();
         }
 

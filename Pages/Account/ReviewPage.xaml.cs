@@ -57,7 +57,6 @@ namespace WpfApp.Pages.Account
         {
             try
             {
-                // Make sure we have the vehicle with all necessary properties
                 if (_booking.Vehicle == null)
                 {
                     using (var context = new DBEntities())
@@ -68,13 +67,10 @@ namespace WpfApp.Pages.Account
                     }
                 }
 
-                // Load vehicle image
                 if (_booking.Vehicle != null)
                 {
-                    // Ensure image is loaded
                     await _booking.Vehicle.GetImageSourceAsync();
 
-                    // Refresh the binding
                     this.DataContext = null;
                     this.DataContext = new { Booking = _booking, Review = _review };
                 }

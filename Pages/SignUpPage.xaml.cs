@@ -107,7 +107,6 @@ namespace WpfApp
                 return true;
             }
         }
-
         private void ButtonSignUp_Click(object sender, RoutedEventArgs e)
         {
             checkBoxRevealPassword.IsChecked = false;
@@ -118,12 +117,10 @@ namespace WpfApp
             var passwordRepeat = passwordBoxPasswordRepeat.Password.Trim();
             Register(email, firstName, lastName, password, passwordRepeat);
         }
-
         private void ButtonSignIn_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new SignInPage());
         }
-
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             textBoxRevealedPassword.Text = passwordBoxPassword.Password;

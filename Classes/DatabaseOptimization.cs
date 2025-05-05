@@ -8,14 +8,10 @@ namespace WpfApp.Classes
 {
     public static class DatabaseOptimization
     {
-        // Cache for frequently accessed static data
         private static Dictionary<string, object> _cache = new Dictionary<string, object>();
         private static DateTime _lastCacheRefresh = DateTime.MinValue;
         private static readonly TimeSpan CacheLifetime = TimeSpan.FromMinutes(10);
 
-        /// <summary>
-        /// Gets all vehicle categories with caching to reduce database calls
-        /// </summary>
         public static List<VehicleCategory> GetVehicleCategories()
         {
             RefreshCacheIfNeeded();
@@ -28,9 +24,6 @@ namespace WpfApp.Classes
             return (List<VehicleCategory>)_cache["VehicleCategories"];
         }
 
-        /// <summary>
-        /// Gets all insurance options with caching
-        /// </summary>
         public static List<Insurance> GetInsurances()
         {
             RefreshCacheIfNeeded();
@@ -43,9 +36,6 @@ namespace WpfApp.Classes
             return (List<Insurance>)_cache["Insurances"];
         }
 
-        /// <summary>
-        /// Gets vehicle images for the specified vehicle
-        /// </summary>
         public static List<string> GetVehicleImageUrls(int vehicleId)
         {
             var imageKey = $"VehicleImages_{vehicleId}";
@@ -62,28 +52,20 @@ namespace WpfApp.Classes
             return (List<string>)_cache[imageKey];
         }
 
-        /// <summary>
-        /// Gets all active vehicles with optimization for performance
-        /// </summary>
         public static async Task<List<Vehicle>> GetActiveVehiclesAsync()
         {
             var context = DBEntities.GetContext();
 
-            // Use AsNoTracking for read-only operations to improve performance
             return await context.Vehicles
                 .AsNoTracking()
                 .Where(v => v.Available)
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Efficient loading of vehicle with related data
-        /// </summary>
         public static async Task<Vehicle> GetVehicleWithDetailsAsync(int vehicleId)
         {
             var context = DBEntities.GetContext();
 
-            // Use Include to eager load related data in one query
             return await context.Vehicles
                 .Include(v => v.VehicleCategory)
                 .Include(v => v.VehicleImages)
@@ -91,18 +73,12 @@ namespace WpfApp.Classes
                 .FirstOrDefaultAsync(v => v.VehicleID == vehicleId);
         }
 
-        /// <summary>
-        /// Clear the cache to force reload from database
-        /// </summary>
         public static void ClearCache()
         {
             _cache.Clear();
             _lastCacheRefresh = DateTime.Now;
         }
 
-        /// <summary>
-        /// Check if cache needs refreshing based on lifetime
-        /// </summary>
         private static void RefreshCacheIfNeeded()
         {
             if (DateTime.Now - _lastCacheRefresh > CacheLifetime)

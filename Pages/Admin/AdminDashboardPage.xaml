@@ -502,7 +502,7 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="Роли">
+            <TabItem Header="Роли" Visibility="Collapsed">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />

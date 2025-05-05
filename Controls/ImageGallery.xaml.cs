@@ -51,7 +51,6 @@ namespace WpfApp.Controls
             NoImagesText.Visibility = Visibility.Collapsed;
             MainImage.Visibility = Visibility.Visible;
 
-            // Load images asynchronously
             LoadImagesAsync(imageUrls);
         }
 
@@ -63,7 +62,6 @@ namespace WpfApp.Controls
                 {
                     var imageUrl = imageUrls[i];
 
-                    // Use ImageCache for efficient loading
                     var bitmap = await ImageCache.GetImageAsync(imageUrl);
 
                     _thumbnails.Add(new ThumbnailItem
@@ -74,7 +72,6 @@ namespace WpfApp.Controls
                         ImageUrl = imageUrl
                     });
 
-                    // If this is the first image, set it as the main image
                     if (i == 0)
                     {
                         MainImage.Source = bitmap;
@@ -83,17 +80,14 @@ namespace WpfApp.Controls
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error loading image: {ex.Message}");
-                    // Just skip problematic images
                 }
             }
 
-            // Only show navigation buttons if we have multiple images
             PreviousButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
             NextButton.Visibility = _thumbnails.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
 
             UpdateNavigationButtons();
 
-            // Force refresh of the thumbnails
             var temp = _thumbnails.ToList();
             ThumbnailsControl.ItemsSource = null;
             ThumbnailsControl.ItemsSource = temp;
@@ -113,18 +107,15 @@ namespace WpfApp.Controls
 
             _currentIndex = index;
 
-            // Update selection state
             for (int i = 0; i < _thumbnails.Count; i++)
             {
                 _thumbnails[i].IsSelected = (i == index);
             }
 
-            // Update the main image
             MainImage.Source = _thumbnails[index].ImageSource;
 
             UpdateNavigationButtons();
 
-            // Force refresh of the thumbnails
             ThumbnailsControl.ItemsSource = null;
             ThumbnailsControl.ItemsSource = _thumbnails;
         }
@@ -178,7 +169,6 @@ namespace WpfApp.Controls
         }
     }
 
-    // Add this converter to your App.xaml resources
     public class BooleanToSelectionBorderConverter : System.Windows.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

@@ -45,7 +45,6 @@ namespace WpfApp.Pages.Admin
                 LoadData();
             }
         }
-
         private void DeleteSelectedItems<T>(DataGrid grid, DbSet<T> dbSet) where T : class
         {
             var selectedItems = grid.SelectedItems.Cast<T>().ToList();
@@ -63,7 +62,6 @@ namespace WpfApp.Pages.Admin
                 }
             }
         }
-
         private void NavigateToEditPage<T>(object dataContext) where T : Page
         {
             var page = (T)Activator.CreateInstance(typeof(T), dataContext);

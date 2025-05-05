@@ -149,7 +149,6 @@ namespace WpfApp
                         .Where(x => x.Available == true)
                         .ToListAsync();
 
-                    // Apply any active filters
                     ApplyFiltersAndSort(vehicles);
                 }
             }
@@ -175,12 +174,10 @@ namespace WpfApp
 
         private async Task ShowGalleryDialogAsync(Vehicle vehicle)
         {
-            // Show loading indicator
             LoadingProgressBar.Visibility = Visibility.Visible;
 
             try
             {
-                // Get all images for this vehicle asynchronously
                 string[] imageUrls = await vehicle.GetAllImageUrlsAsync();
 
                 if (imageUrls == null || imageUrls.Length == 0)
@@ -189,17 +186,13 @@ namespace WpfApp
                     return;
                 }
 
-                // Create the gallery dialog
                 _galleryDialog = new GalleryDialog();
                 _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Images");
 
-                // Load images
                 _galleryDialog.LoadImages(imageUrls.ToList());
 
-                // Handle close event
                 _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
 
-                // Show the dialog
                 _dialogHost.Children.Clear();
                 _dialogHost.Children.Add(_galleryDialog);
                 _dialogHost.Visibility = Visibility.Visible;
@@ -210,7 +203,6 @@ namespace WpfApp
             }
             finally
             {
-                // Hide loading indicator
                 LoadingProgressBar.Visibility = Visibility.Collapsed;
             }
         }
@@ -276,21 +268,17 @@ namespace WpfApp
             Vehicle selectedVehicle = ListViewExploreCars.SelectedItem as Vehicle;
             if (selectedVehicle == null) return;
 
-            // Show progress while loading details
             LoadingProgressBar.Visibility = Visibility.Visible;
 
             try
             {
                 DataContext = selectedVehicle;
 
-                // Load the vehicle image asynchronously
                 var imageSource = await selectedVehicle.GetImageSourceAsync();
                 imageVehicle.Source = imageSource;
 
-                // Load reviews
                 await LoadVehicleReviewsAsync(selectedVehicle);
 
-                // Calculate rent cost
                 CalculateRentCost();
             }
             catch (Exception ex)
@@ -309,14 +297,12 @@ namespace WpfApp
             {
                 using (var context = new DBEntities())
                 {
-                    // Load reviews with user information
                     var reviews = await context.Reviews
                         .Include(r => r.User)
                         .Where(r => r.VehicleID == vehicle.VehicleID)
                         .OrderByDescending(r => r.CreatedAt)
                         .ToListAsync();
 
-                    // Update the UI with the loaded reviews
                     ListViewReviews.ItemsSource = reviews;
                 }
             }
@@ -341,14 +327,12 @@ namespace WpfApp
             {
                 using (var context = new DBEntities())
                 {
-                    // Get all available vehicles (use AsNoTracking for read-only queries)
                     var query = context.Vehicles
                         .AsNoTracking()
                         .Include(v => v.VehicleCategory)
                         .Include(v => v.VehicleImages)
                         .Where(x => x.Available == true);
 
-                    // Apply search filter if present
                     string searchText = TextBoxSearch.Text?.Trim().ToLowerInvariant() ?? "";
                     if (!string.IsNullOrEmpty(searchText))
                     {
@@ -358,22 +342,18 @@ namespace WpfApp
                             x.Year.ToString().Contains(searchText));
                     }
 
-                    // Apply category filter if selected
                     if (ComboBoxFilter.SelectedItem is VehicleCategory selectedCategory)
                     {
                         query = query.Where(x => x.VehicleCategoryID == selectedCategory.VehicleCategoryID);
                     }
 
-                    // Execute the query
                     var vehicles = await query.ToListAsync();
 
-                    // Apply sorting (which needs to be done in memory)
                     if (ComboBoxSort.SelectedItem is SortOption selectedSort)
                     {
                         vehicles = selectedSort.SortFunction(vehicles).ToList();
                     }
                     await PreloadThumbnailsAsync(vehicles);
-                    // Update the observable collection
                     Dispatcher.Invoke(() =>
                     {
                         Vehicles.Clear();
@@ -402,7 +382,6 @@ namespace WpfApp
 
             var filteredItems = vehicles;
 
-            // Apply text search
             if (!string.IsNullOrEmpty(searchText))
             {
                 filteredItems = filteredItems
@@ -413,7 +392,6 @@ namespace WpfApp
                     .ToList();
             }
 
-            // Apply category filter
             if (ComboBoxFilter.SelectedItem is VehicleCategory selectedCategory)
             {
                 filteredItems = filteredItems
@@ -421,13 +399,11 @@ namespace WpfApp
                     .ToList();
             }
 
-            // Apply sorting
             if (ComboBoxSort.SelectedItem is SortOption selectedSort)
             {
                 filteredItems = selectedSort.SortFunction(filteredItems).ToList();
             }
 
-            // Update collection on UI thread
             Dispatcher.Invoke(() =>
             {
                 Vehicles.Clear();
@@ -451,7 +427,7 @@ namespace WpfApp
             else
             {
                 _searchTimer = new System.Windows.Threading.DispatcherTimer();
-                _searchTimer.Interval = TimeSpan.FromMilliseconds(300); // 300ms debounce
+                _searchTimer.Interval = TimeSpan.FromMilliseconds(300);
                 _searchTimer.Tick += (s, args) =>
                 {
                     _searchTimer.Stop();
@@ -500,7 +476,6 @@ namespace WpfApp
                 DatePickerStart.SelectedDate.HasValue &&
                 DatePickerEnd.SelectedDate.HasValue)
             {
-                // Use the helper to run with progress
                 await AsyncOperationHelper.RunWithProgressAsync(async () =>
                 {
                     using (var context = new DBEntities())
@@ -537,7 +512,6 @@ namespace WpfApp
 
                 MessageBox.Show("Бронирование отправлено на подтверждение администратору.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Reset form
                 DatePickerStart.SelectedDate = null;
                 DatePickerEnd.SelectedDate = null;
                 ComboBoxInsurance.SelectedIndex = -1;
@@ -545,7 +519,6 @@ namespace WpfApp
                 ComboBoxInsurance.IsEnabled = false;
                 ButtonRent.IsEnabled = false;
 
-                // Refresh available vehicles
                 await LoadVehiclesAsync();
             }
         }
@@ -640,14 +613,6 @@ namespace WpfApp
                 }
 
                 ButtonRent.Content = "Арендовать за " + rentCost.ToString("C");
-            }
-        }
-
-        private async void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (IsVisible)
-            {
-                await LoadVehiclesAsync();
             }
         }
     }

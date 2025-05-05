@@ -40,7 +40,6 @@ namespace WpfApp
                 return string.Concat(hash.ComputeHash(Encoding.UTF8.GetBytes(password)).Select(s => s.ToString("X2")));
             }
         }
-
         private void GenerateCaptcha()
         {
             var rand = new Random();

@@ -51,7 +51,6 @@ namespace WpfApp.Pages.Admin.Edit
         {
             try
             {
-                // Show loading indicator if there are images to load
                 if (_vehicleImages.Count > 0)
                 {
                     LoadingIndicator.Visibility = Visibility.Visible;
@@ -61,12 +60,10 @@ namespace WpfApp.Pages.Admin.Edit
 
                 if (_vehicleImages.Count > 0)
                 {
-                    // Use existing vehicle images
                     imageUrls = _vehicleImages.Select(vi => vi.ImagePath).ToList();
                 }
                 else if (_vehicle.VehicleID != 0)
                 {
-                    // Try loading from database if not already loaded
                     using (var context = new DBEntities())
                     {
                         var images = await context.VehicleImages
@@ -84,14 +81,11 @@ namespace WpfApp.Pages.Admin.Edit
                 }
                 else
                 {
-                    // New vehicle, no images yet
                     imageUrls = new List<string>();
                 }
 
-                // Add temp images to the display list
                 imageUrls.AddRange(_tempImagePaths);
 
-                // Load images in the gallery
                 VehicleImageGallery.LoadImages(imageUrls);
             }
             catch (Exception ex)
@@ -118,8 +112,6 @@ namespace WpfApp.Pages.Admin.Edit
                 {
                     _tempImagePaths.Add(filename);
                 }
-
-                // Show the temp images in the gallery
                 var currentImages = _vehicleImages.Select(vi => vi.ImagePath).ToList();
                 VehicleImageGallery.LoadImages(currentImages.Concat(_tempImagePaths).ToList());
             }
@@ -128,20 +120,17 @@ namespace WpfApp.Pages.Admin.Edit
 
         private void ButtonDeleteCurrentImage_Click(object sender, RoutedEventArgs e)
         {
-            // Get current image
             string currentImageUrl = VehicleImageGallery.GetCurrentImageUrl();
 
             if (string.IsNullOrEmpty(currentImageUrl))
                 return;
 
-            // Check if it's a temp image or a saved one
             if (_tempImagePaths.Contains(currentImageUrl))
             {
                 _tempImagePaths.Remove(currentImageUrl);
             }
             else
             {
-                // Find the VehicleImage entity
                 var imageToDelete = _vehicleImages.FirstOrDefault(vi => vi.ImagePath == currentImageUrl);
                 if (imageToDelete != null)
                 {
@@ -150,7 +139,6 @@ namespace WpfApp.Pages.Admin.Edit
                 }
             }
 
-            // Refresh gallery
             var remainingImages = _vehicleImages.Select(vi => vi.ImagePath).Concat(_tempImagePaths).ToList();
             VehicleImageGallery.LoadImages(remainingImages);
         }
@@ -180,11 +168,9 @@ namespace WpfApp.Pages.Admin.Edit
 
             try
             {
-                // Show loading indicator
                 LoadingIndicator.Visibility = Visibility.Visible;
                 SavePanel.IsEnabled = false;
 
-                // Save vehicle first to get ID if new
                 if (_vehicle.VehicleID == 0)
                 {
                     _vehicle.CreatedAt = DateTime.Now;
@@ -193,13 +179,11 @@ namespace WpfApp.Pages.Admin.Edit
                     await Task.Run(() => DBEntities.GetContext().SaveChanges());
                 }
 
-                // Upload new images to ImgBB
                 if (_tempImagePaths.Count > 0)
                 {
                     var imgBBService = new ImgBBService(_imgBBApiKey);
                     var uploadedUrls = await imgBBService.UploadImagesAsync(_tempImagePaths);
 
-                    // Save uploaded URLs to database
                     foreach (var url in uploadedUrls)
                     {
                         var newImage = new VehicleImage
@@ -211,13 +195,11 @@ namespace WpfApp.Pages.Admin.Edit
                     }
                 }
 
-                // Delete images marked for deletion
                 foreach (var image in _imagesToDelete)
                 {
                     DBEntities.GetContext().VehicleImages.Remove(image);
                 }
 
-                // Save all changes
                 await Task.Run(() => DBEntities.GetContext().SaveChanges());
 
                 MessageBox.Show("Данные успешно сохранены");
@@ -229,7 +211,6 @@ namespace WpfApp.Pages.Admin.Edit
             }
             finally
             {
-                // Hide loading indicator
                 LoadingIndicator.Visibility = Visibility.Collapsed;
                 SavePanel.IsEnabled = true;
             }

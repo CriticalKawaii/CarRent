@@ -28,7 +28,7 @@
                        Margin="5" />
 
                 <TextBlock x:Name="NoImagesText"
-                           Text="No images available"
+                           Text="Нет доступных изображений"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource MaterialDesignBodyLight}"

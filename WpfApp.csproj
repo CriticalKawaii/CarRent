@@ -140,7 +140,6 @@
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
     <Compile Include="Classes\AsyncOperationHelper.cs" />
-    <Compile Include="Classes\Core.cs" />
     <Compile Include="Classes\DatabaseExtensions.cs" />
     <Compile Include="Classes\DatabaseOptimization.cs" />
     <Compile Include="Classes\ImageCache.cs" />
