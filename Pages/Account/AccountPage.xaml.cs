@@ -14,7 +14,8 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using MaterialDesignThemes.Wpf;
 using System.Windows.Input;
-
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace WpfApp.Pages
 {
@@ -74,9 +75,25 @@ namespace WpfApp.Pages
             }
         }
 
+        private ReportType _currentReportType = ReportType.UserActivity;
+        private DateTime? _reportStartDate = null;
+        private DateTime? _reportEndDate = null;
+        private VehicleCategory _selectedCategory = null;
+
+        private enum ReportType
+        {
+            UserActivity,
+            Financial,
+            CategoryPopularity,
+            VehiclePerformance
+        }
+
+        public List<PaymentMethod> PaymentMethods { get; set; }
+
         public AccountPage()
         {
             InitializeComponent();
+            
             if (SessionManager.CurrentUser != null && SessionManager.CurrentUser.RoleID != 1)
             {
                 AccountPageHeaderIcon.Kind = PackIconKind.Administrator;
@@ -91,37 +108,143 @@ namespace WpfApp.Pages
                 TabItemReports.Focus();
                 frameAdmin.Navigate(new AdminDashboardPage());
             }
-            DataContext = SessionManager.CurrentUser;
+            
             Loaded += AccountPage_Loaded;
         }
 
-        private void AccountPage_Loaded(object sender, RoutedEventArgs e)
+        private async void AccountPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Show loading indicator immediately
+            LoadingProgressBar.Visibility = Visibility.Visible;
+            
+            try
+            {
+                // Load all data asynchronously
+                await LoadAccountDataAsync();
+            }
+            finally
+            {
+                // Hide loading indicator when done
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously loads all data needed for the account page
+        /// </summary>
+        private async Task LoadAccountDataAsync()
         {
             if (SessionManager.CurrentUser != null)
             {
-                var userBookings = DBEntities.GetContext().Bookings
-                    .Where(b => b.UserID == SessionManager.CurrentUser.UserID)
-                    .OrderByDescending(b => b.CreatedAt)
-                    .ToList();
-
-                DataGridUserBookings.ItemsSource = userBookings;
-                DataGridUserBookings.Visibility = userBookings.Any() ? Visibility.Visible : Visibility.Collapsed;
-                TextBlockNoBookings.Visibility = userBookings.Any() ? Visibility.Collapsed : Visibility.Visible;
-
-                if (SessionManager.CurrentUser.RoleID != 1)
+                try
                 {
-                    InitializeReportingSystem();
-                    SetupAdminConfirmations();
+                    // Load user bookings
+                    await LoadUserBookingsAsync();
+
+                    // Load admin-specific data if needed
+                    if (SessionManager.CurrentUser.RoleID != 1)
+                    {
+                        await LoadAdminDataAsync();
+                    }
+                    else
+                    {
+                        // Set user data as the data context for regular users
+                        DataContext = SessionManager.CurrentUser;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    DataContext = SessionManager.CurrentUser;
+                    MessageBox.Show($"Error loading account data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }
 
+        /// <summary>
+        /// Loads the user's bookings asynchronously
+        /// </summary>
+        private async Task LoadUserBookingsAsync()
+        {
+            using (var context = new DBEntities())
+            {
+                var bookings = await context.Bookings
+                    .Include(b => b.BookingStatus)
+                    .Include(b => b.Vehicle)
+                    .Include(b => b.Vehicle.VehicleImages)
+                    .Where(b => b.UserID == SessionManager.CurrentUser.UserID)
+                    .OrderByDescending(b => b.CreatedAt)
+                    .ToListAsync();
 
-        private void ButtonReview_Click(object sender, RoutedEventArgs e)
+                DataGridUserBookings.ItemsSource = bookings;
+                DataGridUserBookings.Visibility = bookings.Any() ? Visibility.Visible : Visibility.Collapsed;
+                TextBlockNoBookings.Visibility = bookings.Any() ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously refreshes user bookings
+        /// </summary>
+        private async Task RefreshUserBookingsAsync()
+        {
+            try
+            {
+                await LoadUserBookingsAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing bookings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Loads admin-specific data asynchronously
+        /// </summary>
+        private async Task LoadAdminDataAsync()
+        {
+            using (var context = new DBEntities())
+            {
+                // Load data for reports
+                await InitializeReportingSystemAsync(context);
+
+                // Load admin confirmations data
+                await SetupAdminConfirmationsAsync(context);
+            }
+        }
+
+        /// <summary>
+        /// Initialize the reporting system asynchronously
+        /// </summary>
+        private async Task InitializeReportingSystemAsync(DBEntities context)
+        {
+            // Initialize chart
+            ChartReport.ChartAreas.Clear();
+            ChartReport.Series.Clear();
+            ChartReport.Titles.Clear();
+
+            ChartReport.ChartAreas.Add(new ChartArea("MainArea"));
+            ChartReport.ChartAreas[0].AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            ChartReport.ChartAreas[0].AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
+            ChartReport.ChartAreas[0].AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
+            ChartReport.ChartAreas[0].AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
+
+            // Set default dates
+            _reportStartDate = DateTime.Today.AddMonths(-1);
+            _reportEndDate = DateTime.Today;
+
+            // Load vehicle categories asynchronously
+            var vehicleCategories = await context.VehicleCategories.ToListAsync();
+            ComboBoxVehicleCategory.ItemsSource = vehicleCategories;
+
+            // Set default report period
+            ComboBoxReportPeriod.SelectedIndex = 1; // Current Month
+
+            // Set default report type
+            ComboBoxReportType.SelectedIndex = 0; // User Activity
+
+            // Generate initial report asynchronously
+            await GenerateReportAsync();
+        }
+
+        private async void ButtonReview_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new ReviewPage((sender as Button).DataContext as Booking));
         }
@@ -130,6 +253,7 @@ namespace WpfApp.Pages
         {
             return Regex.IsMatch(email, @"^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$");
         }
+        
         private string GetHash(string password)
         {
             using (var hash = System.Security.Cryptography.SHA1.Create())
@@ -139,7 +263,7 @@ namespace WpfApp.Pages
             }
         }
 
-        private void ButtonCancelBooking_Click(object sender, RoutedEventArgs e)
+        private async void ButtonCancelBooking_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var booking = button.DataContext as Booking;
@@ -156,20 +280,25 @@ namespace WpfApp.Pages
             var result = MessageBox.Show("Вы действительно хотите отменить бронирование?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                try
-                {
-                    booking.StatusID = 5; // Pending Cancellation
-                    DBEntities.GetContext().SaveChanges();
-                    RefreshUserBookings();
-                    MessageBox.Show("Запрос на отмену отправлен администратору.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Ошибка при отмене бронирования: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                    using (var context = new DBEntities())
+                    {
+                        var dbBooking = await context.Bookings.FindAsync(booking.BookingID);
+                        if (dbBooking != null)
+                        {
+                            dbBooking.StatusID = 5; // Pending Cancellation
+                            await context.SaveChangesWithRetryAsync();
+                        }
+                    }
+                    await RefreshUserBookingsAsync();
+                    return true;
+                }, LoadingProgressBar, button);
+                
+                MessageBox.Show("Запрос на отмену отправлен администратору.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
-        private void ButtonWithdrawCancellation_Click(object sender, RoutedEventArgs e)
+        
+        private async void ButtonWithdrawCancellation_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var booking = button.DataContext as Booking;
@@ -177,20 +306,24 @@ namespace WpfApp.Pages
             if (booking == null || booking.BookingStatus.BookingStatus1 != "Pending Cancellation")
                 return;
 
-            try
-            {
-                booking.StatusID = 2;
-                DBEntities.GetContext().SaveChanges();
-                RefreshUserBookings();
-                MessageBox.Show("Отмена бронирования отозвана.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при отзыве отмены: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
+                {
+                    var dbBooking = await context.Bookings.FindAsync(booking.BookingID);
+                    if (dbBooking != null)
+                    {
+                        dbBooking.StatusID = 2; // Confirmed
+                        await context.SaveChangesWithRetryAsync();
+                    }
+                }
+                await RefreshUserBookingsAsync();
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Отмена бронирования отозвана.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void ButtonUserConfirmCompletion_Click(object sender, RoutedEventArgs e)
+        private async void ButtonUserConfirmCompletion_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var booking = button.DataContext as Booking;
@@ -198,36 +331,24 @@ namespace WpfApp.Pages
             if (booking == null || booking.BookingStatus.BookingStatus1 != "Confirmed" || !booking.IsStarted)
                 return;
 
-            try
-            {
-                booking.StatusID = 6; 
-                DBEntities.GetContext().SaveChanges();
-                RefreshUserBookings();
-                MessageBox.Show("Запрос на подтверждение завершения отправлен администратору.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при подтверждении завершения: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
+                {
+                    var dbBooking = await context.Bookings.FindAsync(booking.BookingID);
+                    if (dbBooking != null)
+                    {
+                        dbBooking.StatusID = 6; // Pending Completion
+                        await context.SaveChangesWithRetryAsync();
+                    }
+                }
+                await RefreshUserBookingsAsync();
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Запрос на подтверждение завершения отправлен администратору.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void RefreshUserBookings()
-        {
-            if (SessionManager.CurrentUser != null)
-            {
-                var userBookings = DBEntities.GetContext().Bookings
-                    .Where(b => b.UserID == SessionManager.CurrentUser.UserID)
-                    .OrderByDescending(b => b.CreatedAt)
-                    .ToList();
-
-                DataGridUserBookings.ItemsSource = userBookings;
-                DataGridUserBookings.Visibility = userBookings.Any() ? Visibility.Visible : Visibility.Collapsed;
-                TextBlockNoBookings.Visibility = userBookings.Any() ? Visibility.Collapsed : Visibility.Visible;
-            }
-        }
-
-
-        private void ButtonSaveUserData_Click(object sender, RoutedEventArgs e)
+        private async void ButtonSaveUserData_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder errors = new StringBuilder();
             
@@ -246,39 +367,43 @@ namespace WpfApp.Pages
                 MessageBox.Show(errors.ToString(), "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
-            try
-            {
-                var dbUser = DBEntities.GetContext().Users.Find(SessionManager.CurrentUser.UserID);
-
-                if (dbUser == null)
+            
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
                 {
-                    MessageBox.Show("Пользователь не найден в базе данных", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    var dbUser = await context.Users.FindAsync(SessionManager.CurrentUser.UserID);
+
+                    if (dbUser == null)
+                    {
+                        MessageBox.Show("Пользователь не найден в базе данных", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return false;
+                    }
+
+                    dbUser.Email = TextBoxEmail.Text;
+                    dbUser.FirstName = TextBoxFirstName.Text;
+                    dbUser.LastName = TextBoxLastName.Text;
+
+                    if (!string.IsNullOrEmpty(PasswordBoxNewPassword.Password))
+                    {
+                        dbUser.PasswordHash = GetHash(PasswordBoxNewPassword.Password);
+                    }
+
+                    await context.SaveChangesWithRetryAsync();
+
+                    // Update current user in session
+                    SessionManager.SignIn(dbUser);
+
+                    // Update UI
+                    Dispatcher.Invoke(() => {
+                        DataContext = dbUser;
+                        PasswordBoxNewPassword.Password = string.Empty;
+                    });
+
+                    return true;
                 }
-
-                dbUser.Email = TextBoxEmail.Text;
-                dbUser.FirstName = TextBoxFirstName.Text;
-                dbUser.LastName = TextBoxLastName.Text;
-
-                if (!string.IsNullOrEmpty(PasswordBoxNewPassword.Password))
-                {
-                    dbUser.PasswordHash = GetHash(PasswordBoxNewPassword.Password);
-                }
-
-                DBEntities.GetContext().SaveChanges();
-
-                SessionManager.SignIn(dbUser);
-
-                DataContext = dbUser;
-
-                MessageBox.Show("Личные данные успешно обновлены", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                PasswordBoxNewPassword.Password = string.Empty;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при сохранении данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            }, LoadingProgressBar, ButtonSaveUserData);
+            
+            MessageBox.Show("Личные данные успешно обновлены", "Успешно", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void ButtonSignOut_Click(object sender, RoutedEventArgs e)
@@ -289,50 +414,47 @@ namespace WpfApp.Pages
 
         #region Reporting System
 
-        private ReportType _currentReportType = ReportType.UserActivity;
-        private DateTime? _reportStartDate = null;
-        private DateTime? _reportEndDate = null;
-        private VehicleCategory _selectedCategory = null;
-
-        private enum ReportType
+        /// <summary>
+        /// Asynchronously generates a report based on current settings
+        /// </summary>
+        private async Task GenerateReportAsync()
         {
-            UserActivity,
-            Financial,
-            CategoryPopularity,
-            VehiclePerformance
+            if (_reportStartDate == null || _reportEndDate == null) return;
+
+            LoadingProgressBar.Visibility = Visibility.Visible;
+
+            try
+            {
+                ChartReport.Series.Clear();
+                DataGridReportData.Columns.Clear();
+
+                switch (_currentReportType)
+                {
+                    case ReportType.UserActivity:
+                        await GenerateUserActivityReportAsync();
+                        break;
+                    case ReportType.Financial:
+                        await GenerateFinancialReportAsync();
+                        break;
+                    case ReportType.CategoryPopularity:
+                        await GenerateCategoryPopularityReportAsync();
+                        break;
+                    case ReportType.VehiclePerformance:
+                        await GenerateVehiclePerformanceReportAsync();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error generating report: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
         }
-
-        private void InitializeReportingSystem()
-        {
-            // Initialize Chart
-            ChartReport.ChartAreas.Clear();
-            ChartReport.Series.Clear();
-            ChartReport.Titles.Clear();
-
-            ChartReport.ChartAreas.Add(new ChartArea("MainArea"));
-            ChartReport.ChartAreas[0].AxisX.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            ChartReport.ChartAreas[0].AxisY.MajorGrid.LineColor = System.Drawing.Color.LightGray;
-            ChartReport.ChartAreas[0].AxisX.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
-            ChartReport.ChartAreas[0].AxisY.LabelStyle.Font = new System.Drawing.Font("Segoe UI", 9);
-
-            // Set default dates
-            _reportStartDate = DateTime.Today.AddMonths(-1);
-            _reportEndDate = DateTime.Today;
-
-            // Set vehicle categories
-            ComboBoxVehicleCategory.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
-
-            // Set default report period
-            ComboBoxReportPeriod.SelectedIndex = 1; // Current Month
-
-            // Set default report type
-            ComboBoxReportType.SelectedIndex = 0; // User Activity
-
-            // Generate initial report
-            GenerateReport();
-        }
-
-        private void ComboBoxReportType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        
+        private async void ComboBoxReportType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ComboBoxReportType.SelectedIndex < 0) return;
 
@@ -356,10 +478,10 @@ namespace WpfApp.Pages
             ComboBoxVehicleCategory.Visibility = (_currentReportType == ReportType.VehiclePerformance)
                 ? Visibility.Visible : Visibility.Collapsed;
 
-            GenerateReport();
+            await GenerateReportAsync();
         }
 
-        private void ComboBoxReportPeriod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ComboBoxReportPeriod_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (ComboBoxReportPeriod.SelectedIndex < 0) return;
 
@@ -397,11 +519,11 @@ namespace WpfApp.Pages
                 DatePickerStartDate.SelectedDate = _reportStartDate;
                 DatePickerEndDate.SelectedDate = _reportEndDate;
 
-                GenerateReport();
+                await GenerateReportAsync();
             }
         }
 
-        private void DatePickerReportDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
+        private async void DatePickerReportDate_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DatePickerStartDate.SelectedDate.HasValue && DatePickerEndDate.SelectedDate.HasValue)
             {
@@ -422,374 +544,377 @@ namespace WpfApp.Pages
                         DatePickerEndDate.SelectedDate = _reportEndDate;
                     }
                 }
-                GenerateReport();
+                await GenerateReportAsync();
             }
         }
 
-        private void ReportFilter_Changed(object sender, SelectionChangedEventArgs e)
+        private async void ReportFilter_Changed(object sender, SelectionChangedEventArgs e)
         {
             _selectedCategory = ComboBoxVehicleCategory.SelectedItem as VehicleCategory;
-            GenerateReport();
+            await GenerateReportAsync();
         }
 
-        private void ButtonApplyFilters_Click(object sender, RoutedEventArgs e)
+        private async void ButtonApplyFilters_Click(object sender, RoutedEventArgs e)
         {
-            GenerateReport();
+            await GenerateReportAsync();
         }
 
-        private void GenerateReport()
-        {
-            if (_reportStartDate == null || _reportEndDate == null) return;
-
-            ChartReport.Series.Clear();
-            DataGridReportData.Columns.Clear();
-
-            switch (_currentReportType)
-            {
-                case ReportType.UserActivity:
-                    GenerateUserActivityReport();
-                    break;
-                case ReportType.Financial:
-                    GenerateFinancialReport();
-                    break;
-                case ReportType.CategoryPopularity:
-                    GenerateCategoryPopularityReport();
-                    break;
-                case ReportType.VehiclePerformance:
-                    GenerateVehiclePerformanceReport();
-                    break;
-            }
-        }
-
-        private void GenerateUserActivityReport()
+        /// <summary>
+        /// Asynchronously generates the user activity report
+        /// </summary>
+        private async Task GenerateUserActivityReportAsync()
         {
             // Set chart title
             ChartReport.Titles.Clear();
             ChartReport.Titles.Add(new Title("Активность пользователей"));
             ChartReport.Titles[0].Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
 
-            // Get data
-            var bookings = DBEntities.GetContext().Bookings
-                .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
-                .ToList();
-
-            // Create series for number of bookings per user
-            var seriesBookings = new Series("Количество бронирований");
-            seriesBookings.ChartType = SeriesChartType.Column;
-            seriesBookings.IsValueShownAsLabel = true;
-
-            // Group by user and count bookings
-            var userBookings = bookings
-                .GroupBy(b => b.User)
-                .Select(g => new { User = g.Key, BookingCount = g.Count() })
-                .OrderByDescending(x => x.BookingCount)
-                .Take(10) // Top 10 users
-                .ToList();
-
-            foreach (var item in userBookings)
+            using (var context = new DBEntities())
             {
-                string userName = $"{item.User.FirstName} {item.User.LastName}";
-                seriesBookings.Points.AddXY(userName, item.BookingCount);
+                // Get data asynchronously
+                var bookings = await context.Bookings
+                    .Include(b => b.User)
+                    .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
+                    .ToListAsync();
+
+                // Process the data (in memory to avoid complex EF queries)
+                var userBookings = bookings
+                    .GroupBy(b => b.User)
+                    .Select(g => new { User = g.Key, BookingCount = g.Count() })
+                    .OrderByDescending(x => x.BookingCount)
+                    .Take(10) // Top 10 users
+                    .ToList();
+
+                // Create series for number of bookings per user
+                var seriesBookings = new Series("Количество бронирований");
+                seriesBookings.ChartType = SeriesChartType.Column;
+                seriesBookings.IsValueShownAsLabel = true;
+
+                foreach (var item in userBookings)
+                {
+                    string userName = $"{item.User.FirstName} {item.User.LastName}";
+                    seriesBookings.Points.AddXY(userName, item.BookingCount);
+                }
+
+                ChartReport.Series.Add(seriesBookings);
+
+                // Create DataGrid columns
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Пользователь",
+                    Binding = new System.Windows.Data.Binding("UserName")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Бронирований",
+                    Binding = new System.Windows.Data.Binding("BookingCount")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Email",
+                    Binding = new System.Windows.Data.Binding("Email")
+                });
+
+                // Add data to DataGrid
+                var gridData = userBookings.Select(item => new {
+                    UserName = $"{item.User.FirstName} {item.User.LastName}",
+                    BookingCount = item.BookingCount,
+                    Email = item.User.Email
+                }).ToList();
+
+                DataGridReportData.ItemsSource = gridData;
             }
-
-            ChartReport.Series.Add(seriesBookings);
-
-            // Create DataGrid columns
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Пользователь",
-                Binding = new System.Windows.Data.Binding("UserName")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Бронирований",
-                Binding = new System.Windows.Data.Binding("BookingCount")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Email",
-                Binding = new System.Windows.Data.Binding("Email")
-            });
-
-            // Add data to DataGrid
-            var gridData = userBookings.Select(item => new {
-                UserName = $"{item.User.FirstName} {item.User.LastName}",
-                BookingCount = item.BookingCount,
-                Email = item.User.Email
-            }).ToList();
-
-            DataGridReportData.ItemsSource = gridData;
         }
 
-        private void GenerateFinancialReport()
+        /// <summary>
+        /// Asynchronously generates the financial report
+        /// </summary>
+        private async Task GenerateFinancialReportAsync()
         {
             // Set chart title
             ChartReport.Titles.Clear();
             ChartReport.Titles.Add(new Title("Финансовый отчет"));
             ChartReport.Titles[0].Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
 
-            // Get data
-            var bookings = DBEntities.GetContext().Bookings
-                .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
-                .ToList();
-
-            // Create series for revenue by month
-            var seriesRevenue = new Series("Доход");
-            seriesRevenue.ChartType = SeriesChartType.Column;
-            seriesRevenue.Color = System.Drawing.Color.ForestGreen;
-            seriesRevenue.IsValueShownAsLabel = true;
-
-            // Group by month and sum revenue
-            var monthlyRevenue = bookings
-                .GroupBy(b => new { Month = b.CreatedAt.Value.Month, Year = b.CreatedAt.Value.Year })
-                .Select(g => new {
-                    Period = new DateTime(g.Key.Year, g.Key.Month, 1),
-                    Revenue = g.Sum(b => b.TotalCost),
-                    BookingCount = g.Count()
-                })
-                .OrderBy(x => x.Period)
-                .ToList();
-
-            foreach (var item in monthlyRevenue)
+            using (var context = new DBEntities())
             {
-                string periodLabel = item.Period.ToString("MMM yyyy");
-                seriesRevenue.Points.AddXY(periodLabel, item.Revenue);
-                seriesRevenue.Points.Last().Label = item.Revenue.ToString("C0");
+                // Get data asynchronously
+                var bookings = await context.Bookings
+                    .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
+                    .ToListAsync();
+
+                // Create series for revenue by month
+                var seriesRevenue = new Series("Доход");
+                seriesRevenue.ChartType = SeriesChartType.Column;
+                seriesRevenue.Color = System.Drawing.Color.ForestGreen;
+                seriesRevenue.IsValueShownAsLabel = true;
+
+                // Group by month and sum revenue
+                var monthlyRevenue = bookings
+                    .GroupBy(b => new { Month = b.CreatedAt.Value.Month, Year = b.CreatedAt.Value.Year })
+                    .Select(g => new {
+                        Period = new DateTime(g.Key.Year, g.Key.Month, 1),
+                        Revenue = g.Sum(b => b.TotalCost),
+                        BookingCount = g.Count()
+                    })
+                    .OrderBy(x => x.Period)
+                    .ToList();
+
+                foreach (var item in monthlyRevenue)
+                {
+                    string periodLabel = item.Period.ToString("MMM yyyy");
+                    seriesRevenue.Points.AddXY(periodLabel, item.Revenue);
+                    seriesRevenue.Points.Last().Label = item.Revenue.ToString("C0");
+                }
+
+                ChartReport.Series.Add(seriesRevenue);
+
+                // Add booking count series
+                var seriesCount = new Series("Количество бронирований");
+                seriesCount.ChartType = SeriesChartType.Line;
+                seriesCount.Color = System.Drawing.Color.RoyalBlue;
+                seriesCount.BorderWidth = 3;
+                seriesCount.MarkerStyle = MarkerStyle.Circle;
+                seriesCount.MarkerSize = 8;
+                seriesCount.YAxisType = AxisType.Secondary;
+
+                // Add secondary Y axis
+                ChartReport.ChartAreas[0].AxisY2.Enabled = AxisEnabled.True;
+                ChartReport.ChartAreas[0].AxisY2.MajorGrid.Enabled = false;
+
+                foreach (var item in monthlyRevenue)
+                {
+                    string periodLabel = item.Period.ToString("MMM yyyy");
+                    seriesCount.Points.AddXY(periodLabel, item.BookingCount);
+                }
+
+                ChartReport.Series.Add(seriesCount);
+
+                // Create DataGrid columns
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Период",
+                    Binding = new System.Windows.Data.Binding("Period")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Доход",
+                    Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Бронирований",
+                    Binding = new System.Windows.Data.Binding("BookingCount")
+                });
+
+                // Add data to DataGrid
+                var gridData = monthlyRevenue.Select(item => new {
+                    Period = item.Period.ToString("MMMM yyyy"),
+                    Revenue = item.Revenue,
+                    BookingCount = item.BookingCount
+                }).ToList();
+
+                DataGridReportData.ItemsSource = gridData;
             }
-
-            ChartReport.Series.Add(seriesRevenue);
-
-            // Add booking count series
-            var seriesCount = new Series("Количество бронирований");
-            seriesCount.ChartType = SeriesChartType.Line;
-            seriesCount.Color = System.Drawing.Color.RoyalBlue;
-            seriesCount.BorderWidth = 3;
-            seriesCount.MarkerStyle = MarkerStyle.Circle;
-            seriesCount.MarkerSize = 8;
-            seriesCount.YAxisType = AxisType.Secondary;
-
-            // Add secondary Y axis
-            ChartReport.ChartAreas[0].AxisY2.Enabled = AxisEnabled.True;
-            ChartReport.ChartAreas[0].AxisY2.MajorGrid.Enabled = false;
-
-            foreach (var item in monthlyRevenue)
-            {
-                string periodLabel = item.Period.ToString("MMM yyyy");
-                seriesCount.Points.AddXY(periodLabel, item.BookingCount);
-            }
-
-            ChartReport.Series.Add(seriesCount);
-
-            // Create DataGrid columns
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Период",
-                Binding = new System.Windows.Data.Binding("Period")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Доход",
-                Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Бронирований",
-                Binding = new System.Windows.Data.Binding("BookingCount")
-            });
-
-            // Add data to DataGrid
-            var gridData = monthlyRevenue.Select(item => new {
-                Period = item.Period.ToString("MMMM yyyy"),
-                Revenue = item.Revenue,
-                BookingCount = item.BookingCount
-            }).ToList();
-
-            DataGridReportData.ItemsSource = gridData;
         }
 
-        private void GenerateCategoryPopularityReport()
+        /// <summary>
+        /// Asynchronously generates the category popularity report
+        /// </summary>
+        private async Task GenerateCategoryPopularityReportAsync()
         {
             // Set chart title
             ChartReport.Titles.Clear();
             ChartReport.Titles.Add(new Title("Популярность категорий транспорта"));
             ChartReport.Titles[0].Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
 
-            // Get data
-            var bookings = DBEntities.GetContext().Bookings
-                .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
-                .ToList();
-
-            // Create series for vehicle categories
-            var seriesCategories = new Series("Количество бронирований");
-            seriesCategories.ChartType = SeriesChartType.Pie;
-            seriesCategories.IsValueShownAsLabel = true;
-
-            // Group by category and count bookings
-            var categoryBookings = bookings
-                .Where(b => b.Vehicle != null && b.Vehicle.VehicleCategory != null)
-                .GroupBy(b => b.Vehicle.VehicleCategory)
-                .Select(g => new {
-                    Category = g.Key,
-                    BookingCount = g.Count(),
-                    Revenue = g.Sum(b => b.TotalCost)
-                })
-                .OrderByDescending(x => x.BookingCount)
-                .ToList();
-
-            // Configure pie chart
-            ChartReport.ChartAreas[0].Area3DStyle.Enable3D = true;
-            ChartReport.ChartAreas[0].Area3DStyle.Inclination = 20;
-
-            foreach (var item in categoryBookings)
+            using (var context = new DBEntities())
             {
-                string categoryName = item.Category.VehicleCategory1;
-                int pointIndex = seriesCategories.Points.AddXY(categoryName, item.BookingCount);
-                DataPoint point = seriesCategories.Points[pointIndex];
-                point.Label = $"{categoryName}: {item.BookingCount}";
+                // Get data asynchronously
+                var bookings = await context.Bookings
+                    .Include(b => b.Vehicle.VehicleCategory)
+                    .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate)
+                    .ToListAsync();
 
-                point.Color = GetRandomColor(item.Category.VehicleCategoryID);
+                // Create series for vehicle categories
+                var seriesCategories = new Series("Количество бронирований");
+                seriesCategories.ChartType = SeriesChartType.Pie;
+                seriesCategories.IsValueShownAsLabel = true;
+
+                // Group by category and count bookings
+                var categoryBookings = bookings
+                    .Where(b => b.Vehicle != null && b.Vehicle.VehicleCategory != null)
+                    .GroupBy(b => b.Vehicle.VehicleCategory)
+                    .Select(g => new {
+                        Category = g.Key,
+                        BookingCount = g.Count(),
+                        Revenue = g.Sum(b => b.TotalCost)
+                    })
+                    .OrderByDescending(x => x.BookingCount)
+                    .ToList();
+
+                // Configure pie chart
+                ChartReport.ChartAreas[0].Area3DStyle.Enable3D = true;
+                ChartReport.ChartAreas[0].Area3DStyle.Inclination = 20;
+
+                foreach (var item in categoryBookings)
+                {
+                    string categoryName = item.Category.VehicleCategory1;
+                    int pointIndex = seriesCategories.Points.AddXY(categoryName, item.BookingCount);
+                    DataPoint point = seriesCategories.Points[pointIndex];
+                    point.Label = $"{categoryName}: {item.BookingCount}";
+
+                    point.Color = GetRandomColor(item.Category.VehicleCategoryID);
+                }
+
+                ChartReport.Series.Add(seriesCategories);
+
+                // Create DataGrid columns
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Категория",
+                    Binding = new System.Windows.Data.Binding("Category")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Бронирований",
+                    Binding = new System.Windows.Data.Binding("BookingCount")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Доход",
+                    Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Доля (%)",
+                    Binding = new System.Windows.Data.Binding("Percentage") { StringFormat = "{0:F1}%" }
+                });
+
+                // Calculate percentage
+                int totalBookings = categoryBookings.Sum(x => x.BookingCount);
+
+                // Add data to DataGrid
+                var gridData = categoryBookings.Select(item => new {
+                    Category = item.Category.VehicleCategory1,
+                    BookingCount = item.BookingCount,
+                    Revenue = item.Revenue,
+                    Percentage = (double)item.BookingCount / totalBookings * 100
+                }).ToList();
+
+                DataGridReportData.ItemsSource = gridData;
             }
-
-            ChartReport.Series.Add(seriesCategories);
-
-            // Create DataGrid columns
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Категория",
-                Binding = new System.Windows.Data.Binding("Category")
-            });
-            DataGridReportData.Columns.Add(new  System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Бронирований",
-                Binding = new System.Windows.Data.Binding("BookingCount")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Доход",
-                Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
-            });
-            DataGridReportData.Columns.Add(new  System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Доля (%)",
-                Binding = new System.Windows.Data.Binding("Percentage") { StringFormat = "{0:F1}%" }
-            });
-
-            // Calculate percentage
-            int totalBookings = categoryBookings.Sum(x => x.BookingCount);
-
-            // Add data to DataGrid
-            var gridData = categoryBookings.Select(item => new {
-                Category = item.Category.VehicleCategory1,
-                BookingCount = item.BookingCount,
-                Revenue = item.Revenue,
-                Percentage = (double)item.BookingCount / totalBookings * 100
-            }).ToList();
-
-            DataGridReportData.ItemsSource = gridData;
         }
 
-        private void GenerateVehiclePerformanceReport()
+        /// <summary>
+        /// Asynchronously generates the vehicle performance report
+        /// </summary>
+        private async Task GenerateVehiclePerformanceReportAsync()
         {
             // Set chart title
             ChartReport.Titles.Clear();
             ChartReport.Titles.Add(new Title("Эффективность транспорта"));
             ChartReport.Titles[0].Font = new System.Drawing.Font("Segoe UI", 12, System.Drawing.FontStyle.Bold);
 
-            // Get data with filter for selected category if applicable
-            var query = DBEntities.GetContext().Bookings
-                .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate);
-
-            if (_selectedCategory != null)
+            using (var context = new DBEntities())
             {
-                query = query.Where(b => b.Vehicle.VehicleCategoryID == _selectedCategory.VehicleCategoryID);
-            }
+                // Create a query with optional category filter
+                var query = context.Bookings
+                    .Include(b => b.Vehicle)
+                    .Where(b => b.CreatedAt >= _reportStartDate && b.CreatedAt <= _reportEndDate);
 
-            var bookings = query.ToList();
-
-            // Create a series for the chart
-            var seriesVehicles = new Series("Доход на автомобиль");
-            seriesVehicles.ChartType = SeriesChartType.Bar;
-            seriesVehicles.IsValueShownAsLabel = true;
-
-            // Group by vehicle and calculate metrics
-            var vehicleMetrics = bookings
-                .Where(b => b.Vehicle != null)
-                .GroupBy(b => b.Vehicle)
-                .Select(g => new {
-                    Vehicle = g.Key,
-                    BookingCount = g.Count(),
-                    TotalRevenue = g.Sum(b => b.TotalCost),
-                    TotalDays = g.Sum(b => (b.EndDate - b.StartDate).Days),
-                    AvgRating = g.Key.AvgRating
-                })
-                .OrderByDescending(x => x.TotalRevenue)
-                .Take(15) // Top 15 vehicles
-                .ToList();
-
-            foreach (var item in vehicleMetrics)
-            {
-                string vehicleName = $"{item.Vehicle.Make} {item.Vehicle.Model}";
-                seriesVehicles.Points.AddXY(vehicleName, item.TotalRevenue);
-                seriesVehicles.Points.Last().Label = item.TotalRevenue.ToString("C0");
-
-                // Color based on performance (higher revenue = greener)
-                decimal maxRevenue = vehicleMetrics.Max(v => v.TotalRevenue);
-                decimal minRevenue = vehicleMetrics.Min(v => v.TotalRevenue);
-                decimal range = maxRevenue - minRevenue;
-
-                if (range > 0)
+                if (_selectedCategory != null)
                 {
-                    // Calculate intensity (0.0 to 1.0)
-                    double intensity = (double)((item.TotalRevenue - minRevenue) / range);
-
-                    // Gradient from red to green
-                    byte r = (byte)(255 * (1 - intensity));
-                    byte g = (byte)(255 * intensity);
-                    byte b = 0;
-
-                    seriesVehicles.Points.Last().Color = System.Drawing.Color.FromArgb(r, g, b);
+                    query = query.Where(b => b.Vehicle.VehicleCategoryID == _selectedCategory.VehicleCategoryID);
                 }
+
+                var bookings = await query.ToListAsync();
+
+                // Create a series for the chart
+                var seriesVehicles = new Series("Доход на автомобиль");
+                seriesVehicles.ChartType = SeriesChartType.Bar;
+                seriesVehicles.IsValueShownAsLabel = true;
+
+                // Group by vehicle and calculate metrics
+                var vehicleMetrics = bookings
+                    .Where(b => b.Vehicle != null)
+                    .GroupBy(b => b.Vehicle)
+                    .Select(g => new {
+                        Vehicle = g.Key,
+                        BookingCount = g.Count(),
+                        TotalRevenue = g.Sum(b => b.TotalCost),
+                        TotalDays = g.Sum(b => (b.EndDate - b.StartDate).Days),
+                        AvgRating = g.Key.AvgRating
+                    })
+                    .OrderByDescending(x => x.TotalRevenue)
+                    .Take(15) // Top 15 vehicles
+                    .ToList();
+
+                foreach (var item in vehicleMetrics)
+                {
+                    string vehicleName = $"{item.Vehicle.Make} {item.Vehicle.Model}";
+                    seriesVehicles.Points.AddXY(vehicleName, item.TotalRevenue);
+                    seriesVehicles.Points.Last().Label = item.TotalRevenue.ToString("C0");
+
+                    // Color based on performance (higher revenue = greener)
+                    decimal maxRevenue = vehicleMetrics.Max(v => v.TotalRevenue);
+                    decimal minRevenue = vehicleMetrics.Min(v => v.TotalRevenue);
+                    decimal range = maxRevenue - minRevenue;
+
+                    if (range > 0)
+                    {
+                        // Calculate intensity (0.0 to 1.0)
+                        double intensity = (double)((item.TotalRevenue - minRevenue) / range);
+
+                        // Gradient from red to green
+                        byte r = (byte)(255 * (1 - intensity));
+                        byte g = (byte)(255 * intensity);
+                        byte b = 0;
+
+                        seriesVehicles.Points.Last().Color = System.Drawing.Color.FromArgb(r, g, b);
+                    }
+                }
+
+                ChartReport.Series.Add(seriesVehicles);
+
+                // Create DataGrid columns
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Автомобиль",
+                    Binding = new System.Windows.Data.Binding("VehicleName")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Бронирований",
+                    Binding = new System.Windows.Data.Binding("BookingCount")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Доход",
+                    Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Дней в аренде",
+                    Binding = new System.Windows.Data.Binding("TotalDays")
+                });
+                DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
+                {
+                    Header = "Рейтинг",
+                    Binding = new System.Windows.Data.Binding("Rating") { StringFormat = "{0:F1}" }
+                });
+
+                // Add data to DataGrid
+                var gridData = vehicleMetrics.Select(item => new {
+                    VehicleName = $"{item.Vehicle.Make} {item.Vehicle.Model} {item.Vehicle.Year}",
+                    BookingCount = item.BookingCount,
+                    Revenue = item.TotalRevenue,
+                    TotalDays = item.TotalDays,
+                    Rating = item.AvgRating
+                }).ToList();
+
+                DataGridReportData.ItemsSource = gridData;
             }
-
-            ChartReport.Series.Add(seriesVehicles);
-
-            // Create DataGrid columns
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Автомобиль",
-                Binding = new System.Windows.Data.Binding("VehicleName")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Бронирований",
-                Binding = new System.Windows.Data.Binding("BookingCount")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Доход",
-                Binding = new System.Windows.Data.Binding("Revenue") { StringFormat = "{0:C}" }
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Дней в аренде",
-                Binding = new System.Windows.Data.Binding("TotalDays")
-            });
-            DataGridReportData.Columns.Add(new System.Windows.Controls.DataGridTextColumn
-            {
-                Header = "Рейтинг",
-                Binding = new System.Windows.Data.Binding("Rating") { StringFormat = "{0:F1}" }
-            });
-
-            // Add data to DataGrid
-            var gridData = vehicleMetrics.Select(item => new {
-                VehicleName = $"{item.Vehicle.Make} {item.Vehicle.Model} {item.Vehicle.Year}",
-                BookingCount = item.BookingCount,
-                Revenue = item.TotalRevenue,
-                TotalDays = item.TotalDays,
-                Rating = item.AvgRating
-            }).ToList();
-
-            DataGridReportData.ItemsSource = gridData;
         }
 
         private System.Drawing.Color GetRandomColor(int seed)
@@ -805,307 +930,391 @@ namespace WpfApp.Pages
             return System.Drawing.Color.FromArgb(r, g, b);
         }
 
-        private void ButtonExportWord_Click(object sender, RoutedEventArgs e)
+        private async void ButtonExportWord_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
-
-                // Create Word application
-                var wordApp = new Word.Application();
-                wordApp.Visible = false;
-
-                // Add new document
-                Word.Document document = wordApp.Documents.Add();
-
-                // Add title
-                string reportTitle = "Отчет: ";
-                switch (_currentReportType)
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                try
                 {
-                    case ReportType.UserActivity:
-                        reportTitle += "Активность пользователей";
-                        break;
-                    case ReportType.Financial:
-                        reportTitle += "Финансовый отчет";
-                        break;
-                    case ReportType.CategoryPopularity:
-                        reportTitle += "Популярность категорий транспорта";
-                        break;
-                    case ReportType.VehiclePerformance:
-                        reportTitle += "Эффективность транспорта";
-                        break;
-                }
+                    Mouse.OverrideCursor = Cursors.Wait;
 
-                Word.Paragraph titleParagraph = document.Paragraphs.Add();
-                titleParagraph.Range.Text = reportTitle;
-                titleParagraph.Range.Font.Size = 16;
-                titleParagraph.Range.Font.Bold = 1;
-                titleParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                titleParagraph.Range.InsertParagraphAfter();
+                    // Create Word application
+                    var wordApp = new Word.Application();
+                    wordApp.Visible = false;
 
-                // Add date range
-                Word.Paragraph dateParagraph = document.Paragraphs.Add();
-                dateParagraph.Range.Text = $"Период: {_reportStartDate:dd.MM.yyyy} - {_reportEndDate:dd.MM.yyyy}";
-                dateParagraph.Range.Font.Size = 12;
-                dateParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                dateParagraph.Range.InsertParagraphAfter();
+                    // Add new document
+                    Word.Document document = wordApp.Documents.Add();
 
-                // Add chart image
-                ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
-                Word.Paragraph chartParagraph = document.Paragraphs.Add();
-                Word.Range chartRange = chartParagraph.Range;
-                chartRange.InlineShapes.AddPicture(System.IO.Path.GetTempPath() + "tempChart.png");
-                chartRange.InsertParagraphAfter();
-
-                // Add table with data
-                Word.Paragraph tableParagraph = document.Paragraphs.Add();
-                Word.Range tableRange = tableParagraph.Range;
-
-                // Get data from DataGrid
-                var dataItems = DataGridReportData.ItemsSource as System.Collections.IEnumerable;
-                if (dataItems != null)
-                {
-                    var itemsList = dataItems.Cast<object>().ToList();
-                    if (itemsList.Any())
+                    // Add title
+                    string reportTitle = "Отчет: ";
+                    switch (_currentReportType)
                     {
-                        var properties = itemsList[0].GetType().GetProperties();
+                        case ReportType.UserActivity:
+                            reportTitle += "Активность пользователей";
+                            break;
+                        case ReportType.Financial:
+                            reportTitle += "Финансовый отчет";
+                            break;
+                        case ReportType.CategoryPopularity:
+                            reportTitle += "Популярность категорий транспорта";
+                            break;
+                        case ReportType.VehiclePerformance:
+                            reportTitle += "Эффективность транспорта";
+                            break;
+                    }
 
-                        // Create table
-                        Word.Table dataTable = document.Tables.Add(tableRange, itemsList.Count + 1, properties.Length);
-                        dataTable.Borders.InsideLineStyle = dataTable.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+                    Word.Paragraph titleParagraph = document.Paragraphs.Add();
+                    titleParagraph.Range.Text = reportTitle;
+                    titleParagraph.Range.Font.Size = 16;
+                    titleParagraph.Range.Font.Bold = 1;
+                    titleParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    titleParagraph.Range.InsertParagraphAfter();
 
-                        // Add headers
-                        for (int col = 0; col < properties.Length; col++)
+                    // Add date range
+                    Word.Paragraph dateParagraph = document.Paragraphs.Add();
+                    dateParagraph.Range.Text = $"Период: {_reportStartDate:dd.MM.yyyy} - {_reportEndDate:dd.MM.yyyy}";
+                    dateParagraph.Range.Font.Size = 12;
+                    dateParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                    dateParagraph.Range.InsertParagraphAfter();
+
+                    // Add chart image
+                    await Task.Run(() => {
+                        ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
+                    });
+                    
+                    Word.Paragraph chartParagraph = document.Paragraphs.Add();
+                    Word.Range chartRange = chartParagraph.Range;
+                    chartRange.InlineShapes.AddPicture(System.IO.Path.GetTempPath() + "tempChart.png");
+                    chartRange.InsertParagraphAfter();
+
+                    // Add table with data
+                    Word.Paragraph tableParagraph = document.Paragraphs.Add();
+                    Word.Range tableRange = tableParagraph.Range;
+
+                    // Get data from DataGrid
+                    var dataItems = DataGridReportData.ItemsSource as System.Collections.IEnumerable;
+                    if (dataItems != null)
+                    {
+                        var itemsList = dataItems.Cast<object>().ToList();
+                        if (itemsList.Any())
                         {
-                            dataTable.Cell(1, col + 1).Range.Text = DataGridReportData.Columns[col].Header.ToString();
-                            dataTable.Cell(1, col + 1).Range.Font.Bold = 1;
-                        }
+                            var properties = itemsList[0].GetType().GetProperties();
 
-                        // Add data
-                        for (int row = 0; row < itemsList.Count; row++)
-                        {
+                            // Create table
+                            Word.Table dataTable = document.Tables.Add(tableRange, itemsList.Count + 1, properties.Length);
+                            dataTable.Borders.InsideLineStyle = dataTable.Borders.OutsideLineStyle = Word.WdLineStyle.wdLineStyleSingle;
+
+                            // Add headers
                             for (int col = 0; col < properties.Length; col++)
                             {
-                                var value = properties[col].GetValue(itemsList[row]);
-                                dataTable.Cell(row + 2, col + 1).Range.Text = value?.ToString() ?? "";
+                                dataTable.Cell(1, col + 1).Range.Text = DataGridReportData.Columns[col].Header.ToString();
+                                dataTable.Cell(1, col + 1).Range.Font.Bold = 1;
                             }
+
+                            // Add data
+                            for (int row = 0; row < itemsList.Count; row++)
+                            {
+                                for (int col = 0; col < properties.Length; col++)
+                                {
+                                    var value = properties[col].GetValue(itemsList[row]);
+                                    dataTable.Cell(row + 2, col + 1).Range.Text = value?.ToString() ?? "";
+                                }
+                            }
+
+                            // Format table
+                            dataTable.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
+                            dataTable.Range.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
                         }
-
-                        // Format table
-                        dataTable.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphCenter;
-                        dataTable.Range.Cells.VerticalAlignment = Word.WdCellVerticalAlignment.wdCellAlignVerticalCenter;
                     }
+
+                    // Add summary paragraph
+                    Word.Paragraph summaryParagraph = document.Paragraphs.Add();
+                    summaryParagraph.Range.Text = "Отчет составлен: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+                    summaryParagraph.Range.Font.Italic = 1;
+                    summaryParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
+
+                    // Save document
+                    var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                    {
+                        Filter = "Word Document (*.docx)|*.docx",
+                        DefaultExt = ".docx",
+                        FileName = $"Отчет_{DateTime.Now:yyyyMMdd}"
+                    };
+
+                    bool? result = saveFileDialog.ShowDialog();
+                    if (result == true)
+                    {
+                        document.SaveAs(saveFileDialog.FileName);
+                        document.Close();
+                        wordApp.Quit();
+
+                        MessageBox.Show("Отчет успешно экспортирован в Word", "Экспорт завершен", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        document.Close(false);
+                        wordApp.Quit();
+                    }
+
+                    // Delete temporary files
+                    await Task.Run(() => {
+                        try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
+                    });
+                    
+                    return true;
                 }
-
-                // Add summary paragraph
-                Word.Paragraph summaryParagraph = document.Paragraphs.Add();
-                summaryParagraph.Range.Text = "Отчет составлен: " + DateTime.Now.ToString("dd.MM.yyyy HH:mm");
-                summaryParagraph.Range.Font.Italic = 1;
-                summaryParagraph.Range.ParagraphFormat.Alignment = Word.WdParagraphAlignment.wdAlignParagraphRight;
-
-                // Save document
-                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                catch (Exception ex)
                 {
-                    Filter = "Word Document (*.docx)|*.docx",
-                    DefaultExt = ".docx",
-                    FileName = $"Отчет_{DateTime.Now:yyyyMMdd}"
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    document.SaveAs(saveFileDialog.FileName);
-                    document.Close();
-                    wordApp.Quit();
-
-                    MessageBox.Show("Отчет успешно экспортирован в Word", "Экспорт завершен", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Ошибка при экспорте в Word: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
-                else
+                finally
                 {
-                    document.Close(false);
-                    wordApp.Quit();
+                    Mouse.OverrideCursor = null;
                 }
-
-                // Delete temporary files
-                try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при экспорте в Word: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                Mouse.OverrideCursor = null;
-            }
+            }, LoadingProgressBar);
         }
 
-        private void ButtonExportExcel_Click(object sender, RoutedEventArgs e)
+        private async void ButtonExportExcel_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                Mouse.OverrideCursor = Cursors.Wait;
-
-                // Create Excel application
-                var excelApp = new Excel.Application();
-                excelApp.Visible = false;
-
-                // Add new workbook
-                Excel.Workbook workbook = excelApp.Workbooks.Add();
-                Excel.Worksheet worksheet = workbook.Sheets[1];
-
-                // Set title
-                string reportTitle = "Отчет: ";
-                switch (_currentReportType)
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                try
                 {
-                    case ReportType.UserActivity:
-                        reportTitle += "Активность пользователей";
-                        break;
-                    case ReportType.Financial:
-                        reportTitle += "Финансовый отчет";
-                        break;
-                    case ReportType.CategoryPopularity:
-                        reportTitle += "Популярность категорий транспорта";
-                        break;
-                    case ReportType.VehiclePerformance:
-                        reportTitle += "Эффективность транспорта";
-                        break;
-                }
+                    Mouse.OverrideCursor = Cursors.Wait;
 
-                worksheet.Cells[1, 1] = reportTitle;
-                Excel.Range titleRange = worksheet.Range["A1:E1"];
-                titleRange.Merge();
-                titleRange.Font.Bold = true;
-                titleRange.Font.Size = 14;
-                titleRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    // Create Excel application
+                    var excelApp = new Excel.Application();
+                    excelApp.Visible = false;
 
-                // Add date range
-                worksheet.Cells[2, 1] = $"Период: {_reportStartDate:dd.MM.yyyy} - {_reportEndDate:dd.MM.yyyy}";
-                Excel.Range dateRange = worksheet.Range["A2:E2"];
-                dateRange.Merge();
-                dateRange.Font.Italic = true;
-                dateRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    // Add new workbook
+                    Excel.Workbook workbook = excelApp.Workbooks.Add();
+                    Excel.Worksheet worksheet = workbook.Sheets[1];
 
-                // Insert chart image
-                ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
-                Excel.Range chartRange = worksheet.Range["A4:E20"];
-                worksheet.Shapes.AddPicture(
-                    System.IO.Path.GetTempPath() + "tempChart.png",
-                    Microsoft.Office.Core.MsoTriState.msoFalse,
-                    Microsoft.Office.Core.MsoTriState.msoTrue,
-                    chartRange.Left, chartRange.Top, chartRange.Width, chartRange.Height);
-
-                // Get data from DataGrid
-                var dataItems = DataGridReportData.ItemsSource as System.Collections.IEnumerable;
-                if (dataItems != null)
-                {
-                    var itemsList = dataItems.Cast<object>().ToList();
-                    if (itemsList.Any())
+                    // Set title
+                    string reportTitle = "Отчет: ";
+                    switch (_currentReportType)
                     {
-                        var properties = itemsList[0].GetType().GetProperties();
+                        case ReportType.UserActivity:
+                            reportTitle += "Активность пользователей";
+                            break;
+                        case ReportType.Financial:
+                            reportTitle += "Финансовый отчет";
+                            break;
+                        case ReportType.CategoryPopularity:
+                            reportTitle += "Популярность категорий транспорта";
+                            break;
+                        case ReportType.VehiclePerformance:
+                            reportTitle += "Эффективность транспорта";
+                            break;
+                    }
 
-                        // Start at row 22 (below chart)
-                        int currentRow = 22;
+                    worksheet.Cells[1, 1] = reportTitle;
+                    Excel.Range titleRange = worksheet.Range["A1:E1"];
+                    titleRange.Merge();
+                    titleRange.Font.Bold = true;
+                    titleRange.Font.Size = 14;
+                    titleRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
-                        // Add headers
-                        for (int col = 0; col < properties.Length; col++)
+                    // Add date range
+                    worksheet.Cells[2, 1] = $"Период: {_reportStartDate:dd.MM.yyyy} - {_reportEndDate:dd.MM.yyyy}";
+                    Excel.Range dateRange = worksheet.Range["A2:E2"];
+                    dateRange.Merge();
+                    dateRange.Font.Italic = true;
+                    dateRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                    // Insert chart image
+                    await Task.Run(() => {
+                        ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
+                    });
+                    
+                    Excel.Range chartRange = worksheet.Range["A4:E20"];
+                    worksheet.Shapes.AddPicture(
+                        System.IO.Path.GetTempPath() + "tempChart.png",
+                        Microsoft.Office.Core.MsoTriState.msoFalse,
+                        Microsoft.Office.Core.MsoTriState.msoTrue,
+                        chartRange.Left, chartRange.Top, chartRange.Width, chartRange.Height);
+
+                    // Get data from DataGrid
+                    var dataItems = DataGridReportData.ItemsSource as System.Collections.IEnumerable;
+                    if (dataItems != null)
+                    {
+                        var itemsList = dataItems.Cast<object>().ToList();
+                        if (itemsList.Any())
                         {
-                            worksheet.Cells[currentRow, col + 1] = DataGridReportData.Columns[col].Header.ToString();
-                            worksheet.Cells[currentRow, col + 1].Font.Bold = true;
-                        }
+                            var properties = itemsList[0].GetType().GetProperties();
 
-                        // Format header row
-                        Excel.Range headerRange = worksheet.Range[worksheet.Cells[currentRow, 1], worksheet.Cells[currentRow, properties.Length]];
-                        headerRange.Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.LightGray);
-                        headerRange.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
-                        headerRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                            // Start at row 22 (below chart)
+                            int currentRow = 22;
 
-                        // Add data
-                        currentRow++;
-                        for (int row = 0; row < itemsList.Count; row++)
-                        {
+                            // Add headers
                             for (int col = 0; col < properties.Length; col++)
                             {
-                                var value = properties[col].GetValue(itemsList[row]);
-                                worksheet.Cells[currentRow + row, col + 1] = value;
+                                worksheet.Cells[currentRow, col + 1] = DataGridReportData.Columns[col].Header.ToString();
+                                worksheet.Cells[currentRow, col + 1].Font.Bold = true;
+                            }
 
-                                // Set currency format for financial values
-                                try
+                            // Format header row
+                            Excel.Range headerRange = worksheet.Range[worksheet.Cells[currentRow, 1], worksheet.Cells[currentRow, properties.Length]];
+                            headerRange.Interior.Color = System.Drawing.ColorTranslator.ToOle(System.Drawing.Color.LightGray);
+                            headerRange.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+                            headerRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                            // Add data
+                            currentRow++;
+                            for (int row = 0; row < itemsList.Count; row++)
+                            {
+                                for (int col = 0; col < properties.Length; col++)
                                 {
-                                    if (value != null &&
-                                        ((value is decimal || value is double) &&
-                                        (properties[col].Name.Contains("Revenue") || properties[col].Name.Contains("Cost"))))
+                                    var value = properties[col].GetValue(itemsList[row]);
+                                    worksheet.Cells[currentRow + row, col + 1] = value;
+
+                                    // Set currency format for financial values
+                                    try
                                     {
-                                        Excel.Range cell = worksheet.Cells[currentRow + row, col + 1];
-                                        cell.NumberFormat = "_-* #,##0.00₽_-;-* #,##0.00₽_-;_-* \"-\"??₽_-;_-@_-";
+                                        if (value != null &&
+                                            ((value is decimal || value is double) &&
+                                            (properties[col].Name.Contains("Revenue") || properties[col].Name.Contains("Cost"))))
+                                        {
+                                            Excel.Range cell = worksheet.Cells[currentRow + row, col + 1];
+                                            cell.NumberFormat = "_-* #,##0.00₽_-;-* #,##0.00₽_-;_-* \"-\"??₽_-;_-@_-";
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        // Silently continue if number format can't be set
                                     }
                                 }
-                                catch
-                                {
-                                    // Silently continue if number format can't be set
-                                }
                             }
+
+                            // Format data range
+                            Excel.Range dataRange = worksheet.Range[worksheet.Cells[currentRow, 1], worksheet.Cells[currentRow + itemsList.Count - 1, properties.Length]];
+                            dataRange.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
+                            dataRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+
+                            // Autofit columns
+                            worksheet.UsedRange.Columns.AutoFit();
                         }
-
-                        // Format data range
-                        Excel.Range dataRange = worksheet.Range[worksheet.Cells[currentRow, 1], worksheet.Cells[currentRow + itemsList.Count - 1, properties.Length]];
-                        dataRange.Borders.LineStyle = Excel.XlLineStyle.xlContinuous;
-                        dataRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-
-                        // Autofit columns
-                        worksheet.UsedRange.Columns.AutoFit();
                     }
+
+                    // Save workbook
+                    var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                    {
+                        Filter = "Excel Workbook (*.xlsx)|*.xlsx",
+                        DefaultExt = ".xlsx",
+                        FileName = $"Отчет_{DateTime.Now:yyyyMMdd}"
+                    };
+
+                    bool? result = saveFileDialog.ShowDialog();
+                    if (result == true)
+                    {
+                        workbook.SaveAs(saveFileDialog.FileName);
+                        workbook.Close();
+                        excelApp.Quit();
+
+                        MessageBox.Show("Отчет успешно экспортирован в Excel", "Экспорт завершен", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    else
+                    {
+                        workbook.Close(false);
+                        excelApp.Quit();
+                    }
+
+                    // Delete temporary files
+                    await Task.Run(() => {
+                        try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
+                    });
+                    
+                    return true;
                 }
-
-                // Save workbook
-                var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+                catch (Exception ex)
                 {
-                    Filter = "Excel Workbook (*.xlsx)|*.xlsx",
-                    DefaultExt = ".xlsx",
-                    FileName = $"Отчет_{DateTime.Now:yyyyMMdd}"
-                };
-
-                if (saveFileDialog.ShowDialog() == true)
-                {
-                    workbook.SaveAs(saveFileDialog.FileName);
-                    workbook.Close();
-                    excelApp.Quit();
-
-                    MessageBox.Show("Отчет успешно экспортирован в Excel", "Экспорт завершен", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show($"Ошибка при экспорте в Excel: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
                 }
-                else
+                finally
                 {
-                    workbook.Close(false);
-                    excelApp.Quit();
+                    Mouse.OverrideCursor = null;
                 }
-
-                // Delete temporary files
-                try { System.IO.File.Delete(System.IO.Path.GetTempPath() + "tempChart.png"); } catch { }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при экспорте в Excel: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            finally
-            {
-                Mouse.OverrideCursor = null;
-            }
+            }, LoadingProgressBar);
         }
 
         #endregion
 
-
         #region Admin
 
-        private void SetupAdminConfirmations()
+        /// <summary>
+        /// Sets up admin confirmations asynchronously
+        /// </summary>
+        private async Task SetupAdminConfirmationsAsync(DBEntities context)
         {
-            PaymentMethods = DBEntities.GetContext().PaymentMethods.ToList();
+            // Load payment methods
+            PaymentMethods = await context.PaymentMethods.ToListAsync();
             DataContext = this;
 
-            LoadPendingPayments();
-            LoadPendingCancellations();
-            LoadPendingCompletions();
+            // Load various confirmation data
+            await LoadPendingPaymentsAsync(context);
+            await LoadPendingCancellationsAsync(context);
+            await LoadPendingCompletionsAsync(context);
         }
 
-        public List<PaymentMethod> PaymentMethods { get; set; }
+        /// <summary>
+        /// Loads pending payments asynchronously
+        /// </summary>
+        private async Task LoadPendingPaymentsAsync(DBEntities context)
+        {
+            var pendingBookings = await context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Vehicle)
+                .Where(b => b.StatusID == 1) // Pending status
+                .ToListAsync();
+
+            var viewModels = pendingBookings.Select(booking => new ConfirmationViewModel
+            {
+                Booking = booking,
+                ActualCostInput = booking.TotalCost
+            }).ToList();
+
+            DataGridPendingPayments.ItemsSource = viewModels;
+        }
+
+        /// <summary>
+        /// Loads pending cancellations asynchronously
+        /// </summary>
+        private async Task LoadPendingCancellationsAsync(DBEntities context)
+        {
+            var pendingCancellations = await context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Vehicle)
+                .Where(b => b.StatusID == 5) // Pending Cancellation
+                .ToListAsync();
+
+            var viewModels = pendingCancellations.Select(booking => new ConfirmationViewModel
+            {
+                Booking = booking
+            }).ToList();
+
+            DataGridPendingCancellations.ItemsSource = viewModels;
+        }
+
+        /// <summary>
+        /// Loads pending completions asynchronously
+        /// </summary>
+        private async Task LoadPendingCompletionsAsync(DBEntities context)
+        {
+            var pendingCompletions = await context.Bookings
+                .Include(b => b.User)
+                .Include(b => b.Vehicle)
+                .Where(b => b.StatusID == 6) // Pending Completion
+                .ToListAsync();
+
+            var viewModels = pendingCompletions.Select(booking => new ConfirmationViewModel
+            {
+                Booking = booking,
+                ReturnDateInput = DateTime.Today,
+                ActualCostInput = booking.TotalCost
+            }).ToList();
+
+            DataGridPendingCompletions.ItemsSource = viewModels;
+        }
 
         private void ToggleButtonConfirmations_Checked(object sender, RoutedEventArgs e)
         {
@@ -1121,68 +1330,22 @@ namespace WpfApp.Pages
             if (radioButton == ToggleButtonPendingPayments && GridPendingPayments != null)
             {
                 GridPendingPayments.Visibility = Visibility.Visible;
-                LoadPendingPayments();
+                LoadPendingPaymentsAsync(DBEntities.GetContext());
             }
             else if (radioButton == ToggleButtonPendingCancellations && GridPendingCancellations != null)
             {
                 GridPendingCancellations.Visibility = Visibility.Visible;
-                LoadPendingCancellations();
+                LoadPendingCancellationsAsync(DBEntities.GetContext());
             }
             else if (radioButton == ToggleButtonPendingCompletions && GridPendingCompletions != null)
             {
                 GridPendingCompletions.Visibility = Visibility.Visible;
-                LoadPendingCompletions();
+                LoadPendingCompletionsAsync(DBEntities.GetContext());
             }
         }
 
-
-        private void LoadPendingPayments()
-        {
-            var pendingBookings = DBEntities.GetContext().Bookings
-                .Where(b => b.StatusID == 1) // Pending status
-                .ToList();
-
-            var viewModels = pendingBookings.Select(booking => new ConfirmationViewModel
-            {
-                Booking = booking,
-                ActualCostInput = booking.TotalCost
-            }).ToList();
-
-            DataGridPendingPayments.ItemsSource = viewModels;
-        }
-
-        private void LoadPendingCancellations()
-        {
-            var pendingCancellations = DBEntities.GetContext().Bookings
-                .Where(b => b.StatusID == 5) // Pending Cancellation
-                .ToList();
-
-            var viewModels = pendingCancellations.Select(booking => new ConfirmationViewModel
-            {
-                Booking = booking
-            }).ToList();
-
-            DataGridPendingCancellations.ItemsSource = viewModels;
-        }
-
-        private void LoadPendingCompletions()
-        {
-            var pendingCompletions = DBEntities.GetContext().Bookings
-                .Where(b => b.StatusID == 6) // Pending Completion
-                .ToList();
-
-            var viewModels = pendingCompletions.Select(booking => new ConfirmationViewModel
-            {
-                Booking = booking,
-                ReturnDateInput = DateTime.Today,
-                ActualCostInput = booking.TotalCost
-            }).ToList();
-
-            DataGridPendingCompletions.ItemsSource = viewModels;
-        }
-
         // Payment confirmation methods
-        private void ButtonConfirmPayment_Click(object sender, RoutedEventArgs e)
+        private async void ButtonConfirmPayment_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var viewModel = button.DataContext as ConfirmationViewModel;
@@ -1193,30 +1356,36 @@ namespace WpfApp.Pages
                 return;
             }
 
-            try
-            {
-                var booking = viewModel.Booking;
-                booking.StatusID = 2; // Confirmed
-
-                // Update payment
-                var payment = booking.Payments.FirstOrDefault();
-                if (payment != null)
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
                 {
-                    payment.PaymentStatusID = 2; // Completed
-                    payment.PaymentMethodID = viewModel.SelectedPaymentMethod.PaymentMethodID;
-                }
+                    var booking = await context.Bookings
+                        .Include(b => b.Payments)
+                        .FirstOrDefaultAsync(b => b.BookingID == viewModel.Booking.BookingID);
+                    
+                    if (booking != null)
+                    {
+                        booking.StatusID = 2; // Confirmed
 
-                DBEntities.GetContext().SaveChanges();
-                LoadPendingPayments();
-                MessageBox.Show("Оплата подтверждена, бронирование активировано.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при подтверждении оплаты: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                        // Update payment
+                        var payment = booking.Payments.FirstOrDefault();
+                        if (payment != null)
+                        {
+                            payment.PaymentStatusID = 2; // Completed
+                            payment.PaymentMethodID = viewModel.SelectedPaymentMethod.PaymentMethodID;
+                        }
+
+                        await context.SaveChangesWithRetryAsync();
+                        await LoadPendingPaymentsAsync(context);
+                    }
+                }
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Оплата подтверждена, бронирование активировано.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void ButtonCancelPayment_Click(object sender, RoutedEventArgs e)
+        private async void ButtonCancelPayment_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var viewModel = button.DataContext as ConfirmationViewModel;
@@ -1224,30 +1393,36 @@ namespace WpfApp.Pages
             if (viewModel?.Booking == null)
                 return;
 
-            try
-            {
-                var booking = viewModel.Booking;
-                booking.StatusID = 4; // Cancelled
-
-                // Update payment
-                var payment = booking.Payments.FirstOrDefault();
-                if (payment != null)
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
                 {
-                    payment.PaymentStatusID = 3; // Cancelled
-                }
+                    var booking = await context.Bookings
+                        .Include(b => b.Payments)
+                        .FirstOrDefaultAsync(b => b.BookingID == viewModel.Booking.BookingID);
+                    
+                    if (booking != null)
+                    {
+                        booking.StatusID = 4; // Cancelled
 
-                DBEntities.GetContext().SaveChanges();
-                LoadPendingPayments();
-                MessageBox.Show("Оплата отменена, бронирование отклонено.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при отмене оплаты: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                        // Update payment
+                        var payment = booking.Payments.FirstOrDefault();
+                        if (payment != null)
+                        {
+                            payment.PaymentStatusID = 3; // Cancelled
+                        }
+
+                        await context.SaveChangesWithRetryAsync();
+                        await LoadPendingPaymentsAsync(context);
+                    }
+                }
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Оплата отменена, бронирование отклонено.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // Cancellation confirmation methods
-        private void ButtonConfirmCancellation_Click(object sender, RoutedEventArgs e)
+        private async void ButtonConfirmCancellation_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var viewModel = button.DataContext as ConfirmationViewModel;
@@ -1255,22 +1430,24 @@ namespace WpfApp.Pages
             if (viewModel?.Booking == null)
                 return;
 
-            try
-            {
-                var booking = viewModel.Booking;
-                booking.StatusID = 4; // Cancelled
-
-                DBEntities.GetContext().SaveChanges();
-                LoadPendingCancellations();
-                MessageBox.Show("Отмена подтверждена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при подтверждении отмены: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
+                {
+                    var booking = await context.Bookings.FindAsync(viewModel.Booking.BookingID);
+                    if (booking != null)
+                    {
+                        booking.StatusID = 4; // Cancelled
+                        await context.SaveChangesWithRetryAsync();
+                        await LoadPendingCancellationsAsync(context);
+                    }
+                }
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Отмена подтверждена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        private void ButtonDenyCancellation_Click(object sender, RoutedEventArgs e)
+        private async void ButtonDenyCancellation_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var viewModel = button.DataContext as ConfirmationViewModel;
@@ -1278,23 +1455,25 @@ namespace WpfApp.Pages
             if (viewModel?.Booking == null)
                 return;
 
-            try
-            {
-                var booking = viewModel.Booking;
-                booking.StatusID = 2; // Confirmed
-
-                DBEntities.GetContext().SaveChanges();
-                LoadPendingCancellations();
-                MessageBox.Show("Отмена отклонена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при отклонении отмены: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
+                {
+                    var booking = await context.Bookings.FindAsync(viewModel.Booking.BookingID);
+                    if (booking != null)
+                    {
+                        booking.StatusID = 2; // Confirmed
+                        await context.SaveChangesWithRetryAsync();
+                        await LoadPendingCancellationsAsync(context);
+                    }
+                }
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Отмена отклонена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // Completion confirmation method
-        private void ButtonConfirmCompletion_Click(object sender, RoutedEventArgs e)
+        private async void ButtonConfirmCompletion_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
             var viewModel = button.DataContext as ConfirmationViewModel;
@@ -1305,21 +1484,23 @@ namespace WpfApp.Pages
                 return;
             }
 
-            try
-            {
-                var booking = viewModel.Booking;
-                booking.StatusID = 3; // Completed
-                booking.ReturnDate = viewModel.ReturnDateInput.Value;
-                booking.ActualCost = viewModel.ActualCostInput.Value;
-
-                DBEntities.GetContext().SaveChanges();
-                LoadPendingCompletions();
-                MessageBox.Show("Завершение подтверждено.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при подтверждении завершения: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            await AsyncOperationHelper.RunWithProgressAsync(async () => {
+                using (var context = new DBEntities())
+                {
+                    var booking = await context.Bookings.FindAsync(viewModel.Booking.BookingID);
+                    if (booking != null)
+                    {
+                        booking.StatusID = 3; // Completed
+                        booking.ReturnDate = viewModel.ReturnDateInput.Value;
+                        booking.ActualCost = viewModel.ActualCostInput.Value;
+                        await context.SaveChangesWithRetryAsync();
+                        await LoadPendingCompletionsAsync(context);
+                    }
+                }
+                return true;
+            }, LoadingProgressBar, button);
+            
+            MessageBox.Show("Завершение подтверждено.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         #endregion
     }

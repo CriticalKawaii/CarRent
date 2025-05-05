@@ -7,6 +7,7 @@
       mc:Ignorable="d"
       xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
       xmlns:charts="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
+      xmlns:controls="clr-namespace:WpfApp.Controls"
       d:DesignHeight="700"
       d:DesignWidth="1150"
       Title="AccountPage"
@@ -42,7 +43,8 @@
             </StackPanel>
         </DockPanel>
         <TabControl Grid.Row="1">
-            <TabItem x:Name="TabRents" Header="Мои аренды">
+            <TabItem x:Name="TabRents"
+                     Header="Мои аренды">
                 <Grid>
                     <DataGrid x:Name="DataGridUserBookings"
                               AutoGenerateColumns="False"
@@ -608,5 +610,14 @@
                        NavigationUIVisibility="Hidden" />
             </TabItem>
         </TabControl>
+
+        <ProgressBar x:Name="LoadingProgressBar"
+                     IsIndeterminate="True"
+                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                     Value="0"
+                     Grid.RowSpan="2"
+                     Visibility="Collapsed"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center" />
     </Grid>
 </Page>

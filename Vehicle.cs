@@ -12,10 +12,13 @@ namespace WpfApp
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Data.Entity;
     using System.IO;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+    using WpfApp.Classes;
 
     public partial class Vehicle : INotifyPropertyChanged
     {
@@ -31,21 +34,6 @@ namespace WpfApp
         public string Make { get; set; }
         public string Model { get; set; }
 
-        // VehicleImage is now deprecated but kept for backward compatibility
-        // This property will be gradually phased out as we move to VehicleImages collection
-        private byte[] _vehicleImage;
-        public byte[] VehicleImage
-        {
-            get => _vehicleImage;
-            set
-            {
-                _vehicleImage = value;
-                _vehicleImageSource = null;
-                OnPropertyChanged(nameof(VehicleImage));
-                OnPropertyChanged(nameof(VehicleImageSource));
-            }
-        }
-
         public int Year { get; set; }
         public string LicensePlate { get; set; }
         public Nullable<int> VehicleCategoryID { get; set; }
@@ -59,13 +47,20 @@ namespace WpfApp
             get { return $"{Make} {Model} {Year}"; }
         }
 
+        private Task<ImageSource> _imageLoadingTask;
+
         private ImageSource _vehicleImageSource;
         public ImageSource VehicleImageSource
         {
             get
             {
+                // If we already have a loaded image, return it
+                if (_vehicleImageSource != null)
+                    return _vehicleImageSource;
+
+                // Otherwise attempt to load it synchronously (not recommended for new code)
                 // First try to get image from VehicleImages collection
-                if (_vehicleImageSource == null && VehicleImages != null && VehicleImages.Count > 0)
+                if (VehicleImages != null && VehicleImages.Count > 0)
                 {
                     var firstImage = VehicleImages.FirstOrDefault();
                     if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
@@ -81,36 +76,77 @@ namespace WpfApp
                         }
                     }
                 }
-                // Fall back to legacy VehicleImage if needed
-                else if (_vehicleImageSource == null && VehicleImage != null && VehicleImage.Length > 0)
-                {
-                    try
-                    {
-                        using (var stream = new System.IO.MemoryStream(VehicleImage))
-                        {
-                            var bitmapImage = new BitmapImage();
-                            bitmapImage.BeginInit();
-                            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                            bitmapImage.StreamSource = stream;
-                            bitmapImage.EndInit();
-                            bitmapImage.Freeze();
-                            _vehicleImageSource = bitmapImage;
-                        }
-                    }
-                    catch
-                    {
-                        // If there's an error with the binary data, use placeholder
-                        _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
-                    }
-                }
-                // Use placeholder if no images available
-                else if (_vehicleImageSource == null)
-                {
-                    _vehicleImageSource = new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
-                }
+                
 
                 return _vehicleImageSource;
             }
+        }
+
+        public async Task<ImageSource> GetImageSourceAsync()
+        {
+            // Return existing task if we're already loading the image
+            if (_imageLoadingTask != null)
+            {
+                return await _imageLoadingTask;
+            }
+
+            // Create a new task for loading the image
+            _imageLoadingTask = LoadImageSourceAsync();
+            return await _imageLoadingTask;
+        }
+
+        private async Task<ImageSource> LoadImageSourceAsync()
+        {
+            try
+            {
+                // First try to get image from VehicleImages collection
+                if (VehicleImages != null && VehicleImages.Count > 0)
+                {
+                    var firstImage = VehicleImages.FirstOrDefault();
+                    if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
+                    {
+                        // Use the ImageCache for efficient image loading
+                        return await ImageCache.GetImageAsync(firstImage.ImagePath);
+                    }
+                }
+
+
+                // Use placeholder if no images available
+                return GetPlaceholderImage();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in LoadImageSourceAsync: {ex.Message}");
+                return GetPlaceholderImage();
+            }
+        }
+
+        private static BitmapImage GetPlaceholderImage()
+        {
+            return new BitmapImage(new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
+        }
+
+        /// <summary>
+        /// Gets all images for this vehicle asynchronously
+        /// </summary>
+        public async Task<string[]> GetAllImageUrlsAsync()
+        {
+            if (VehicleImages == null || VehicleImages.Count == 0)
+            {
+                // Try to load images from database if not already loaded
+                using (var context = new DBEntities())
+                {
+                    var images = await context.VehicleImages
+                        .Where(vi => vi.VehicleID == VehicleID)
+                        .Select(vi => vi.ImagePath)
+                        .ToArrayAsync();
+
+                    return images;
+                }
+            }
+
+            // Use already loaded images
+            return VehicleImages.Select(vi => vi.ImagePath).ToArray();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -118,6 +154,7 @@ namespace WpfApp
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Booking> Bookings { get; set; }

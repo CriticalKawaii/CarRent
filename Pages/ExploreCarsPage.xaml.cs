@@ -7,6 +7,8 @@ using WpfApp.Classes;
 using System.Collections.Generic;
 using WpfApp.Controls;
 using MaterialDesignThemes.Wpf;
+using System.Threading.Tasks;
+using System.Data.Entity;
 
 namespace WpfApp
 {
@@ -35,23 +37,15 @@ namespace WpfApp
             InitializeComponent();
 
 
-            Vehicles = new ObservableCollection<Vehicle>(DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true));
+            Vehicles = new ObservableCollection<Vehicle>();
             ListViewExploreCars.ItemsSource = Vehicles;
 
-            ComboBoxFilter.ItemsSource = DBEntities.GetContext().VehicleCategories.ToList();
-
             InitializeSortOptions();
-
             ComboBoxSort.ItemsSource = sortOptions;
-
-            ListViewExploreCars.SelectedIndex = 0;
-
-            ComboBoxInsurance.ItemsSource = DBEntities.GetContext().Insurances.ToList();
 
             MainWindow = Application.Current.MainWindow as MainWindow;
 
             Loaded += ExploreCarsPage_Loaded;
-
             imageVehicle.MouseLeftButtonDown += ImageVehicle_MouseLeftButtonDown;
 
             // Initialize dialog host
@@ -66,63 +60,161 @@ namespace WpfApp
             (this.Content as Grid).Children.Add(_dialogHost);
         }
 
-        private void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
+        private async void ExploreCarsPage_Loaded(object sender, RoutedEventArgs e)
         {
+            LoadingProgressBar.Visibility = Visibility.Visible;
+            
+            await LoadVehicleCategoriesAsync();
+
             DatePickerStart.DisplayDateStart = DateTime.Today.AddDays(1);
             DatePickerStart.DisplayDateEnd = DateTime.Today.AddMonths(1);
-
-            foreach (var booking in DBEntities.GetContext().Bookings
-                .Where(x => x.BookingStatus.BookingStatus1 == "Confirmed")
-                .ToList())
-            {
-                if (booking.StartDate <= booking.EndDate)
-                {
-                    DatePickerStart.BlackoutDates.Add(new CalendarDateRange(booking.StartDate, booking.EndDate));
-                    DatePickerEnd.BlackoutDates.Add(new CalendarDateRange(booking.StartDate, booking.EndDate));
-                }
-            }
+            
+            await LoadVehiclesAsync();
+            await LoadInsurancesAsync();
+            await LoadBlackoutDatesAsync();
 
             LoadingProgressBar.Visibility = Visibility.Collapsed;
         }
 
-        private void ImageVehicle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async Task LoadVehicleCategoriesAsync()
+        {
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    var categories = await context.VehicleCategories.ToListAsync();
+                    ComboBoxFilter.ItemsSource = categories;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading vehicle categories: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task LoadInsurancesAsync()
+        {
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    var insurances = await context.Insurances.ToListAsync();
+                    ComboBoxInsurance.ItemsSource = insurances;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading insurances: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task LoadBlackoutDatesAsync()
+        {
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    var confirmedBookings = await context.Bookings
+                        .Where(x => x.BookingStatus.BookingStatus1 == "Confirmed")
+                        .ToListAsync();
+
+                    foreach (var booking in confirmedBookings)
+                    {
+                        if (booking.StartDate <= booking.EndDate)
+                        {
+                            DatePickerStart.BlackoutDates.Add(new CalendarDateRange(booking.StartDate, booking.EndDate));
+                            DatePickerEnd.BlackoutDates.Add(new CalendarDateRange(booking.StartDate, booking.EndDate));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading booking dates: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async Task LoadVehiclesAsync()
+        {
+            LoadingProgressBar.Visibility = Visibility.Visible;
+
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    var vehicles = await context.Vehicles
+                        .AsNoTracking()
+                        .Include(v => v.VehicleCategory)
+                        .Include(v => v.VehicleImages)
+                        .Where(x => x.Available == true)
+                        .ToListAsync();
+
+                    // Apply any active filters
+                    ApplyFiltersAndSort(vehicles);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading vehicles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
+        private async void ImageVehicle_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             Vehicle selectedVehicle = DataContext as Vehicle;
             if (selectedVehicle != null && selectedVehicle.VehicleID > 0)
             {
-                ShowGalleryDialog(selectedVehicle);
+                await ShowGalleryDialogAsync(selectedVehicle);
             }
         }
 
-        private void ShowGalleryDialog(Vehicle vehicle)
+        private async Task ShowGalleryDialogAsync(Vehicle vehicle)
         {
-            // Get all images for this vehicle
-            var vehicleImages = DBEntities.GetContext().VehicleImages
-                .Where(vi => vi.VehicleID == vehicle.VehicleID)
-                .ToList();
+            // Show loading indicator
+            LoadingProgressBar.Visibility = Visibility.Visible;
 
-            if (vehicleImages == null || vehicleImages.Count == 0)
+            try
             {
-                MessageBox.Show("No images available for this vehicle", "Gallery", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                // Get all images for this vehicle asynchronously
+                string[] imageUrls = await vehicle.GetAllImageUrlsAsync();
+
+                if (imageUrls == null || imageUrls.Length == 0)
+                {
+                    MessageBox.Show("No images available for this vehicle", "Gallery", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // Create the gallery dialog
+                _galleryDialog = new GalleryDialog();
+                _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Images");
+
+                // Load images
+                _galleryDialog.LoadImages(imageUrls.ToList());
+
+                // Handle close event
+                _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
+
+                // Show the dialog
+                _dialogHost.Children.Clear();
+                _dialogHost.Children.Add(_galleryDialog);
+                _dialogHost.Visibility = Visibility.Visible;
             }
-
-            // Create the gallery dialog
-            _galleryDialog = new GalleryDialog();
-            _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Images");
-
-            // Extract image URLs
-            var imageUrls = vehicleImages.Select(vi => vi.ImagePath).ToList();
-            _galleryDialog.LoadImages(imageUrls);
-
-            // Handle close event
-            _galleryDialog.CloseRequested += GalleryDialog_CloseRequested;
-
-            // Show the dialog
-            _dialogHost.Children.Clear();
-            _dialogHost.Children.Add(_galleryDialog);
-            _dialogHost.Visibility = Visibility.Visible;
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading gallery: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // Hide loading indicator
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
         }
+
 
         private void GalleryDialog_CloseRequested(object sender, EventArgs e)
         {
@@ -179,46 +271,143 @@ namespace WpfApp
             };
         }
 
-        private void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ListViewExploreCars_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Vehicle selectedVehicle = ListViewExploreCars.SelectedItem as Vehicle;
-            DataContext = selectedVehicle;
+            if (selectedVehicle == null) return;
 
-            if (selectedVehicle != null)
+            // Show progress while loading details
+            LoadingProgressBar.Visibility = Visibility.Visible;
+
+            try
             {
-                // Load the primary image for the selected vehicle
-                var vehicleImage = DBEntities.GetContext().VehicleImages
-                    .Where(vi => vi.VehicleID == selectedVehicle.VehicleID)
-                    .FirstOrDefault();
+                DataContext = selectedVehicle;
 
-                if (vehicleImage != null)
-                {
-                    selectedVehicle.VehicleImage = null; // Clear the old binary image
-                    imageVehicle.Source = new System.Windows.Media.Imaging.BitmapImage(new Uri(vehicleImage.ImagePath));
-                }
-                else
-                {
-                    // Load placeholder image
-                    imageVehicle.Source = new System.Windows.Media.Imaging.BitmapImage(
-                        new Uri("pack://application:,,,/Resources/Images/car_placeholder.png"));
-                }
+                // Load the vehicle image asynchronously
+                var imageSource = await selectedVehicle.GetImageSourceAsync();
+                imageVehicle.Source = imageSource;
+
+                // Load reviews
+                await LoadVehicleReviewsAsync(selectedVehicle);
+
+                // Calculate rent cost
+                CalculateRentCost();
             }
-
-            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-            CalculateRentCost();
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading vehicle details: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
         }
 
-        private void UpdateItems()
+        private async Task LoadVehicleReviewsAsync(Vehicle vehicle)
         {
-            var allVehicles = DBEntities.GetContext().Vehicles.ToList().Where(x => x.Available == true);
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    // Load reviews with user information
+                    var reviews = await context.Reviews
+                        .Include(r => r.User)
+                        .Where(r => r.VehicleID == vehicle.VehicleID)
+                        .OrderByDescending(r => r.CreatedAt)
+                        .ToListAsync();
 
+                    // Update the UI with the loaded reviews
+                    ListViewReviews.ItemsSource = reviews;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading reviews: {ex.Message}");
+            }
+        }
+
+
+        private async void UpdateItemsAsync()
+        {
+            LoadingProgressBar.Visibility = Visibility.Visible;
+
+            try
+            {
+                using (var context = new DBEntities())
+                {
+                    // Get all available vehicles (use AsNoTracking for read-only queries)
+                    var query = context.Vehicles
+                        .AsNoTracking()
+                        .Include(v => v.VehicleCategory)
+                        .Include(v => v.VehicleImages)
+                        .Where(x => x.Available == true);
+
+                    // Apply search filter if present
+                    string searchText = TextBoxSearch.Text?.Trim().ToLowerInvariant() ?? "";
+                    if (!string.IsNullOrEmpty(searchText))
+                    {
+                        query = query.Where(x =>
+                            x.Make.ToLower().Contains(searchText) ||
+                            x.Model.ToLower().Contains(searchText) ||
+                            x.Year.ToString().Contains(searchText));
+                    }
+
+                    // Apply category filter if selected
+                    if (ComboBoxFilter.SelectedItem is VehicleCategory selectedCategory)
+                    {
+                        query = query.Where(x => x.VehicleCategoryID == selectedCategory.VehicleCategoryID);
+                    }
+
+                    // Execute the query
+                    var vehicles = await query.ToListAsync();
+
+                    // Apply sorting (which needs to be done in memory)
+                    if (ComboBoxSort.SelectedItem is SortOption selectedSort)
+                    {
+                        vehicles = selectedSort.SortFunction(vehicles).ToList();
+                    }
+
+                    // Update the observable collection
+                    Dispatcher.Invoke(() =>
+                    {
+                        Vehicles.Clear();
+                        foreach (var vehicle in vehicles)
+                        {
+                            Vehicles.Add(vehicle);
+                        }
+
+                        ListViewExploreCars.SelectedIndex = vehicles.Any() ? 0 : -1;
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating vehicles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingProgressBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void ApplyFiltersAndSort(List<Vehicle> vehicles)
+        {
             string searchText = TextBoxSearch.Text?.Trim().ToLowerInvariant() ?? "";
 
-            var filteredItems = allVehicles.Where(x =>
-                (x.Make?.ToLowerInvariant().Contains(searchText) ?? false) ||
-                (x.Model?.ToLowerInvariant().Contains(searchText) ?? false) ||
-                x.Year.ToString().Contains(searchText)).ToList();
+            var filteredItems = vehicles;
 
+            // Apply text search
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                filteredItems = filteredItems
+                    .Where(x =>
+                        (x.Make?.ToLowerInvariant().Contains(searchText) ?? false) ||
+                        (x.Model?.ToLowerInvariant().Contains(searchText) ?? false) ||
+                        x.Year.ToString().Contains(searchText))
+                    .ToList();
+            }
+
+            // Apply category filter
             if (ComboBoxFilter.SelectedItem is VehicleCategory selectedCategory)
             {
                 filteredItems = filteredItems
@@ -226,29 +415,54 @@ namespace WpfApp
                     .ToList();
             }
 
+            // Apply sorting
             if (ComboBoxSort.SelectedItem is SortOption selectedSort)
             {
                 filteredItems = selectedSort.SortFunction(filteredItems).ToList();
             }
 
-            Vehicles = new ObservableCollection<Vehicle>(filteredItems);
-            ListViewExploreCars.ItemsSource = Vehicles;
-            ListViewExploreCars.SelectedIndex = filteredItems.Any() ? 0 : -1;
+            // Update collection on UI thread
+            Dispatcher.Invoke(() =>
+            {
+                Vehicles.Clear();
+                foreach (var vehicle in filteredItems)
+                {
+                    Vehicles.Add(vehicle);
+                }
+
+                ListViewExploreCars.SelectedIndex = filteredItems.Any() ? 0 : -1;
+            });
+
         }
 
+        private System.Windows.Threading.DispatcherTimer _searchTimer;
         private void TextBoxSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
-            UpdateItems();
+            if (_searchTimer != null)
+            {
+                _searchTimer.Stop();
+            }
+            else
+            {
+                _searchTimer = new System.Windows.Threading.DispatcherTimer();
+                _searchTimer.Interval = TimeSpan.FromMilliseconds(300); // 300ms debounce
+                _searchTimer.Tick += (s, args) =>
+                {
+                    _searchTimer.Stop();
+                    UpdateItemsAsync();
+                };
+            }
+            _searchTimer.Start();
         }
 
         private void ComboBoxFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateItems();
+            UpdateItemsAsync();
         }
 
         private void ComboBoxSort_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            UpdateItems();
+            UpdateItemsAsync();
         }
 
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
@@ -256,10 +470,10 @@ namespace WpfApp
             ComboBoxFilter.SelectedIndex = -1;
             ComboBoxSort.SelectedIndex = -1;
             TextBoxSearch.Clear();
-            UpdateItems();
+            UpdateItemsAsync();
         }
 
-        private void ButtonRent_Click(object sender, RoutedEventArgs e)
+        private async void ButtonRent_Click(object sender, RoutedEventArgs e)
         {
             if (!SessionManager.IsLoggedIn)
             {
@@ -275,13 +489,15 @@ namespace WpfApp
                 MessageBox.Show("Администратор не может оформлять аренды.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
-            else
+
+            if (ListViewExploreCars.SelectedItem is Vehicle selectedVehicle &&
+                DatePickerStart.SelectedDate.HasValue &&
+                DatePickerEnd.SelectedDate.HasValue)
             {
-                if (ListViewExploreCars.SelectedItem is Vehicle selectedVehicle &&
-                    DatePickerStart.SelectedDate.HasValue &&
-                    DatePickerEnd.SelectedDate.HasValue)
+                // Use the helper to run with progress
+                await AsyncOperationHelper.RunWithProgressAsync(async () =>
                 {
-                    try
+                    using (var context = new DBEntities())
                     {
                         var booking = new Booking
                         {
@@ -295,8 +511,8 @@ namespace WpfApp
                             CreatedAt = DateTime.Now
                         };
 
-                        DBEntities.GetContext().Bookings.Add(booking);
-                        DBEntities.GetContext().SaveChanges();
+                        context.Bookings.Add(booking);
+                        await context.SaveChangesAsync();
 
                         var payment = new Payment
                         {
@@ -307,20 +523,24 @@ namespace WpfApp
                             CreatedAt = DateTime.Now
                         };
 
-                        DBEntities.GetContext().Payments.Add(payment);
-                        DBEntities.GetContext().SaveChanges();
-
-                        MessageBox.Show("Бронирование отправлено на подтверждение администратору.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                        DatePickerStart.SelectedDate = DatePickerStart.DisplayDateStart;
-                        DatePickerEnd.SelectedDate = null;
-                        ComboBoxInsurance.SelectedIndex = -1;
+                        context.Payments.Add(payment);
+                        await context.SaveChangesAsync();
                     }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Произошла ошибка при оформлении аренды: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
+                    return true;
+                }, LoadingProgressBar, ButtonRent);
+
+                MessageBox.Show("Бронирование отправлено на подтверждение администратору.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // Reset form
+                DatePickerStart.SelectedDate = null;
+                DatePickerEnd.SelectedDate = null;
+                ComboBoxInsurance.SelectedIndex = -1;
+                DatePickerEnd.IsEnabled = false;
+                ComboBoxInsurance.IsEnabled = false;
+                ButtonRent.IsEnabled = false;
+
+                // Refresh available vehicles
+                await LoadVehiclesAsync();
             }
         }
 
@@ -328,7 +548,8 @@ namespace WpfApp
         {
             foreach (var range in DatePickerStart.BlackoutDates)
             {
-                if (DatePickerStart.SelectedDate.Value <= range.End &&
+                if (DatePickerStart.SelectedDate.HasValue &&
+                    DatePickerStart.SelectedDate.Value <= range.End &&
                     DatePickerEnd.SelectedDate.HasValue &&
                     DatePickerEnd.SelectedDate.Value >= range.Start)
                 {
@@ -338,6 +559,7 @@ namespace WpfApp
                 }
             }
         }
+
         private void DatePickerStart_SelectedDateChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DatePickerStart.SelectedDate.HasValue)
@@ -347,7 +569,7 @@ namespace WpfApp
                     DatePickerStart.SelectedDate = DateTime.Today.AddDays(1);
                 }
 
-                if (DatePickerStart.SelectedDate > DatePickerEnd.SelectedDate)
+                if (DatePickerEnd.SelectedDate.HasValue && DatePickerStart.SelectedDate > DatePickerEnd.SelectedDate)
                 {
                     DatePickerEnd.SelectedDate = DatePickerStart.SelectedDate.Value;
                 }
@@ -415,10 +637,12 @@ namespace WpfApp
             }
         }
 
-        private void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        private async void Page_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-            UpdateItems();
+            if (IsVisible)
+            {
+                await LoadVehiclesAsync();
+            }
         }
     }
 }
