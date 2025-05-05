@@ -18,8 +18,8 @@ namespace WpfApp
         public int BookingID { get; set; }
         public decimal Amount { get; set; }
         public Nullable<int> PaymentMethodID { get; set; }
-        public Nullable<int> PaymentStatusID { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public int PaymentStatusID { get; set; }
+        public System.DateTime CreatedAt { get; set; }
     
         public virtual Booking Booking { get; set; }
         public virtual PaymentMethod PaymentMethod { get; set; }

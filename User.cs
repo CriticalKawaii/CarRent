@@ -27,7 +27,7 @@ namespace WpfApp
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public int RoleID { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public System.DateTime CreatedAt { get; set; }
 
         public string FullName
         {

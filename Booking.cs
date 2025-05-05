@@ -37,10 +37,10 @@ namespace WpfApp
         {
             get
             {
-                    using (var context = new DBEntities())
-                    {
-                        return context.Reviews.Any(r => r.UserID == UserID && r.VehicleID == VehicleID);
-                    }
+                using (var context = new DBEntities())
+                {
+                    return context.Reviews.Any(r => r.UserID == UserID && r.VehicleID == VehicleID);
+                }
             }
         }
 

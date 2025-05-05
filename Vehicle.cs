@@ -38,9 +38,8 @@ namespace WpfApp
         public int VehicleCategoryID { get; set; }
         public decimal DailyRate { get; set; }
         public bool Available { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public System.DateTime CreatedAt { get; set; }
         public Nullable<decimal> AvgRating { get; set; }
-
         public string FullName
         {
             get { return $"{Make} {Model} {Year}"; }

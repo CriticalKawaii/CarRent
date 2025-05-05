@@ -19,7 +19,7 @@ namespace WpfApp
         public int UserID { get; set; }
         public int Rating { get; set; }
         public string Comment { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public System.DateTime CreatedAt { get; set; }
     
         public virtual User User { get; set; }
         public virtual Vehicle Vehicle { get; set; }

@@ -52,8 +52,8 @@
           <Property Name="BookingID" Type="int" Nullable="false" />
           <Property Name="Amount" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="PaymentMethodID" Type="int" />
-          <Property Name="PaymentStatusID" Type="int" />
-          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="PaymentStatusID" Type="int" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="PaymentStatuses">
           <Key>
@@ -71,7 +71,7 @@
           <Property Name="UserID" Type="int" Nullable="false" />
           <Property Name="Rating" Type="int" Nullable="false" />
           <Property Name="Comment" Type="nvarchar" MaxLength="500" />
-          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="Roles">
           <Key>
@@ -90,7 +90,7 @@
           <Property Name="Email" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="PasswordHash" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="RoleID" Type="int" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="VehicleCategories">
           <Key>
@@ -119,7 +119,7 @@
           <Property Name="VehicleCategoryID" Type="int" Nullable="false" />
           <Property Name="DailyRate" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="bit" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="AvgRating" Type="decimal" Precision="3" Scale="2" />
         </EntityType>
         <Association Name="FK__Bookings__CarID__49C3F6B7">
@@ -201,7 +201,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Payments__Paymen__5AEE82B9">
-          <End Role="PaymentStatuses" Type="Self.PaymentStatuses" Multiplicity="0..1" />
+          <End Role="PaymentStatuses" Type="Self.PaymentStatuses" Multiplicity="1" />
           <End Role="Payments" Type="Self.Payments" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="PaymentStatuses">
@@ -425,8 +425,8 @@
           <Property Name="BookingID" Type="Int32" Nullable="false" />
           <Property Name="Amount" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="PaymentMethodID" Type="Int32" />
-          <Property Name="PaymentStatusID" Type="Int32" />
-          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="PaymentStatusID" Type="Int32" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Booking" Relationship="Self.FK__Payments__Bookin__534D60F1" FromRole="Payments" ToRole="Bookings" />
           <NavigationProperty Name="PaymentMethod" Relationship="Self.FK__Payments__Paymen__59FA5E80" FromRole="Payments" ToRole="PaymentMethods" />
           <NavigationProperty Name="PaymentStatus" Relationship="Self.FK__Payments__Paymen__5AEE82B9" FromRole="Payments" ToRole="PaymentStatuses" />
@@ -448,7 +448,7 @@
           <Property Name="UserID" Type="Int32" Nullable="false" />
           <Property Name="Rating" Type="Int32" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="User" Relationship="Self.FK__Reviews__UserID__5BE2A6F2" FromRole="Reviews" ToRole="Users" />
           <NavigationProperty Name="Vehicle" Relationship="Self.FK_Reviews_Vehicles" FromRole="Reviews" ToRole="Vehicles" />
         </EntityType>
@@ -470,7 +470,7 @@
           <Property Name="Email" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="RoleID" Type="Int32" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Renter__4AB81AF0" FromRole="Users" ToRole="Bookings" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK__Reviews__UserID__5BE2A6F2" FromRole="Users" ToRole="Reviews" />
           <NavigationProperty Name="Role" Relationship="Self.FK_Users_Roles" FromRole="Users" ToRole="Roles" />
@@ -504,7 +504,7 @@
           <Property Name="VehicleCategoryID" Type="Int32" Nullable="false" />
           <Property Name="DailyRate" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="Boolean" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="AvgRating" Type="Decimal" Precision="3" Scale="2" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Vehicles" ToRole="Bookings" />
           <NavigationProperty Name="Reviews" Relationship="Self.FK_Reviews_Vehicles" FromRole="Vehicles" ToRole="Reviews" />
@@ -590,7 +590,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Payments__Paymen__5AEE82B9">
-          <End Role="PaymentStatuses" Type="Self.PaymentStatus" Multiplicity="0..1" />
+          <End Role="PaymentStatuses" Type="Self.PaymentStatus" Multiplicity="1" />
           <End Role="Payments" Type="Self.Payment" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="PaymentStatuses">
