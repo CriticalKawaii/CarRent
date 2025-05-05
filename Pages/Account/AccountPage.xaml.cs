@@ -601,7 +601,7 @@ namespace WpfApp.Pages
             seriesRevenue.IsValueShownAsLabel = true;
 
             var monthlyRevenue = bookings
-                .GroupBy(b => new { Month = b.CreatedAt.Value.Month, Year = b.CreatedAt.Value.Year })
+                .GroupBy(b => new { Month = b.CreatedAt.Month, Year = b.CreatedAt.Year })
                 .Select(g => new {
                     Period = new DateTime(g.Key.Year, g.Key.Month, 1),
                     Revenue = g.Sum(b => b.TotalCost),

@@ -4,20 +4,20 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="DBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Bookings">
           <Key>
             <PropertyRef Name="BookingID" />
           </Key>
           <Property Name="BookingID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="VehicleID" Type="int" />
-          <Property Name="UserID" Type="int" />
+          <Property Name="VehicleID" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
           <Property Name="StartDate" Type="datetime" Nullable="false" />
           <Property Name="EndDate" Type="datetime" Nullable="false" />
           <Property Name="ReturnDate" Type="datetime" />
           <Property Name="TotalCost" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="StatusID" Type="int" Nullable="false" />
-          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
           <Property Name="InsuranceID" Type="int" />
           <Property Name="ActualCost" Type="decimal" Precision="10" Scale="2" />
         </EntityType>
@@ -35,7 +35,7 @@
           <Property Name="InsuranceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="InsuranceName" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="InsuranceDetails" Type="nvarchar" MaxLength="300" Nullable="false" />
-          <Property Name="InsurancePrice" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="InsurancePrice" Type="decimal" Precision="10" Scale="2" Nullable="false" />
         </EntityType>
         <EntityType Name="PaymentMethods">
           <Key>
@@ -49,7 +49,7 @@
             <PropertyRef Name="PaymentID" />
           </Key>
           <Property Name="PaymentID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="BookingID" Type="int" />
+          <Property Name="BookingID" Type="int" Nullable="false" />
           <Property Name="Amount" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="PaymentMethodID" Type="int" />
           <Property Name="PaymentStatusID" Type="int" />
@@ -67,8 +67,8 @@
             <PropertyRef Name="ReviewID" />
           </Key>
           <Property Name="ReviewID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="VehicleID" Type="int" />
-          <Property Name="UserID" Type="int" />
+          <Property Name="VehicleID" Type="int" Nullable="false" />
+          <Property Name="UserID" Type="int" Nullable="false" />
           <Property Name="Rating" Type="int" Nullable="false" />
           <Property Name="Comment" Type="nvarchar" MaxLength="500" />
           <Property Name="CreatedAt" Type="datetime" />
@@ -116,14 +116,14 @@
           <Property Name="Model" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Year" Type="int" Nullable="false" />
           <Property Name="LicensePlate" Type="nvarchar" MaxLength="20" Nullable="false" />
-          <Property Name="VehicleCategoryID" Type="int" />
+          <Property Name="VehicleCategoryID" Type="int" Nullable="false" />
           <Property Name="DailyRate" Type="decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="bit" Nullable="false" />
           <Property Name="CreatedAt" Type="datetime" />
           <Property Name="AvgRating" Type="decimal" Precision="3" Scale="2" />
         </EntityType>
         <Association Name="FK__Bookings__CarID__49C3F6B7">
-          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="0..1">
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Bookings" Type="Self.Bookings" Multiplicity="*" />
@@ -149,7 +149,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Bookings__Renter__4AB81AF0">
-          <End Role="Users" Type="Self.Users" Multiplicity="0..1">
+          <End Role="Users" Type="Self.Users" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Bookings" Type="Self.Bookings" Multiplicity="*" />
@@ -175,7 +175,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Payments__Bookin__534D60F1">
-          <End Role="Bookings" Type="Self.Bookings" Multiplicity="0..1">
+          <End Role="Bookings" Type="Self.Bookings" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Payments" Type="Self.Payments" Multiplicity="*" />
@@ -213,7 +213,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Reviews__UserID__5BE2A6F2">
-          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
           <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Users">
@@ -237,7 +237,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Vehicles__Catego__4316F928">
-          <End Role="VehicleCategories" Type="Self.VehicleCategories" Multiplicity="0..1" />
+          <End Role="VehicleCategories" Type="Self.VehicleCategories" Multiplicity="1" />
           <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="VehicleCategories">
@@ -249,7 +249,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Reviews_Vehicles">
-          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="0..1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="1" />
           <End Role="Reviews" Type="Self.Reviews" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Vehicles">
@@ -365,7 +365,8 @@
             <End Role="Users" EntitySet="Users" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -374,14 +375,14 @@
             <PropertyRef Name="BookingID" />
           </Key>
           <Property Name="BookingID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="VehicleID" Type="Int32" />
-          <Property Name="UserID" Type="Int32" />
+          <Property Name="VehicleID" Type="Int32" Nullable="false" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
           <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="EndDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="ReturnDate" Type="DateTime" Precision="3" />
           <Property Name="TotalCost" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="StatusID" Type="Int32" Nullable="false" />
-          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="InsuranceID" Type="Int32" />
           <Property Name="ActualCost" Type="Decimal" Precision="10" Scale="2" />
           <NavigationProperty Name="Vehicle" Relationship="Self.FK__Bookings__CarID__49C3F6B7" FromRole="Bookings" ToRole="Vehicles" />
@@ -405,7 +406,7 @@
           <Property Name="InsuranceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="InsuranceName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="InsuranceDetails" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="InsurancePrice" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="InsurancePrice" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <NavigationProperty Name="Bookings" Relationship="Self.FK__Bookings__Insura__68487DD7" FromRole="Insurances" ToRole="Bookings" />
         </EntityType>
         <EntityType Name="PaymentMethod">
@@ -421,7 +422,7 @@
             <PropertyRef Name="PaymentID" />
           </Key>
           <Property Name="PaymentID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="BookingID" Type="Int32" />
+          <Property Name="BookingID" Type="Int32" Nullable="false" />
           <Property Name="Amount" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="PaymentMethodID" Type="Int32" />
           <Property Name="PaymentStatusID" Type="Int32" />
@@ -443,8 +444,8 @@
             <PropertyRef Name="ReviewID" />
           </Key>
           <Property Name="ReviewID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="VehicleID" Type="Int32" />
-          <Property Name="UserID" Type="Int32" />
+          <Property Name="VehicleID" Type="Int32" Nullable="false" />
+          <Property Name="UserID" Type="Int32" Nullable="false" />
           <Property Name="Rating" Type="Int32" Nullable="false" />
           <Property Name="Comment" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
@@ -500,7 +501,7 @@
           <Property Name="Model" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Year" Type="Int32" Nullable="false" />
           <Property Name="LicensePlate" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="VehicleCategoryID" Type="Int32" />
+          <Property Name="VehicleCategoryID" Type="Int32" Nullable="false" />
           <Property Name="DailyRate" Type="Decimal" Precision="10" Scale="2" Nullable="false" />
           <Property Name="Available" Type="Boolean" Nullable="false" />
           <Property Name="CreatedAt" Type="DateTime" Precision="3" />
@@ -511,7 +512,7 @@
           <NavigationProperty Name="VehicleImages" Relationship="Self.FK__VehicleIm__Vehic__5EBF139D" FromRole="Vehicles" ToRole="VehicleImages" />
         </EntityType>
         <Association Name="FK__Bookings__CarID__49C3F6B7">
-          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1">
+          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
@@ -537,7 +538,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Bookings__Renter__4AB81AF0">
-          <End Role="Users" Type="Self.User" Multiplicity="0..1">
+          <End Role="Users" Type="Self.User" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Bookings" Type="Self.Booking" Multiplicity="*" />
@@ -563,7 +564,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Payments__Bookin__534D60F1">
-          <End Role="Bookings" Type="Self.Booking" Multiplicity="0..1">
+          <End Role="Bookings" Type="Self.Booking" Multiplicity="1">
             <OnDelete Action="Cascade" />
           </End>
           <End Role="Payments" Type="Self.Payment" Multiplicity="*" />
@@ -601,7 +602,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Reviews__UserID__5BE2A6F2">
-          <End Role="Users" Type="Self.User" Multiplicity="0..1" />
+          <End Role="Users" Type="Self.User" Multiplicity="1" />
           <End Role="Reviews" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Users">
@@ -613,7 +614,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK_Reviews_Vehicles">
-          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="0..1" />
+          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="1" />
           <End Role="Reviews" Type="Self.Review" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="Vehicles">
@@ -637,7 +638,7 @@
           </ReferentialConstraint>
         </Association>
         <Association Name="FK__Vehicles__Catego__4316F928">
-          <End Role="VehicleCategories" Type="Self.VehicleCategory" Multiplicity="0..1" />
+          <End Role="VehicleCategories" Type="Self.VehicleCategory" Multiplicity="1" />
           <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="VehicleCategories">

@@ -95,7 +95,6 @@
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <!-- Cancel Confirmed Booking -->
                                             <Button x:Name="ButtonCancelBooking"
                                                     Content="Отменить"
                                                     Click="ButtonCancelBooking_Click"
@@ -116,7 +115,6 @@
                                                 </Button.Style>
                                             </Button>
 
-                                            <!-- Withdraw Cancellation -->
                                             <Button x:Name="ButtonWithdrawCancellation"
                                                     Content="Отозвать отмену"
                                                     Click="ButtonWithdrawCancellation_Click"
@@ -137,7 +135,6 @@
                                                 </Button.Style>
                                             </Button>
 
-                                            <!-- Confirm Completion -->
                                             <Button x:Name="ButtonConfirmCompletion"
                                                     Content="Подтвердить сдачу"
                                                     Click="ButtonUserConfirmCompletion_Click"
@@ -163,7 +160,6 @@
                                                 </Button.Style>
                                             </Button>
 
-                                            <!-- Review Button -->
                                             <Button x:Name="ButtonReview"
                                                     Click="ButtonReview_Click">
                                                 <Button.Content>
@@ -301,7 +297,6 @@
 
                         </StackPanel>
                     </materialDesign:ColorZone>
-                    <!-- Pending Payments -->
                     <Grid Grid.Row="2"
                           x:Name="GridPendingPayments">
                         <DataGrid x:Name="DataGridPendingPayments"
@@ -359,7 +354,6 @@
                         </DataGrid>
                     </Grid>
 
-                    <!-- Pending Cancellations -->
                     <Grid Grid.Row="2"
                           x:Name="GridPendingCancellations"
                           Visibility="Collapsed">
@@ -404,7 +398,6 @@
                         </DataGrid>
                     </Grid>
 
-                    <!-- Pending Completions -->
                     <Grid Grid.Row="2"
                           x:Name="GridPendingCompletions"
                           Visibility="Collapsed">
@@ -542,14 +535,12 @@
                         </Grid>
                     </Border>
 
-                    <!-- Report Data Display -->
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- Chart Display -->
                         <WindowsFormsHost Grid.Column="0"
                                           Margin="10">
                             <charts:Chart x:Name="ChartReport">
@@ -560,14 +551,12 @@
                             </charts:Chart>
                         </WindowsFormsHost>
 
-                        <!-- Report Data Grid -->
                         <DataGrid Grid.Column="1"
                                   Name="DataGridReportData"
                                   Width="400"
                                   Margin="0,10,10,10"
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True">
-                            <!-- Columns will be added dynamically in code -->
                         </DataGrid>
                     </Grid>
 

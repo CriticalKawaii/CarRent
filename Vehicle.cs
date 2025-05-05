@@ -29,14 +29,13 @@ namespace WpfApp
             this.Reviews = new HashSet<Review>();
             this.VehicleImages = new HashSet<VehicleImage>();
         }
-
+    
         public int VehicleID { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
-
         public int Year { get; set; }
         public string LicensePlate { get; set; }
-        public Nullable<int> VehicleCategoryID { get; set; }
+        public int VehicleCategoryID { get; set; }
         public decimal DailyRate { get; set; }
         public bool Available { get; set; }
         public Nullable<System.DateTime> CreatedAt { get; set; }
@@ -72,7 +71,7 @@ namespace WpfApp
                         }
                     }
                 }
-                
+
 
                 return _vehicleImageSource;
             }
@@ -88,7 +87,7 @@ namespace WpfApp
                     if (firstImage != null && !string.IsNullOrEmpty(firstImage.ImagePath))
                     {
                         var imageSource = await ImageCache.GetImageAsync(firstImage.ImagePath);
-                        _vehicleImageSource = imageSource; 
+                        _vehicleImageSource = imageSource;
                         return imageSource;
                     }
                 }
@@ -170,7 +169,6 @@ namespace WpfApp
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Booking> Bookings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
@@ -179,5 +177,4 @@ namespace WpfApp
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<VehicleImage> VehicleImages { get; set; }
     }
-
 }

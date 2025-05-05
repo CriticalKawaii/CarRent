@@ -22,14 +22,14 @@ namespace WpfApp
         }
     
         public int BookingID { get; set; }
-        public Nullable<int> VehicleID { get; set; }
-        public Nullable<int> UserID { get; set; }
+        public int VehicleID { get; set; }
+        public int UserID { get; set; }
         public System.DateTime StartDate { get; set; }
         public System.DateTime EndDate { get; set; }
         public Nullable<System.DateTime> ReturnDate { get; set; }
         public decimal TotalCost { get; set; }
         public int StatusID { get; set; }
-        public Nullable<System.DateTime> CreatedAt { get; set; }
+        public System.DateTime CreatedAt { get; set; }
         public Nullable<int> InsuranceID { get; set; }
         public Nullable<decimal> ActualCost { get; set; }
 
@@ -37,14 +37,10 @@ namespace WpfApp
         {
             get
             {
-                if (UserID.HasValue && VehicleID.HasValue)
-                {
                     using (var context = new DBEntities())
                     {
                         return context.Reviews.Any(r => r.UserID == UserID && r.VehicleID == VehicleID);
                     }
-                }
-                return false;
             }
         }
 

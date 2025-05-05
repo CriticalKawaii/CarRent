@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="a94f748047de4dc39d7d3507200185b9" Name="Diagram1" ZoomLevel="85">
+      <Diagram DiagramId="2ada7f110e5a45509d2da0dafc8b1482" Name="Diagram1">
         <EntityTypeShape EntityType="DBModel.Booking" Width="1.5" PointX="5.25" PointY="2.875" IsExpanded="true" />
         <EntityTypeShape EntityType="DBModel.BookingStatus" Width="1.5" PointX="3" PointY="7.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DBModel.Insurance" Width="1.5" PointX="3" PointY="9.625" IsExpanded="true" />
@@ -14,8 +14,8 @@
         <EntityTypeShape EntityType="DBModel.Review" Width="1.5" PointX="8.25" PointY="3.625" IsExpanded="true" />
         <EntityTypeShape EntityType="DBModel.Role" Width="1.5" PointX="0.75" PointY="4.125" IsExpanded="true" />
         <EntityTypeShape EntityType="DBModel.User" Width="1.5" PointX="3" PointY="3.375" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.VehicleCategory" Width="1.5" PointX="0.75" PointY="13.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="DBModel.VehicleImage" Width="1.5" PointX="5.25" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.VehicleCategory" Width="1.5" PointX="0.75" PointY="13.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="DBModel.VehicleImage" Width="1.5" PointX="5.25" PointY="13.25" IsExpanded="true" />
         <EntityTypeShape EntityType="DBModel.Vehicle" Width="1.5" PointX="3" PointY="12.375" IsExpanded="true" />
         <AssociationConnector Association="DBModel.FK__Bookings__CarID__49C3F6B7" ManuallyRouted="false" />
         <AssociationConnector Association="DBModel.FK__Bookings__Insura__68487DD7" ManuallyRouted="false" />

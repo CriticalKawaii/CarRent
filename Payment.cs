@@ -15,7 +15,7 @@ namespace WpfApp
     public partial class Payment
     {
         public int PaymentID { get; set; }
-        public Nullable<int> BookingID { get; set; }
+        public int BookingID { get; set; }
         public decimal Amount { get; set; }
         public Nullable<int> PaymentMethodID { get; set; }
         public Nullable<int> PaymentStatusID { get; set; }

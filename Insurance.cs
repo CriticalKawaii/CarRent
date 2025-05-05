@@ -23,7 +23,7 @@ namespace WpfApp
         public int InsuranceID { get; set; }
         public string InsuranceName { get; set; }
         public string InsuranceDetails { get; set; }
-        public Nullable<decimal> InsurancePrice { get; set; }
+        public decimal InsurancePrice { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Booking> Bookings { get; set; }
