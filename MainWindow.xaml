@@ -28,12 +28,12 @@
         </Grid.ColumnDefinitions>
         <TextBlock Text="RENT-A-CAR"
                    HorizontalAlignment="Center"
+                   VerticalAlignment="Bottom"
                    MouseLeftButtonDown="Window_MouseDown"
                    Margin="40,0"
                    ToolTip="ул. Мира, 42, Сочи, 354375"
                    Foreground="{DynamicResource MaterialDesign.Brush.Secondary}"
                    FontStyle="Italic"
-                   VerticalAlignment="Center"
                    FontWeight="ExtraBlack"
                    Style="{StaticResource MaterialDesignHeadline3TextBlock}" />
 

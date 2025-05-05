@@ -22,32 +22,20 @@ namespace WpfApp
             if (e.ChangedButton == MouseButton.Left) DragMove();
         }
 
-        private void RadioButtonAccount_Checked(object sender, RoutedEventArgs e)
+        private async void RadioButtonAccount_Checked(object sender, RoutedEventArgs e)
         {
-            Dispatcher.InvokeAsync( () => {
                 if (!SessionManager.IsLoggedIn)
                     frameMainWindow?.Navigate(new SignInPage());
                 else
                 {
                     frameMainWindow?.Navigate(new AccountPage());
                 }
-            } );
         }
 
-        private void RadioButtonExplore_Checked(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.InvokeAsync( () => { frameMainWindow?.Navigate(ExploreCarsPage); } );
-            DBEntities.GetContext().ChangeTracker.Entries().ToList().ForEach(X => X.Reload());
-        }
+        private async void RadioButtonExplore_Checked(object sender, RoutedEventArgs e) => frameMainWindow?.Navigate(ExploreCarsPage);
 
-        private void frameMainWindow_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
-        {
-            LoadingProgressBar.Visibility = Visibility.Collapsed;
-        }
-
-        private void frameMainWindow_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
-        {
-            LoadingProgressBar.Visibility = Visibility.Visible;
-        }
+        private async void frameMainWindow_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e) => LoadingProgressBar.Visibility = Visibility.Collapsed;
+        
+        private void frameMainWindow_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e) => LoadingProgressBar.Visibility = Visibility.Visible;
     }
 }

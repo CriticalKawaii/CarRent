@@ -48,7 +48,6 @@ namespace WpfApp
             Loaded += ExploreCarsPage_Loaded;
             imageVehicle.MouseLeftButtonDown += ImageVehicle_MouseLeftButtonDown;
 
-            // Initialize dialog host
             _dialogHost = new Grid();
             _dialogHost.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(150, 0, 0, 0));
@@ -71,7 +70,6 @@ namespace WpfApp
             
             await LoadVehiclesAsync();
             await LoadInsurancesAsync();
-            await LoadBlackoutDatesAsync();
 
             LoadingProgressBar.Visibility = Visibility.Collapsed;
         }
@@ -88,7 +86,7 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading vehicle categories: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке категорий транспортных средств: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -104,18 +102,25 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading insurances: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке страховок: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async Task LoadBlackoutDatesAsync()
+        private async Task LoadBlackoutDatesAsync(int vehicleId)
         {
             try
             {
+                DatePickerStart.BlackoutDates.Clear();
+                DatePickerEnd.BlackoutDates.Clear();
+
+                DateTime today = DateTime.Today;
+                DatePickerStart.BlackoutDates.Add(new CalendarDateRange(DateTime.MinValue, today));
+                DatePickerEnd.BlackoutDates.Add(new CalendarDateRange(DateTime.MinValue, today));
+
                 using (var context = new DBEntities())
                 {
                     var confirmedBookings = await context.Bookings
-                        .Where(x => x.BookingStatus.BookingStatus1 == "Confirmed")
+                        .Where(x => x.BookingStatus.BookingStatus1 == "Confirmed" && x.VehicleID == vehicleId)
                         .ToListAsync();
 
                     foreach (var booking in confirmedBookings)
@@ -130,9 +135,10 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading booking dates: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке дат бронирования: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
 
         private async Task LoadVehiclesAsync()
         {
@@ -154,7 +160,7 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading vehicles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка загрузки транспортных средств: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -182,12 +188,12 @@ namespace WpfApp
 
                 if (imageUrls == null || imageUrls.Length == 0)
                 {
-                    MessageBox.Show("No images available for this vehicle", "Gallery", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Нет изображений для этого автомобиля", "Галерея", MessageBoxButton.OK, MessageBoxImage.Information);
                     return;
                 }
 
                 _galleryDialog = new GalleryDialog();
-                _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Images");
+                _galleryDialog.SetTitle($"{vehicle.Make} {vehicle.Model} {vehicle.Year} - Изображения");
 
                 _galleryDialog.LoadImages(imageUrls.ToList());
 
@@ -199,7 +205,7 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading gallery: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке галереи: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -279,11 +285,14 @@ namespace WpfApp
 
                 await LoadVehicleReviewsAsync(selectedVehicle);
 
+                DatePickerStart.SelectedDate = null;
+                DatePickerEnd.SelectedDate = null;
+                await LoadBlackoutDatesAsync(selectedVehicle.VehicleID);
                 CalculateRentCost();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading vehicle details: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при загрузке данных о транспортном средстве: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -308,7 +317,7 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading reviews: {ex.Message}");
+                Console.WriteLine($"Ошибка при загрузке отзывов: {ex.Message}");
             }
         }
 
@@ -368,7 +377,7 @@ namespace WpfApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating vehicles: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка обновления транспортных средств: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -437,15 +446,9 @@ namespace WpfApp
             _searchTimer.Start();
         }
 
-        private void ComboBoxFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            UpdateItemsAsync();
-        }
+        private void ComboBoxFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateItemsAsync();
 
-        private void ComboBoxSort_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            UpdateItemsAsync();
-        }
+        private void ComboBoxSort_SelectionChanged(object sender, SelectionChangedEventArgs e) => UpdateItemsAsync();
 
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
@@ -510,7 +513,7 @@ namespace WpfApp
                     return true;
                 }, LoadingProgressBar, ButtonRent);
 
-                MessageBox.Show("Бронирование отправлено на подтверждение администратору.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Бронирование отправлено на подтверждение.", "Заявка отправлена", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 DatePickerStart.SelectedDate = null;
                 DatePickerEnd.SelectedDate = null;
@@ -594,10 +597,7 @@ namespace WpfApp
             CalculateRentCost();
         }
 
-        private void ComboBoxInsurance_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            CalculateRentCost();
-        }
+        private void ComboBoxInsurance_SelectionChanged(object sender, SelectionChangedEventArgs e) => CalculateRentCost();
 
         private void CalculateRentCost()
         {

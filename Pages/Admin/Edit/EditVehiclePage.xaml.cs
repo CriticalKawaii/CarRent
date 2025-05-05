@@ -215,11 +215,6 @@ namespace WpfApp.Pages.Admin.Edit
                 SavePanel.IsEnabled = true;
             }
         }
-
-        private void ButtonGoBack_Click(object sender, RoutedEventArgs e)
-        {
-            NavigationService.GoBack();
-        }
-
+        private void ButtonGoBack_Click(object sender, RoutedEventArgs e) => NavigationService.GoBack();
     }
 }
