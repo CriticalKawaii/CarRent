@@ -275,23 +275,19 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0"
-                                Margin="10">
-                        <TextBlock Text="Тип отчета:"
-                                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                                   Margin="0,0,0,10" />
-                        <ComboBox Name="ComboBoxReportType"
-                                  Style="{StaticResource OutlinedComboBox}"
-                                  SelectionChanged="ComboBoxReportType_SelectionChanged"
-                                  Margin="0,0,0,10"
-                                  Width="300"
-                                  HorizontalAlignment="Left">
-                            <ComboBoxItem Content="Активность пользователей" />
-                            <ComboBoxItem Content="Финансовый отчет" />
-                            <ComboBoxItem Content="Популярность категорий транспорта" />
-                            <ComboBoxItem Content="Эффективность транспорта" />
-                        </ComboBox>
-                    </StackPanel>
+
+                    <ComboBox Name="ComboBoxReportType"
+                              Style="{StaticResource OutlinedComboBox}"
+                              materialDesign:HintAssist.Hint="Тип отчета"
+                              SelectionChanged="ComboBoxReportType_SelectionChanged"
+                              Margin="10"
+                              Width="300"
+                              HorizontalAlignment="Left">
+                        <ComboBoxItem Content="Активность пользователей" />
+                        <ComboBoxItem Content="Финансовый отчет" />
+                        <ComboBoxItem Content="Популярность категорий транспорта" />
+                        <ComboBoxItem Content="Эффективность транспорта" />
+                    </ComboBox>
 
                     <Border Grid.Row="1"
                             BorderBrush="{DynamicResource MaterialDesignDivider}"
