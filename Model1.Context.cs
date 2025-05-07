@@ -26,11 +26,8 @@ namespace WpfApp
             return _context;
         }
 
-        public DBEntities()
-            : base("name=DBEntities")
-        {
-        }
-    
+        public DBEntities(): base("name=DBEntities"){}
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();

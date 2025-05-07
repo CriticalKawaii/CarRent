@@ -126,6 +126,7 @@ namespace WpfApp.Pages
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
         private async Task LoadAccountDataAsync()
         {
             if (SessionManager.CurrentUser != null)
@@ -1173,7 +1174,7 @@ namespace WpfApp.Pages
             if (radioButton == ToggleButtonPendingPayments && GridPendingPayments != null)
             {
                 GridPendingPayments.Visibility = Visibility.Visible;
-                LoadPendingPaymentsAsync(DBEntities.GetContext());
+                 LoadPendingPaymentsAsync(DBEntities.GetContext());
             }
             else if (radioButton == ToggleButtonPendingCancellations && GridPendingCancellations != null)
             {

@@ -362,13 +362,13 @@
                                   IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID"
-                                                    Binding="{Binding BookingID}"
+                                                    Binding="{Binding Booking.BookingID}"
                                                     Width="50" />
                                 <DataGridTextColumn Header="Пользователь"
-                                                    Binding="{Binding User.FullName}"
+                                                    Binding="{Binding Booking.User.FullName}"
                                                     Width="*" />
                                 <DataGridTextColumn Header="Автомобиль"
-                                                    Binding="{Binding Vehicle.FullName}"
+                                                    Binding="{Binding Booking.Vehicle.FullName}"
                                                     Width="*" />
                                 <DataGridTextColumn Header="Даты"
                                                     Width="150">
@@ -406,13 +406,13 @@
                                   IsReadOnly="True">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID"
-                                                    Binding="{Binding BookingID}"
+                                                    Binding="{Binding Booking.BookingID}"
                                                     Width="50" />
                                 <DataGridTextColumn Header="Пользователь"
-                                                    Binding="{Binding User.FullName}"
+                                                    Binding="{Binding Booking.User.FullName}"
                                                     Width="*" />
                                 <DataGridTextColumn Header="Автомобиль"
-                                                    Binding="{Binding Vehicle.FullName}"
+                                                    Binding="{Binding Booking.Vehicle.FullName}"
                                                     Width="*" />
                                 <DataGridTemplateColumn Header="Дата сдачи"
                                                         Width="150">
