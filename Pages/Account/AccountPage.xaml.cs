@@ -1005,7 +1005,7 @@ namespace WpfApp.Pages
                 dateRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
 
                 ChartReport.SaveImage(System.IO.Path.GetTempPath() + "tempChart.png", System.Drawing.Imaging.ImageFormat.Png);
-                Excel.Range chartRange = worksheet.Range["A4:E20"];
+                Excel.Range chartRange = worksheet.Range["A4:K20"];
                 worksheet.Shapes.AddPicture(
                     System.IO.Path.GetTempPath() + "tempChart.png",
                     Microsoft.Office.Core.MsoTriState.msoFalse,
