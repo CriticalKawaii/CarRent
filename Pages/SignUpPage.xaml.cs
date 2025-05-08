@@ -55,7 +55,17 @@ namespace WpfApp
 
             using (var db = new DBEntities())
             {
-                var user = db.Users.AsNoTracking().FirstOrDefault(u => u.Email == email);
+                User user;
+                try
+                {
+                    user = db.Users.AsNoTracking().FirstOrDefault(u => u.Email == email);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Проверьте подключение к интернету: {ex.Message}", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+
                 if (user != null)
                 {
                     if (!skip)
@@ -73,7 +83,7 @@ namespace WpfApp
                     errors.Add("Фамилия может содержать только буквы, дефисы и пробелы.");
 
                 if (password.Length < 6)
-                { errors.Add("Пароль должен быть больше 6 символов"); }
+                { errors.Add("Пароль должен быть длиннее 6 символов"); }
                 if (!Regex.IsMatch(password, @"^[a-zA-Z0-9]+$"))
                 { errors.Add("Пароль должен быть на английском языке и содержать только буквы и цифры"); }
                 if (!password.Any(char.IsDigit))

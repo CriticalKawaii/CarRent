@@ -124,6 +124,7 @@
     <Compile Include="RegistrationTestCases.cs" />
     <Compile Include="AuthorizationTestCases.cs" />
     <Compile Include="SuccsessfulAuthorizationTest.cs" />
+    <Compile Include="WpfTestBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

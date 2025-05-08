@@ -100,7 +100,16 @@ namespace WpfApp
 
             using (var db = new DBEntities())
             {
-                var user = db.Users.AsNoTracking().FirstOrDefault(u => u.Email.Trim() == email && u.PasswordHash.Trim() == hashPassword);
+                User user;
+                try
+                {
+                    user = db.Users.AsNoTracking().FirstOrDefault(u => u.Email.Trim() == email && u.PasswordHash.Trim() == hashPassword);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Проверьте подключение к интернету: {ex.Message}", "Ошибка!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
 
                 if (user == null)
                 {

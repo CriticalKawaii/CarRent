@@ -6,24 +6,17 @@ using WpfApp;
 
 namespace UnitTestProject
 {
-    [TestClass]
     public class SuccsessfulAuthorizationTest
     {
         [TestInitialize]
         public void Setup()
         {
             if (Application.Current == null)
-            {
                 new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
-            }
-
             Application.Current.Resources.MergedDictionaries.Clear();
             Application.Current.Resources.MergedDictionaries.Add(new ResourceDictionary
-            {
-                Source = new Uri("pack://application:,,,/WpfApp;component/ResourceDictionaries/RentACarStyle.xaml")
-            });
+                {Source = new Uri("pack://application:,,,/WpfApp;component/ResourceDictionaries/RentACarStyle.xaml")});
         }
-
         private List<(string Email, string Password)> testUsers = new List<(string, string)>
         {
             ("Admin", "12345678"),         // Администратор (уже есть в БД)
@@ -32,18 +25,12 @@ namespace UnitTestProject
             ("test2@email.com", "Password2"),
             ("test3@email.com", "Password3"),
         };
-
-        [TestMethod]
-        [TestCategory("Succsessful Authorization Test Across All Users")]
+        [TestMethod][TestCategory("Succsessful Authorization Test Across All Users")]
         public void AuthTestSuccess()
         {
             var signInPage = new SignInPage();
-
             foreach (var (Email, Password) in testUsers)
-            {
-                bool authorized = signInPage.Authorize(Email, Password, skip: true);
-                Assert.IsTrue(authorized, $"Ошибка авторизации {Email}");
-            }
+                Assert.IsTrue(signInPage.Authorize(Email, Password, skip: true), $"Ошибка авторизации {Email}");
         }
     }
 }
