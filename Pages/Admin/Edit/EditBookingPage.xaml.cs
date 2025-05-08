@@ -53,7 +53,7 @@ namespace WpfApp.Pages.Admin.Edit
                 errors.AppendLine("Выберите дату начала!");
             if (_booking.EndDate == null || _booking.EndDate == default)
                 errors.AppendLine("Выберите дату окончания!");
-            if (_booking.StartDate >= _booking.EndDate)
+            if (_booking.StartDate > _booking.EndDate)
                 errors.AppendLine("Дата окончания должна быть позже даты начала!");
             if (_booking.TotalCost <= 0)
                 errors.AppendLine("Введите корректную стоимость!");

@@ -86,6 +86,7 @@
                       DisplayMemberPath="InsuranceName"
                       SelectedItem="{Binding Insurance}"
                       Grid.Row="7"
+                      materialDesign:TextFieldAssist.HasClearButton="True"
                       Margin="0,0,0,10"
                       materialDesign:HintAssist.Hint="Страховка"
                       Style="{StaticResource FloatingHintComboBox}" />

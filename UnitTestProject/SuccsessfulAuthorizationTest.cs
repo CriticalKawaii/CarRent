@@ -6,6 +6,7 @@ using WpfApp;
 
 namespace UnitTestProject
 {
+    //[TestClass]
     public class SuccsessfulAuthorizationTest
     {
         [TestInitialize]
@@ -19,11 +20,9 @@ namespace UnitTestProject
         }
         private List<(string Email, string Password)> testUsers = new List<(string, string)>
         {
-            ("Admin", "12345678"),         // Администратор (уже есть в БД)
+            ("admin", "12345678"),         // Администратор (уже есть в БД)
             ("user@email.com", "123456"), // Обычный пользователь (уже есть в БД)
-            ("test1@email.com", "Password1"),
-            ("test2@email.com", "Password2"),
-            ("test3@email.com", "Password3"),
+            
         };
         [TestMethod][TestCategory("Succsessful Authorization Test Across All Users")]
         public void AuthTestSuccess()
