@@ -31,7 +31,28 @@ namespace WpfApp
                 {
                     e.Handled = true;
 
-                    Process.Start("guide.chm");
+                    string tempFilePath = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(),
+                "guide.chm");
+
+                    var resourceStream = Application.GetResourceStream(
+                        new Uri("pack://application:,,,/guide.chm"));
+
+                    if (resourceStream != null)
+                    {
+                        using (var fileStream = new System.IO.FileStream(tempFilePath,
+                               System.IO.FileMode.Create))
+                        {
+                            resourceStream.Stream.CopyTo(fileStream);
+                        }
+
+                        Process.Start(tempFilePath);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Справочный файл не найден в ресурсах приложения.",
+                            "Файл не найден", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -375,7 +375,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\Guide\guide.chm" />
+    <Resource Include="guide.chm" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
