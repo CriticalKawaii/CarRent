@@ -9,6 +9,7 @@
         Background="{DynamicResource MaterialDesign.Brush.Primary}"
         Style="{StaticResource MaterialDesignWindow}"
         FontFamily="{materialDesign:MaterialDesignFont}"
+        KeyDown="Window_KeyDown"
         Title="RENT-A-CAR"
         Height="700"
         MinHeight="700"
