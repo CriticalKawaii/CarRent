@@ -15,6 +15,14 @@ using WpfApp.Pages;
 
 namespace WpfApp
 {
+    /// <summary>
+    /// Represents the sign-in page for user authentication.
+    /// </summary>
+    /// <remarks>
+    /// This page handles user authentication with email and password,
+    /// implements CAPTCHA verification after failed attempts,
+    /// and provides password reveal functionality.
+    /// </remarks>
     public partial class SignInPage : Page
     {
         public MainWindow MainWindow {get; set;}
@@ -33,13 +41,26 @@ namespace WpfApp
             MainWindow = Application.Current.MainWindow as MainWindow;
         }
 
-        private static string GetHash(string password)
+        /// <summary>
+        /// Generates a SHA1 hash from the provided password.
+        /// </summary>
+        /// <param name="String">The password to hash.</param>
+        /// <returns>A hexadecimal string representation of the SHA1 hash.</returns>
+        private static string GetHash(string String)
         {
             using (var hash = SHA1.Create())
             {
-                return string.Concat(hash.ComputeHash(Encoding.UTF8.GetBytes(password)).Select(s => s.ToString("X2")));
+                return string.Concat(hash.ComputeHash(Encoding.UTF8.GetBytes(String)).Select(s => s.ToString("X2")));
             }
         }
+
+        /// <summary>
+        /// Generates a new CAPTCHA image with random alphanumeric text.
+        /// </summary>
+        /// <remarks>
+        /// Creates a 5-character CAPTCHA string from uppercase letters and numbers,
+        /// renders it as an image with interference lines, and displays it in the UI.
+        /// </remarks>
         private void GenerateCaptcha()
         {
             var rand = new Random();
@@ -81,6 +102,15 @@ namespace WpfApp
             });
         }
 
+        /// <summary>
+        /// Authenticates a user with the provided credentials.
+        /// </summary>
+        /// <param name="email">The user's email address.</param>
+        /// <param name="password">The user's password (plain text).</param>
+        /// <param name="captchaInputText">The CAPTCHA input text (required after 3 failed attempts).</param>
+        /// <param name="skip">If true, skips UI notifications and navigation.</param>
+        /// <returns>True if authentication is successful; otherwise, false.</returns>
+        /// <exception cref="Exception">Thrown when database connection fails.</exception>
         public bool Authorize(string email, string password, string captchaInputText = "", bool skip = false)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
@@ -138,7 +168,6 @@ namespace WpfApp
             if (MainWindow != null)
                 MainWindow.RadioButtonAccountIcon.Kind = PackIconKind.Account;
         }
-
 
         private void RefreshCaptcha_Click(object sender, RoutedEventArgs e)
         {

@@ -64,18 +64,18 @@ namespace WpfApp
 
         private async void RadioButtonAccount_Checked(object sender, RoutedEventArgs e)
         {
-                if (!SessionManager.IsLoggedIn)
-                    frameMainWindow?.Navigate(new SignInPage());
-                else
-                {
-                    frameMainWindow?.Navigate(new AccountPage());
-                }
+            if (!SessionManager.IsLoggedIn)
+                frameMainWindow?.Navigate(new SignInPage());
+            else
+            {
+                frameMainWindow?.Navigate(new AccountPage());
+            }
         }
 
         private async void RadioButtonExplore_Checked(object sender, RoutedEventArgs e) => frameMainWindow?.Navigate(ExploreCarsPage);
 
         private async void frameMainWindow_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e) => LoadingProgressBar.Visibility = Visibility.Collapsed;
-        
+
         private void frameMainWindow_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e) => LoadingProgressBar.Visibility = Visibility.Visible;
     }
 }
